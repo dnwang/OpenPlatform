@@ -1,7 +1,7 @@
 package com.iflytek.platform;
 
-import com.iflytek.platform.callbacks.OnLoginListener;
-import com.iflytek.platform.callbacks.OnShareListener;
+import android.content.Context;
+
 import com.iflytek.platform.entity.ShareContent;
 
 /**
@@ -14,7 +14,12 @@ import com.iflytek.platform.entity.ShareContent;
  * @version 8/11/16,22:55
  * @see
  */
-final class SinaWeibo extends SocialPlatform {
+final class SinaWeibo extends Platform implements Socialize {
+
+    @Override
+    void initialize(Context context) {
+
+    }
 
     @Override
     public void share(ShareContent content, OnShareListener listener) {
@@ -23,11 +28,6 @@ final class SinaWeibo extends SocialPlatform {
 
     @Override
     public void login(OnLoginListener listener) {
-
-    }
-
-    @Override
-    public void onRegister() {
 
     }
 

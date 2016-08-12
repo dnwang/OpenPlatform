@@ -18,18 +18,8 @@ interface ActivityLifecycleCallbacks {
 
     void onCreate(Activity activity, Bundle bundle);
 
-    void onStart(Activity activity);
-
-    void onResume(Activity activity);
-
-    void onPause(Activity activity);
-
-    void onStop(Activity activity);
-
-    void onSaveInstanceState(Activity activity, Bundle bundle);
+    void onNewIntent(Activity activity, Intent intent);
 
     void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data);
-
-    void onDestroy(Activity activity);
 
 }
