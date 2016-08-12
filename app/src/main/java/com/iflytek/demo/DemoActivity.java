@@ -7,10 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.iflytek.platform.PlatformType;
+import com.iflytek.platform.Platform;
 import com.iflytek.platform.PlatformHelper;
-import com.iflytek.platform.LifecycleDispatcher;
-import com.iflytek.platform.Socialize;
 import com.iflytek.platform.entity.ShareContent;
 
 /**
@@ -28,8 +26,26 @@ public class DemoActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LifecycleDispatcher.onCreate(this, savedInstanceState);
         setContentView(getContentView());
+
+        PlatformHelper.INSTANCE.initialize(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        PlatformHelper.INSTANCE.onNewIntent(intent);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        PlatformHelper.INSTANCE.onActivityResult(requestCode, resultCode, data);
     }
 
     private View getContentView() {
@@ -38,6 +54,7 @@ public class DemoActivity extends Activity implements View.OnClickListener {
         final String[] titles = new String[]{"qq", "qzone", "weixin", "weixinfriend", "weibo"};
         for (String title : titles) {
             Button btn = new Button(this);
+            btn.setOnClickListener(this);
             btn.setText(title);
             btn.setTag(title);
             container.addView(btn, -1, -2);
@@ -46,25 +63,12 @@ public class DemoActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        LifecycleDispatcher.onNewIntent(this, intent);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        LifecycleDispatcher.onActivityResult(this, requestCode, resultCode, data);
-    }
-
-    @Override
     public void onClick(View view) {
         final String tag = String.valueOf(view.getTag());
 
-        PlatformHelper.INSTANCE.share(this, PlatformType.WEIBO, new ShareContent(), new Socialize.OnShareListener() {
-
+        PlatformHelper.INSTANCE.getPlatform(Platform.Type.WEIBO).share(this, new ShareContent(), new Platform.Callback() {
             @Override
-            public void onComplete(PlatformType platformType, boolean isSuccess, String msg) {
+            public void call(boolean isSuccess, String msg, int code) {
 
             }
         });

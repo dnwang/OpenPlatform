@@ -1,6 +1,12 @@
 package com.iflytek.platform;
 
-import com.iflytek.platform.callbacks.OnPayListener;
+import android.content.Context;
+
+import com.iflytek.platform.entity.AccountInfo;
+import com.iflytek.platform.entity.PayInfo;
+import com.iflytek.platform.entity.ShareContent;
+
+import java.util.List;
 
 /**
  * Copyright (C), 2016 <br>
@@ -12,16 +18,29 @@ import com.iflytek.platform.callbacks.OnPayListener;
  * @version 8/11/16,22:55
  * @see
  */
-final class AliPay extends PaymentPlatform {
+final class AliPay extends Platform {
 
-    @Override
-    public void pay(Object object, OnPayListener listener) {
-        // TODO: 8/11/16
+    public AliPay(Context context) {
+        super(context);
     }
 
     @Override
-    public void onRegister() {
-        // TODO: 8/11/16
+    public void pay(Context context, PayInfo payInfo, Callback callback) {
+
     }
 
+    @Override
+    public void share(Context context, ShareContent content, Callback callback) {
+
+    }
+
+    @Override
+    public void login(Context context, Callback2<AccountInfo> callback) {
+
+    }
+
+    @Override
+    public void getFriends(Context context, Callback2<List<AccountInfo>> callback) {
+
+    }
 }

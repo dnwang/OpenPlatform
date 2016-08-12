@@ -1,13 +1,11 @@
 package com.iflytek.platform;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.iflytek.platform.entity.PayInfo;
-import com.iflytek.platform.entity.ShareContent;
-
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,55 +18,102 @@ import java.util.Map;
  * @version 8/11/16,20:30
  * @see
  */
-public enum PlatformHelper {
+public enum PlatformHelper implements ActivityLifecycleCallbacks {
 
     INSTANCE;
 
-    final ActivityLifecycleCallbacks lifecycleCallbacks = new ActivityLifecycleCallbacks() {
+    Map<Platform.Type, Platform> platformMap;
 
-        private Context context;
-
-        @Override
-        public void onCreate(Activity activity, Bundle bundle) {
-
-        }
-
-        @Override
-        public void onNewIntent(Activity activity, Intent intent) {
-
-        }
-
-        @Override
-        public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-
-        }
-    };
-
-    private Platform handlePlatform;
-
-    private Map<PlatformType, Platform> platforms;
+    PlatformHelper() {
+        platformMap = new HashMap<>();
+    }
 
     public void initialize(Context context) {
-        
-
-
-    }
-
-    public void share(Context context, PlatformType platformType, ShareContent content, Socialize.OnShareListener listener) {
-        Platform platform = platforms.get(platformType);
-
-        if (null != platform && platform instanceof Socialize) {
-            ((Socialize)platform).share(content, listener);
-            handlePlatform = platform;
+        for (Platform.Type type : Platform.Type.values()) {
+            try {
+                Platform platform = type.clazz.getConstructor(Context.class).newInstance(context);
+                platformMap.put(type, platform);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void login(Context context, PlatformType platformType, Socialize.OnLoginListener listener) {
-
+    public Platform getPlatform(Platform.Type type) {
+        return platformMap.get(type);
     }
 
-    public void pay(Context context, PlatformType platformType, PayInfo payInfo, Payable.OnPayListener listener) {
 
+    @Override
+    public void onCreate(Bundle bundle) {
+        final Collection<Platform> platforms = platformMap.values();
+        for (Platform platform : platforms) {
+            platform.onCreate(bundle);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        final Collection<Platform> platforms = platformMap.values();
+        for (Platform platform : platforms) {
+            platform.onStart();
+        }
+    }
+
+    @Override
+    public void onRestart() {
+        final Collection<Platform> platforms = platformMap.values();
+        for (Platform platform : platforms) {
+            platform.onRestart();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        final Collection<Platform> platforms = platformMap.values();
+        for (Platform platform : platforms) {
+            platform.onResume();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        final Collection<Platform> platforms = platformMap.values();
+        for (Platform platform : platforms) {
+            platform.onStop();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        final Collection<Platform> platforms = platformMap.values();
+        for (Platform platform : platforms) {
+            platform.onDestroy();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        final Collection<Platform> platforms = platformMap.values();
+        for (Platform platform : platforms) {
+            platform.onSaveInstanceState(bundle);
+        }
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        final Collection<Platform> platforms = platformMap.values();
+        for (Platform platform : platforms) {
+            platform.onNewIntent(intent);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        final Collection<Platform> platforms = platformMap.values();
+        for (Platform platform : platforms) {
+            platform.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
 }
