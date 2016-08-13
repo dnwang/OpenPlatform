@@ -1,5 +1,6 @@
 package com.iflytek.platform;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -15,22 +16,22 @@ import android.os.Bundle;
  */
 interface ActivityLifecycleCallbacks {
 
-    void onCreate(Bundle bundle);
+    void onCreate(Activity activity, Bundle bundle);
 
-    void onStart();
+    void onStart(Activity activity);
 
-    void onRestart();
+    void onRestart(Activity activity);
 
-    void onResume();
+    void onResume(Activity activity);
 
-    void onStop();
+    void onStop(Activity activity);
 
-    void onDestroy();
+    void onDestroy(Activity activity);
 
-    void onSaveInstanceState(Bundle bundle);
+    void onSaveInstanceState(Activity activity, Bundle bundle);
 
-    void onNewIntent(Intent intent);
+    void onNewIntent(Activity activity, Intent intent);
 
-    void onActivityResult(int requestCode, int resultCode, Intent data);
+    void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data);
 
 }

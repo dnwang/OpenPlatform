@@ -12,17 +12,11 @@ import com.iflytek.platform.entity.PayInfo;
  * <br>
  *
  * @author dnwang
- * @version 8/11/16,22:55
+ * @version 8/13/16,08:06
  * @see
  */
-final class AliPay extends Platform implements Payable {
+interface Payable {
 
-    public AliPay(Context context) {
-        super(context);
-    }
+    void pay(Context context, PayInfo payInfo, Callback callback);
 
-    @Override
-    public void pay(Context context, PayInfo payInfo, Callback callback) {
-
-    }
 }

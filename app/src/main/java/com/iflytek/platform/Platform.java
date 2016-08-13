@@ -1,14 +1,9 @@
 package com.iflytek.platform;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.iflytek.platform.entity.AccountInfo;
-import com.iflytek.platform.entity.PayInfo;
-import com.iflytek.platform.entity.ShareContent;
-
-import java.util.List;
 
 /**
  * Copyright (C), 2016 <br>
@@ -25,6 +20,10 @@ public abstract class Platform implements ActivityLifecycleCallbacks {
     public enum Type {
 
         WEIBO(SinaWeibo.class),
+        QQ(TencentQQ.class),
+        QZone(TencentQZone.class),
+        WEIXIN(Weixin.class),
+        WEIXIN_CIRCLE(WeixinCircle.class),
         ALIPAY(AliPay.class);
 
         Class<? extends Platform> clazz;
@@ -34,70 +33,52 @@ public abstract class Platform implements ActivityLifecycleCallbacks {
         }
     }
 
-    public interface Callback {
-        void call(boolean isSuccess, String msg, int code);
-    }
-
-    public interface Callback2<T> {
-        void call(T t, boolean isSuccess, String msg, int code);
-    }
-
-    public abstract void pay(Context context, PayInfo payInfo, Callback callback);
-
-    public abstract void share(Context context, ShareContent content, Callback callback);
-
-    public abstract void login(Context context, Callback2<AccountInfo> callback);
-
-    public abstract void getFriends(Context context, Callback2<List<AccountInfo>> Callback);
-
     public Platform(Context context) {
 
     }
 
-
     @Override
-    public void onCreate(Bundle bundle) {
+    public void onCreate(Activity activity, Bundle bundle) {
 
     }
 
     @Override
-    public void onStart() {
+    public void onStart(Activity activity) {
 
     }
 
     @Override
-    public void onRestart() {
+    public void onRestart(Activity activity) {
 
     }
 
     @Override
-    public void onResume() {
+    public void onResume(Activity activity) {
 
     }
 
     @Override
-    public void onStop() {
+    public void onStop(Activity activity) {
 
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy(Activity activity) {
 
     }
 
     @Override
-    public void onSaveInstanceState(Bundle bundle) {
+    public void onSaveInstanceState(Activity activity, Bundle bundle) {
 
     }
 
     @Override
-    public void onNewIntent(Intent intent) {
+    public void onNewIntent(Activity activity, Intent intent) {
 
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 
     }
-
 }
