@@ -76,7 +76,6 @@ public final class Weixin extends Platform implements Socialize {
     public Weixin(Context context) {
         super(context);
         wxApi = WXAPIFactory.createWXAPI(context, APP_ID);
-        wxApi.registerApp(APP_ID);
     }
 
     @Override
@@ -104,8 +103,7 @@ public final class Weixin extends Platform implements Socialize {
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         req.transaction = String.valueOf(System.currentTimeMillis());
         req.message = message;
-//        req.scene = SendMessageToWX.Req.WXSceneTimeline;//朋友圈;
-        req.scene = SendMessageToWX.Req.WXSceneSession;
+        req.scene = SendMessageToWX.Req.WXSceneSession;//WXSceneTimeline朋友圈
 
         wxApi.sendReq(req);
         this.callback = callback;

@@ -28,9 +28,9 @@ public class DemoActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(getContentView());
         // lifecycle back
         PlatformHelper.INSTANCE.onCreate(this, savedInstanceState);
-        setContentView(getContentView());
     }
 
     private View getContentView() {
@@ -65,12 +65,12 @@ public class DemoActivity extends Activity implements View.OnClickListener {
         final Platform.Type type = (Platform.Type) view.getTag();
 
         final ShareContent content = new ShareContent();
-        content.content = "test share message, fuck";
+        content.content = "test";
         content.imageUrl = "http://www.weipet.cn/common/images/pic/a347.jpg";
-        content.title = "Share SDK";
+        content.title = "test";
 
         // share
-        PlatformHelper.INSTANCE.share(this, type, new ShareContent(), new Callback() {
+        PlatformHelper.INSTANCE.share(this, type, content, new Callback() {
             @Override
             public void call(boolean isSuccess, String msg, int code) {
                 Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
