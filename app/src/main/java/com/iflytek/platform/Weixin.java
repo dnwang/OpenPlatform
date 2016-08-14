@@ -9,6 +9,7 @@ import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
+import com.iflytek.platform.entity.StateCodes;
 import com.tencent.mm.sdk.openapi.BaseReq;
 import com.tencent.mm.sdk.openapi.BaseResp;
 import com.tencent.mm.sdk.openapi.IWXAPI;
@@ -30,9 +31,9 @@ import java.util.List;
  * @version 8/11/16,22:55
  * @see
  */
-public final class Weixin extends Platform implements Socialize {
+final class Weixin extends Platform implements Socialize {
 
-    public static final String APP_ID = "wxf04bacbcee9b5cc7";
+    private static final String APP_ID = "wxf04bacbcee9b5cc7";
     private static final String APP_SECRET = "9299bfd1ec0104a4cad2faa23010a580";
 
     private IWXAPI wxApi;
@@ -50,22 +51,22 @@ public final class Weixin extends Platform implements Socialize {
             switch (resp.errCode) {
                 case BaseResp.ErrCode.ERR_OK:
                     if (null != callback) {
-                        callback.call(true, "", 1);
+                        callback.call(true, null, StateCodes.SUCCESS);
                     }
                     break;
                 case BaseResp.ErrCode.ERR_USER_CANCEL:
                     if (null != callback) {
-                        callback.call(false, "cancel", 0);
+                        callback.call(false, null, StateCodes.ERROR_CANCEL);
                     }
                     break;
                 case BaseResp.ErrCode.ERR_AUTH_DENIED:
                     if (null != callback) {
-                        callback.call(false, "auth denied", -1);
+                        callback.call(false, null, StateCodes.ERROR_AUTH_DENIED);
                     }
                     break;
                 default:
                     if (null != callback) {
-                        callback.call(false, "unknown", -1);
+                        callback.call(false, null, StateCodes.ERROR);
                     }
                     break;
             }
@@ -96,15 +97,13 @@ public final class Weixin extends Platform implements Socialize {
     public void share(Context context, ShareContent content, Callback callback) {
         WXTextObject textObject = new WXTextObject();
         textObject.text = content.content;
-
         WXMediaMessage message = new WXMediaMessage(textObject);
         message.description = content.title;
 
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         req.transaction = String.valueOf(System.currentTimeMillis());
         req.message = message;
-        req.scene = SendMessageToWX.Req.WXSceneSession;//WXSceneTimeline朋友圈
-
+        req.scene = SendMessageToWX.Req.WXSceneSession;
         wxApi.sendReq(req);
         this.callback = callback;
     }
@@ -118,4 +117,5 @@ public final class Weixin extends Platform implements Socialize {
     public void getFriends(Context context, Callback2<List<AccountInfo>> Callback) {
 
     }
+
 }

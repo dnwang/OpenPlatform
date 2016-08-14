@@ -65,9 +65,9 @@ public class DemoActivity extends Activity implements View.OnClickListener {
         final Platform.Type type = (Platform.Type) view.getTag();
 
         final ShareContent content = new ShareContent();
-        content.content = "test";
+        content.content = "share from ichang";
         content.imageUrl = "http://www.weipet.cn/common/images/pic/a347.jpg";
-        content.title = "test";
+        content.title = "share sdk";
 
         // share
         PlatformHelper.INSTANCE.share(this, type, content, new Callback() {

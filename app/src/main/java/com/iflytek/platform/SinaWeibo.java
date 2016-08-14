@@ -10,6 +10,7 @@ import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
+import com.iflytek.platform.entity.StateCodes;
 import com.sina.weibo.sdk.api.ImageObject;
 import com.sina.weibo.sdk.api.TextObject;
 import com.sina.weibo.sdk.api.WeiboMultiMessage;
@@ -106,7 +107,7 @@ final class SinaWeibo extends Platform implements Socialize {
             @Override
             public void onWeiboException(WeiboException arg0) {
                 if (null != callback) {
-                    callback.call(false, arg0.getMessage(), -1);
+                    callback.call(false, arg0.getMessage(), StateCodes.ERROR);
                 }
             }
 
@@ -114,14 +115,14 @@ final class SinaWeibo extends Platform implements Socialize {
             public void onComplete(Bundle bundle) {
                 final Oauth2AccessToken token = Oauth2AccessToken.parseAccessToken(bundle);
                 if (null != callback) {
-                    callback.call(true, "", 1);
+                    callback.call(true, null, StateCodes.SUCCESS);
                 }
             }
 
             @Override
             public void onCancel() {
                 if (null != callback) {
-                    callback.call(false, "cancel", 0);
+                    callback.call(false, null, StateCodes.ERROR_CANCEL);
                 }
             }
         });

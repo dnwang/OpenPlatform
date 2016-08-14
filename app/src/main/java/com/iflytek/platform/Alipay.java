@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.PayInfo;
+import com.iflytek.platform.entity.StateCodes;
 
 /**
  * Copyright (C), 2016 <br>
@@ -23,6 +24,8 @@ final class AliPay extends Platform implements Payable {
 
     @Override
     public void pay(Context context, PayInfo payInfo, Callback callback) {
-
+        if (null != callback) {
+            callback.call(false, null, StateCodes.ERROR_NOT_SUPPORT);
+        }
     }
 }

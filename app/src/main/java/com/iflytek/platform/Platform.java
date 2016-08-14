@@ -21,7 +21,7 @@ public abstract class Platform implements ActivityLifecycleCallbacks {
 
         WEIBO(SinaWeibo.class),
         QQ(TencentQQ.class),
-        QZone(TencentQZone.class),
+        QZONE(TencentQZone.class),
         WEIXIN(Weixin.class),
         WEIXIN_CIRCLE(WeixinCircle.class),
         ALIPAY(AliPay.class);
