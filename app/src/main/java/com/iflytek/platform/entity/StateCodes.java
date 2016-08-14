@@ -16,6 +16,7 @@ public interface StateCodes {
     int ERROR_CANCEL = 101;
     int ERROR_NOT_SUPPORT = 102;
     int ERROR_AUTH_DENIED = 103;
+    int ERROR_LOGIN = 104;
 
     int SUCCESS = 300;
 

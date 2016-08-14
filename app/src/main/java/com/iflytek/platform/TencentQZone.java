@@ -3,6 +3,7 @@ package com.iflytek.platform;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.callbacks.Callback2;
@@ -28,8 +29,8 @@ import java.util.List;
  */
 final class TencentQZone extends Platform implements Socialize {
 
-    private static final String APP_ID = "100526240";
-    private static final String APP_KEY = "20bca3e9e564042b7d1e2ec6ee261b1c";
+    private static final String APP_ID = TencentQQ.APP_ID;
+    private static final String APP_KEY = TencentQQ.APP_KEY;
 
     private Tencent shareApi;
 
@@ -43,8 +44,11 @@ final class TencentQZone extends Platform implements Socialize {
         if (!(context instanceof Activity)) {
             return;
         }
+        if (null == content || TextUtils.isEmpty(content.targetUrl)) {
+            return;
+        }
         final Bundle params = new Bundle();
-        params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, "http://www.qq.com");//必填
+        params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, content.targetUrl);//必填
         params.putString(QzoneShare.SHARE_TO_QQ_TITLE, content.title);
         params.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, content.content);
         params.putString(QzoneShare.SHARE_TO_QQ_IMAGE_URL, content.imageUrl);

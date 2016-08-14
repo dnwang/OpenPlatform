@@ -33,8 +33,8 @@ import java.util.List;
  */
 final class Weixin extends Platform implements Socialize {
 
-    private static final String APP_ID = "wxf04bacbcee9b5cc7";
-    private static final String APP_SECRET = "9299bfd1ec0104a4cad2faa23010a580";
+    static final String APP_ID = "wxf04bacbcee9b5cc7";
+    static final String APP_SECRET = "9299bfd1ec0104a4cad2faa23010a580";
 
     private IWXAPI wxApi;
 
@@ -94,7 +94,16 @@ final class Weixin extends Platform implements Socialize {
     }
 
     @Override
+    public void onDestroy(Activity activity) {
+        this.callback = null;
+    }
+
+    @Override
     public void share(Context context, ShareContent content, Callback callback) {
+        if (null == content) {
+            return;
+        }
+
         WXTextObject textObject = new WXTextObject();
         textObject.text = content.content;
         WXMediaMessage message = new WXMediaMessage(textObject);

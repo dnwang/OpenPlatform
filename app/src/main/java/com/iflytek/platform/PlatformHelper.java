@@ -26,7 +26,7 @@ import java.util.Map;
  * @version 8/11/16,20:30
  * @see
  */
-public enum PlatformHelper implements ActivityLifecycleCallbacks {
+public enum PlatformHelper {
 
     INSTANCE;
 
@@ -52,129 +52,119 @@ public enum PlatformHelper implements ActivityLifecycleCallbacks {
 
     public void pay(Context context, Platform.Type type, PayInfo payInfo, Callback callback) {
         Platform platform = getPlatform(context, type);
-        if (platform instanceof Payable) {
+        if (null != platform && platform instanceof Payable) {
             ((Payable) platform).pay(context, payInfo, callback);
         }
     }
 
     public void share(Context context, Platform.Type type, ShareContent content, Callback callback) {
         Platform platform = getPlatform(context, type);
-        if (platform instanceof Socialize) {
+        if (null != platform && platform instanceof Socialize) {
             ((Socialize) platform).share(context, content, callback);
         }
     }
 
     public void login(Context context, Platform.Type type, Callback2<AccountInfo> callback) {
         Platform platform = getPlatform(context, type);
-        if (platform instanceof Socialize) {
+        if (null != platform && platform instanceof Socialize) {
             ((Socialize) platform).login(context, callback);
         }
     }
 
     public void getFriends(Context context, Platform.Type type, Callback2<List<AccountInfo>> Callback) {
         Platform platform = getPlatform(context, type);
-        if (platform instanceof Socialize) {
+        if (null != platform && platform instanceof Socialize) {
             ((Socialize) platform).getFriends(context, Callback);
         }
     }
 
 
     // Activity lifecycle callback
-
-    @Override
-    public void onCreate(Activity activity, Bundle bundle) {
-        if (null == platformMap) {
+    static void onCreate(Activity activity, Bundle bundle) {
+        if (null == INSTANCE.platformMap) {
             return;
         }
-        final Collection<Platform> platforms = platformMap.values();
+        final Collection<Platform> platforms = INSTANCE.platformMap.values();
         for (Platform platform : platforms) {
             platform.onCreate(activity, bundle);
         }
     }
 
-    @Override
-    public void onStart(Activity activity) {
-        if (null == platformMap) {
+    static void onStart(Activity activity) {
+        if (null == INSTANCE.platformMap) {
             return;
         }
-        final Collection<Platform> platforms = platformMap.values();
+        final Collection<Platform> platforms = INSTANCE.platformMap.values();
         for (Platform platform : platforms) {
             platform.onStart(activity);
         }
     }
 
-    @Override
-    public void onRestart(Activity activity) {
-        if (null == platformMap) {
+    static void onRestart(Activity activity) {
+        if (null == INSTANCE.platformMap) {
             return;
         }
-        final Collection<Platform> platforms = platformMap.values();
+        final Collection<Platform> platforms = INSTANCE.platformMap.values();
         for (Platform platform : platforms) {
             platform.onRestart(activity);
         }
     }
 
-    @Override
-    public void onResume(Activity activity) {
-        if (null == platformMap) {
+    static void onResume(Activity activity) {
+        if (null == INSTANCE.platformMap) {
             return;
         }
-        final Collection<Platform> platforms = platformMap.values();
+        final Collection<Platform> platforms = INSTANCE.platformMap.values();
         for (Platform platform : platforms) {
             platform.onResume(activity);
         }
     }
 
-    @Override
-    public void onStop(Activity activity) {
-        if (null == platformMap) {
+    static void onStop(Activity activity) {
+        if (null == INSTANCE.platformMap) {
             return;
         }
-        final Collection<Platform> platforms = platformMap.values();
+        final Collection<Platform> platforms = INSTANCE.platformMap.values();
         for (Platform platform : platforms) {
             platform.onStop(activity);
         }
     }
 
-    @Override
-    public void onDestroy(Activity activity) {
-        if (null == platformMap) {
+    static void onDestroy(Activity activity) {
+        if (null == INSTANCE.platformMap) {
             return;
         }
-        final Collection<Platform> platforms = platformMap.values();
+        final Collection<Platform> platforms = INSTANCE.platformMap.values();
         for (Platform platform : platforms) {
             platform.onDestroy(activity);
         }
     }
 
-    @Override
-    public void onSaveInstanceState(Activity activity, Bundle bundle) {
-        if (null == platformMap) {
+    static void onSaveInstanceState(Activity activity, Bundle bundle) {
+        if (null == INSTANCE.platformMap) {
             return;
         }
-        final Collection<Platform> platforms = platformMap.values();
+        final Collection<Platform> platforms = INSTANCE.platformMap.values();
         for (Platform platform : platforms) {
             platform.onSaveInstanceState(activity, bundle);
         }
     }
 
-    @Override
-    public void onNewIntent(Activity activity, Intent intent) {
-        if (null == platformMap) {
+    static void onNewIntent(Activity activity, Intent intent) {
+        if (null == INSTANCE.platformMap) {
             return;
         }
-        final Collection<Platform> platforms = platformMap.values();
+        final Collection<Platform> platforms = INSTANCE.platformMap.values();
         for (Platform platform : platforms) {
             platform.onNewIntent(activity, intent);
         }
     }
 
-    @Override
-    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        if (null == platformMap) {
+    static void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        if (null == INSTANCE.platformMap) {
             return;
         }
-        final Collection<Platform> platforms = platformMap.values();
+        final Collection<Platform> platforms = INSTANCE.platformMap.values();
         for (Platform platform : platforms) {
             platform.onActivityResult(activity, requestCode, resultCode, data);
         }

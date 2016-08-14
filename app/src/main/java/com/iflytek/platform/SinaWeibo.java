@@ -83,6 +83,9 @@ final class SinaWeibo extends Platform implements Socialize {
             }
             return;
         }
+        if (null == content) {
+            return;
+        }
 
         AuthInfo authInfo = new AuthInfo(context, APP_KEY, REDIRECT_URL, SCOPE);
 
