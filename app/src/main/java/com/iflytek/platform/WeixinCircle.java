@@ -119,12 +119,16 @@ final class WeixinCircle extends Platform implements Socialize {
 
     @Override
     public void login(Context context, Callback2<AccountInfo> callback) {
-        throw new RuntimeException("not support");
+        if (null != callback) {
+            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+        }
     }
 
     @Override
-    public void getFriends(Context context, Callback2<List<AccountInfo>> Callback) {
-        throw new RuntimeException("not support");
+    public void getFriends(Context context, Callback2<List<AccountInfo>> callback) {
+        if (null != callback) {
+            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+        }
     }
 
 }

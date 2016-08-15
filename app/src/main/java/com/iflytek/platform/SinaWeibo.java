@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.callbacks.Callback2;
@@ -22,6 +23,7 @@ import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
+import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
 
 import java.util.List;
@@ -41,11 +43,14 @@ final class SinaWeibo extends Platform implements Socialize {
     private static String APP_KEY = "778164658";
     private static String APP_SECRET = "06552db3dc303529ba971b257379c49e";
 
-    private static String REDIRECT_URL = "http://www.sina.com";
+    private static String REDIRECT_URL = "https://api.weibo.com/oauth2/default.html";
     private static String SCOPE = "email,direct_messages_read,direct_messages_write," +
             "friendships_groups_read,friendships_groups_write,statuses_to_me_read,follow_app_official_microblog,invitation_write";
 
     private IWeiboShareAPI shareAPI;
+
+    private AuthInfo authInfo;
+    private SsoHandler ssoHandler;
 
     private final IWeiboHandler.Response response = new IWeiboHandler.Response() {
         @Override
@@ -57,6 +62,7 @@ final class SinaWeibo extends Platform implements Socialize {
 
     public SinaWeibo(Context context) {
         super(context);
+        authInfo = new AuthInfo(context, APP_KEY, REDIRECT_URL, SCOPE);
         shareAPI = WeiboShareSDK.createWeiboAPI(context, APP_KEY);
         shareAPI.registerApp();
     }
@@ -72,6 +78,13 @@ final class SinaWeibo extends Platform implements Socialize {
     public void onNewIntent(Activity activity, Intent intent) {
         if (null != shareAPI) {
             shareAPI.handleWeiboResponse(intent, response);
+        }
+    }
+
+    @Override
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        if (ssoHandler != null) {
+            ssoHandler.authorizeCallBack(requestCode, resultCode, data);
         }
     }
 
@@ -133,8 +146,24 @@ final class SinaWeibo extends Platform implements Socialize {
     }
 
     @Override
-    public void login(Context context, Callback2<AccountInfo> callback) {
+    public void login(final Context context, final Callback2<AccountInfo> callback) {
+        ssoHandler = new SsoHandler((Activity) context, authInfo);
+        ssoHandler.authorize(new WeiboAuthListener() {
+            @Override
+            public void onComplete(Bundle bundle) {
+                Toast.makeText(context, "onComplete", 0).show();
+            }
 
+            @Override
+            public void onWeiboException(WeiboException e) {
+                Toast.makeText(context, "onWeiboException", 0).show();
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(context, "onCancel", 0).show();
+            }
+        });
     }
 
     @Override
