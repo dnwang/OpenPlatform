@@ -3,7 +3,6 @@ package com.iflytek.platform.utils;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -18,9 +17,9 @@ import java.net.URL;
  * @version 2016/8/16,17:19
  * @see
  */
-public final class Https {
+public final class HttpUtils {
 
-    private Https() {
+    private HttpUtils() {
         throw new AssertionError();
     }
 
@@ -47,19 +46,9 @@ public final class Https {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (null != reader) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            Tools.close(reader);
             if (null != connection) {
-                try {
-                    connection.connect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                connection.disconnect();
             }
         }
         return result;

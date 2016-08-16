@@ -42,6 +42,9 @@ public final class PlatformHelper implements ActivityLifecycleCallbacks, Sociali
         selected.clear();
         if (null != types && types.length > 0) {
             for (PlatformType type : types) {
+                if (null == type) {
+                    continue;
+                }
                 Platform platform = cache.get(type);
                 if (null == platform) {
                     platform = type.getInstance(context);

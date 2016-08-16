@@ -97,14 +97,7 @@ public class DemoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         registerListener();
-        platformHelper.select(PlatformType.WEIXIN);
         platformHelper.onCreate(this, savedInstanceState);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        platformHelper.onNewIntent(this, intent);
     }
 
     @Override

@@ -19,8 +19,9 @@ import java.util.Map;
 public class AccountInfo implements Serializable {
 
     public String id;
-    public String nikename;
-    public boolean gender;
+    public String nickName;
+    public boolean gender; // true:男
+    public String headerImg;
     public String token;
     public int expireDate;
 
@@ -28,6 +29,13 @@ public class AccountInfo implements Serializable {
 
     public AccountInfo() {
         extra = new HashMap<>();
+    }
+
+    public void putExtra(String key, String value) {
+        if (TextUtils.isEmpty(key)) {
+            return;
+        }
+        extra.put(key, value);
     }
 
     public String getExtra(String key) {
