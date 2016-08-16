@@ -89,18 +89,12 @@ final class SinaWeibo extends Platform implements Socialize {
     }
 
     @Override
-    public void share(final Context context, final ShareContent content, final Callback callback) {
-        if (!(context instanceof Activity)) {
-            if (null != callback) {
-                callback.call(false, "", -1);
-            }
-            return;
-        }
+    public void share(final ShareContent content, final Callback callback) {
         if (null == content) {
             return;
         }
 
-        AuthInfo authInfo = new AuthInfo(context, APP_KEY, REDIRECT_URL, SCOPE);
+        AuthInfo authInfo = new AuthInfo(getContext(), APP_KEY, REDIRECT_URL, SCOPE);
 
         TextObject textObject = new TextObject();
         textObject.text = content.content;
@@ -118,7 +112,7 @@ final class SinaWeibo extends Platform implements Socialize {
         request.transaction = String.valueOf(System.currentTimeMillis());
         request.multiMessage = message;
 
-        shareAPI.sendRequest((Activity) context, request, authInfo, "", new WeiboAuthListener() {
+        shareAPI.sendRequest((Activity) getContext(), request, authInfo, "", new WeiboAuthListener() {
 
             @Override
             public void onWeiboException(WeiboException arg0) {
@@ -146,28 +140,28 @@ final class SinaWeibo extends Platform implements Socialize {
     }
 
     @Override
-    public void login(final Context context, final Callback2<AccountInfo> callback) {
-        ssoHandler = new SsoHandler((Activity) context, authInfo);
+    public void login(final Callback2<AccountInfo> callback) {
+        ssoHandler = new SsoHandler((Activity) getContext(), authInfo);
         ssoHandler.authorize(new WeiboAuthListener() {
             @Override
             public void onComplete(Bundle bundle) {
-                Toast.makeText(context, "onComplete", 0).show();
+                Toast.makeText(getContext(), "onComplete", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onWeiboException(WeiboException e) {
-                Toast.makeText(context, "onWeiboException", 0).show();
+                Toast.makeText(getContext(), "onWeiboException", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCancel() {
-                Toast.makeText(context, "onCancel", 0).show();
+                Toast.makeText(getContext(), "onCancel", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
-    public void getFriends(Context context, Callback2<List<AccountInfo>> callback) {
+    public void getFriends(Callback2<List<AccountInfo>> callback) {
 
     }
 }

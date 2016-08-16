@@ -11,7 +11,6 @@ import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,146 +25,136 @@ import java.util.Map;
  * @version 8/11/16,20:30
  * @see
  */
-public enum PlatformHelper {
+public final class PlatformHelper implements ActivityLifecycleCallbacks, Socialize, Payable {
 
-    INSTANCE;
+    private Context context;
 
-    private Map<Platform.Type, Platform> platformMap = null;
+    private Map<PlatformType, Platform> cache;
+    private Map<PlatformType, Platform> selected;
 
-    private Platform getPlatform(Context context, Platform.Type type) {
-        Platform platform = null;
-        if (null == platformMap) {
-            platformMap = new HashMap<>();
-        }
-        if (!platformMap.isEmpty() && platformMap.containsKey(type)) {
-            platform = platformMap.get(type);
-        } else {
-            try {
-                platform = type.clazz.getConstructor(Context.class).newInstance(context);
-                platformMap.put(type, platform);
-            } catch (Exception e) {
-                e.printStackTrace();
+    public PlatformHelper(Context context) {
+        this.context = context;
+        this.cache = new HashMap<>();
+        this.selected = new HashMap<>();
+    }
+
+    public PlatformHelper select(PlatformType... types) {
+        selected.clear();
+        if (null != types && types.length > 0) {
+            for (PlatformType type : types) {
+                Platform platform = cache.get(type);
+                if (null == platform) {
+                    platform = type.getInstance(context);
+                    cache.put(type, platform);
+                }
+                selected.put(type, platform);
             }
         }
-        return platform;
+        return this;
     }
 
-    public void pay(Context context, Platform.Type type, PayInfo payInfo, Callback callback) {
-        Platform platform = getPlatform(context, type);
-        if (null != platform && platform instanceof Payable) {
-            ((Payable) platform).pay(context, payInfo, callback);
+    public PlatformHelper clear() {
+        selected.clear();
+        cache.clear();
+        return this;
+    }
+
+    @Override
+    public void pay(PayInfo payInfo, Callback callback) {
+        for (Platform platform : selected.values()) {
+            if (platform instanceof Payable) {
+                ((Payable) platform).pay(payInfo, callback);
+            }
         }
     }
 
-    public void share(Context context, Platform.Type type, ShareContent content, Callback callback) {
-        Platform platform = getPlatform(context, type);
-        if (null != platform && platform instanceof Socialize) {
-            ((Socialize) platform).share(context, content, callback);
+    @Override
+    public void share(ShareContent content, Callback callback) {
+        for (Platform platform : selected.values()) {
+            if (platform instanceof Socialize) {
+                ((Socialize) platform).share(content, callback);
+            }
         }
     }
 
-    public void login(Context context, Platform.Type type, Callback2<AccountInfo> callback) {
-        Platform platform = getPlatform(context, type);
-        if (null != platform && platform instanceof Socialize) {
-            ((Socialize) platform).login(context, callback);
+    @Override
+    public void login(Callback2<AccountInfo> callback) {
+        for (Platform platform : selected.values()) {
+            if (platform instanceof Socialize) {
+                ((Socialize) platform).login(callback);
+            }
         }
     }
 
-    public void getFriends(Context context, Platform.Type type, Callback2<List<AccountInfo>> Callback) {
-        Platform platform = getPlatform(context, type);
-        if (null != platform && platform instanceof Socialize) {
-            ((Socialize) platform).getFriends(context, Callback);
+    @Override
+    public void getFriends(Callback2<List<AccountInfo>> callback) {
+        for (Platform platform : selected.values()) {
+            if (platform instanceof Socialize) {
+                ((Socialize) platform).getFriends(callback);
+            }
         }
     }
 
 
-    // Activity lifecycle callback
-    static void onCreate(Activity activity, Bundle bundle) {
-        if (null == INSTANCE.platformMap) {
-            return;
-        }
-        final Collection<Platform> platforms = INSTANCE.platformMap.values();
-        for (Platform platform : platforms) {
+    @Override
+    public void onCreate(Activity activity, Bundle bundle) {
+        for (Platform platform : selected.values()) {
             platform.onCreate(activity, bundle);
         }
     }
 
-    static void onStart(Activity activity) {
-        if (null == INSTANCE.platformMap) {
-            return;
-        }
-        final Collection<Platform> platforms = INSTANCE.platformMap.values();
-        for (Platform platform : platforms) {
+    @Override
+    public void onStart(Activity activity) {
+        for (Platform platform : selected.values()) {
             platform.onStart(activity);
         }
     }
 
-    static void onRestart(Activity activity) {
-        if (null == INSTANCE.platformMap) {
-            return;
-        }
-        final Collection<Platform> platforms = INSTANCE.platformMap.values();
-        for (Platform platform : platforms) {
+    @Override
+    public void onRestart(Activity activity) {
+        for (Platform platform : selected.values()) {
             platform.onRestart(activity);
         }
     }
 
-    static void onResume(Activity activity) {
-        if (null == INSTANCE.platformMap) {
-            return;
-        }
-        final Collection<Platform> platforms = INSTANCE.platformMap.values();
-        for (Platform platform : platforms) {
+    @Override
+    public void onResume(Activity activity) {
+        for (Platform platform : selected.values()) {
             platform.onResume(activity);
         }
     }
 
-    static void onStop(Activity activity) {
-        if (null == INSTANCE.platformMap) {
-            return;
-        }
-        final Collection<Platform> platforms = INSTANCE.platformMap.values();
-        for (Platform platform : platforms) {
+    @Override
+    public void onStop(Activity activity) {
+        for (Platform platform : selected.values()) {
             platform.onStop(activity);
         }
     }
 
-    static void onDestroy(Activity activity) {
-        if (null == INSTANCE.platformMap) {
-            return;
-        }
-        final Collection<Platform> platforms = INSTANCE.platformMap.values();
-        for (Platform platform : platforms) {
+    @Override
+    public void onDestroy(Activity activity) {
+        for (Platform platform : selected.values()) {
             platform.onDestroy(activity);
         }
     }
 
-    static void onSaveInstanceState(Activity activity, Bundle bundle) {
-        if (null == INSTANCE.platformMap) {
-            return;
-        }
-        final Collection<Platform> platforms = INSTANCE.platformMap.values();
-        for (Platform platform : platforms) {
+    @Override
+    public void onSaveInstanceState(Activity activity, Bundle bundle) {
+        for (Platform platform : selected.values()) {
             platform.onSaveInstanceState(activity, bundle);
         }
     }
 
-    static void onNewIntent(Activity activity, Intent intent) {
-        if (null == INSTANCE.platformMap) {
-            return;
-        }
-        final Collection<Platform> platforms = INSTANCE.platformMap.values();
-        for (Platform platform : platforms) {
+    @Override
+    public void onNewIntent(Activity activity, Intent intent) {
+        for (Platform platform : selected.values()) {
             platform.onNewIntent(activity, intent);
         }
     }
 
-    static void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        if (null == INSTANCE.platformMap) {
-            return;
-        }
-        final Collection<Platform> platforms = INSTANCE.platformMap.values();
-        for (Platform platform : platforms) {
+    @Override
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        for (Platform platform : selected.values()) {
             platform.onActivityResult(activity, requestCode, resultCode, data);
         }
     }

@@ -15,26 +15,16 @@ import android.os.Bundle;
  * @version 8/11/16,20:52
  * @see
  */
-public abstract class Platform implements ActivityLifecycleCallbacks {
+abstract class Platform implements ActivityLifecycleCallbacks {
 
-    public enum Type {
-
-        WEIBO(SinaWeibo.class),
-        QQ(TencentQQ.class),
-        QZONE(TencentQZone.class),
-        WEIXIN(Weixin.class),
-        WEIXIN_CIRCLE(WeixinCircle.class),
-        ALIPAY(AliPay.class);
-
-        Class<? extends Platform> clazz;
-
-        Type(Class<? extends Platform> clazz) {
-            this.clazz = clazz;
-        }
-    }
+    private Context context;
 
     public Platform(Context context) {
+        this.context = context;
+    }
 
+    protected final Context getContext() {
+        return context;
     }
 
     @Override
@@ -81,4 +71,5 @@ public abstract class Platform implements ActivityLifecycleCallbacks {
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 
     }
+
 }

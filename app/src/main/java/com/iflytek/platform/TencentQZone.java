@@ -15,6 +15,7 @@ import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,10 +41,7 @@ final class TencentQZone extends Platform implements Socialize {
     }
 
     @Override
-    public void share(Context context, ShareContent content, final Callback callback) {
-        if (!(context instanceof Activity)) {
-            return;
-        }
+    public void share(ShareContent content, final Callback callback) {
         if (null == content || TextUtils.isEmpty(content.targetUrl)) {
             return;
         }
@@ -51,9 +49,9 @@ final class TencentQZone extends Platform implements Socialize {
         params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, content.targetUrl);//必填
         params.putString(QzoneShare.SHARE_TO_QQ_TITLE, content.title);
         params.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, content.content);
-        params.putString(QzoneShare.SHARE_TO_QQ_IMAGE_URL, content.imageUrl);
+        params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, new ArrayList<String>());
 
-        shareApi.shareToQzone((Activity) context, params, new IUiListener() {
+        shareApi.shareToQzone((Activity) getContext(), params, new IUiListener() {
             @Override
             public void onCancel() {
                 if (null != callback) {
@@ -78,14 +76,14 @@ final class TencentQZone extends Platform implements Socialize {
     }
 
     @Override
-    public void login(Context context, Callback2<AccountInfo> callback) {
+    public void login(Callback2<AccountInfo> callback) {
         if (null != callback) {
             callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
         }
     }
 
     @Override
-    public void getFriends(Context context, Callback2<List<AccountInfo>> callback) {
+    public void getFriends(Callback2<List<AccountInfo>> callback) {
         if (null != callback) {
             callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
         }

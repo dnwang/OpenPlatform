@@ -94,12 +94,7 @@ final class WeixinCircle extends Platform implements Socialize {
     }
 
     @Override
-    public void onDestroy(Activity activity) {
-        this.callback = null;
-    }
-
-    @Override
-    public void share(Context context, ShareContent content, Callback callback) {
+    public void share(ShareContent content, Callback callback) {
         if (null == content) {
             return;
         }
@@ -118,14 +113,14 @@ final class WeixinCircle extends Platform implements Socialize {
     }
 
     @Override
-    public void login(Context context, Callback2<AccountInfo> callback) {
+    public void login(Callback2<AccountInfo> callback) {
         if (null != callback) {
             callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
         }
     }
 
     @Override
-    public void getFriends(Context context, Callback2<List<AccountInfo>> callback) {
+    public void getFriends(Callback2<List<AccountInfo>> callback) {
         if (null != callback) {
             callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
         }

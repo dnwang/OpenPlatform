@@ -94,12 +94,7 @@ final class Weixin extends Platform implements Socialize {
     }
 
     @Override
-    public void onDestroy(Activity activity) {
-        this.callback = null;
-    }
-
-    @Override
-    public void share(Context context, ShareContent content, Callback callback) {
+    public void share(ShareContent content, Callback callback) {
         if (null == content) {
             return;
         }
@@ -118,12 +113,12 @@ final class Weixin extends Platform implements Socialize {
     }
 
     @Override
-    public void login(Context context, Callback2<AccountInfo> callback) {
+    public void login(Callback2<AccountInfo> callback) {
 
     }
 
     @Override
-    public void getFriends(Context context, Callback2<List<AccountInfo>> Callback) {
+    public void getFriends(Callback2<List<AccountInfo>> Callback) {
 
     }
 

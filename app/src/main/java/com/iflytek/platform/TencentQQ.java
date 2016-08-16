@@ -46,7 +46,7 @@ final class TencentQQ extends Platform implements Socialize {
     }
 
     @Override
-    public void onActivityResult(final Activity activity, int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         if (requestCode == Constants.REQUEST_LOGIN || requestCode == Constants.REQUEST_APPBAR) {
             Tencent.onActivityResultData(requestCode, resultCode, data, new IUiListener() {
                 @Override
@@ -56,15 +56,15 @@ final class TencentQQ extends Platform implements Socialize {
                     }
 
                     if (null == obj) {
-                        Toast.makeText(activity, "返回为空,登录失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "返回为空,登录失败", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     JSONObject json = (JSONObject) obj;
                     if (json.length() == 0) {
-                        Toast.makeText(activity, "返回为空,登录失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "返回为空,登录失败", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    Toast.makeText(activity, "登录成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "登录成功", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
@@ -85,15 +85,7 @@ final class TencentQQ extends Platform implements Socialize {
     }
 
     @Override
-    public void onDestroy(Activity activity) {
-        this.callback2 = null;
-    }
-
-    @Override
-    public void share(Context context, ShareContent content, final Callback callback) {
-        if (!(context instanceof Activity)) {
-            return;
-        }
+    public void share(ShareContent content, final Callback callback) {
         if (null == content || TextUtils.isEmpty(content.targetUrl)) {
             return;
         }
@@ -103,7 +95,7 @@ final class TencentQQ extends Platform implements Socialize {
         params.putString(QQShare.SHARE_TO_QQ_SUMMARY, content.content);
         params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, content.imageUrl);
 
-        shareApi.shareToQQ((Activity) context, params, new IUiListener() {
+        shareApi.shareToQQ((Activity) getContext(), params, new IUiListener() {
             @Override
             public void onCancel() {
                 if (null != callback) {
@@ -128,12 +120,12 @@ final class TencentQQ extends Platform implements Socialize {
     }
 
     @Override
-    public void login(Context context, Callback2<AccountInfo> callback) {
+    public void login(Callback2<AccountInfo> callback) {
         this.callback2 = callback;
     }
 
     @Override
-    public void getFriends(Context context, Callback2<List<AccountInfo>> callback) {
+    public void getFriends(Callback2<List<AccountInfo>> callback) {
 
     }
 }

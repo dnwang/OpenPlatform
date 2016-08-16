@@ -1,7 +1,5 @@
 package com.iflytek.platform;
 
-import android.content.Context;
-
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.PayInfo;
 
@@ -17,6 +15,6 @@ import com.iflytek.platform.entity.PayInfo;
  */
 interface Payable {
 
-    void pay(Context context, PayInfo payInfo, Callback callback);
+    void pay(PayInfo payInfo, Callback callback);
 
 }

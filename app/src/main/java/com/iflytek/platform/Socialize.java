@@ -1,7 +1,5 @@
 package com.iflytek.platform;
 
-import android.content.Context;
-
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
@@ -21,10 +19,10 @@ import java.util.List;
  */
 interface Socialize {
 
-    void share(Context context, ShareContent content, Callback callback);
+    void share(ShareContent content, Callback callback);
 
-    void login(Context context, Callback2<AccountInfo> callback);
+    void login(Callback2<AccountInfo> callback);
 
-    void getFriends(Context context, Callback2<List<AccountInfo>> Callback);
+    void getFriends(Callback2<List<AccountInfo>> callback);
 
 }

@@ -1,14 +1,15 @@
 package com.iflytek.demo;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.iflytek.platform.Platform;
 import com.iflytek.platform.PlatformHelper;
-import com.iflytek.platform.PlatformLifecycleWrapperActivity;
+import com.iflytek.platform.PlatformType;
 import com.iflytek.platform.R;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.callbacks.Callback2;
@@ -28,16 +29,13 @@ import java.util.List;
  * @version 8/11/16,20:30
  * @see
  */
-public class DemoActivity extends PlatformLifecycleWrapperActivity {
+public class DemoActivity extends Activity {
+
+    private PlatformHelper platformHelper;
 
     private final View.OnClickListener shareClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            final Platform.Type platform = getSelectedPlatform();
-            if (null == platform) {
-                return;
-            }
-
             final ShareContent content = new ShareContent.Builder()
                     .title("share sdk")
                     .content("share from ichang")
@@ -46,7 +44,7 @@ public class DemoActivity extends PlatformLifecycleWrapperActivity {
                     .create();
 
             // share
-            PlatformHelper.INSTANCE.share(DemoActivity.this, platform, content, new Callback() {
+            platformHelper.select(getSelectedType()).share(content, new Callback() {
                 @Override
                 public void call(boolean isSuccess, String msg, int code) {
                     Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
@@ -58,12 +56,7 @@ public class DemoActivity extends PlatformLifecycleWrapperActivity {
     private final View.OnClickListener loginClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            final Platform.Type platform = getSelectedPlatform();
-            if (null == platform) {
-                return;
-            }
-
-            PlatformHelper.INSTANCE.login(DemoActivity.this, platform, new Callback2<AccountInfo>() {
+            platformHelper.select(getSelectedType()).login(new Callback2<AccountInfo>() {
                 @Override
                 public void call(AccountInfo accountInfo, boolean isSuccess, String msg, int code) {
                     Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
@@ -75,12 +68,7 @@ public class DemoActivity extends PlatformLifecycleWrapperActivity {
     private final View.OnClickListener getFriendsClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            final Platform.Type platform = getSelectedPlatform();
-            if (null == platform) {
-                return;
-            }
-
-            PlatformHelper.INSTANCE.getFriends(DemoActivity.this, platform, new Callback2<List<AccountInfo>>() {
+            platformHelper.select(getSelectedType()).getFriends(new Callback2<List<AccountInfo>>() {
                 @Override
                 public void call(List<AccountInfo> accountInfos, boolean isSuccess, String msg, int code) {
                     Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
@@ -92,14 +80,9 @@ public class DemoActivity extends PlatformLifecycleWrapperActivity {
     private final View.OnClickListener payClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            final Platform.Type platform = getSelectedPlatform();
-            if (null == platform) {
-                return;
-            }
-
             final PayInfo payInfo = new PayInfo();
 
-            PlatformHelper.INSTANCE.pay(DemoActivity.this, platform, payInfo, new Callback() {
+            platformHelper.select(getSelectedType()).pay(payInfo, new Callback() {
                 @Override
                 public void call(boolean isSuccess, String msg, int code) {
                     Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
@@ -110,10 +93,22 @@ public class DemoActivity extends PlatformLifecycleWrapperActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestPlatformLifecycle(true);
+        platformHelper = new PlatformHelper(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         registerListener();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        platformHelper.onNewIntent(this, intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        platformHelper.onActivityResult(this, requestCode, resultCode, data);
     }
 
     private void registerListener() {
@@ -123,8 +118,8 @@ public class DemoActivity extends PlatformLifecycleWrapperActivity {
         findViewById(R.id.btn_pay).setOnClickListener(payClick);
     }
 
-    private Platform.Type getSelectedPlatform() {
-        Platform.Type platform = null;
+    private PlatformType getSelectedType() {
+        PlatformType platform = null;
         ViewGroup platformNavi = (ViewGroup) findViewById(R.id.navi_platforms);
         final int size = platformNavi.getChildCount();
         for (int i = 0; i < size; i++) {
@@ -133,7 +128,7 @@ public class DemoActivity extends PlatformLifecycleWrapperActivity {
                 if (((RadioButton) v).isChecked()) {
                     Object tag = v.getTag();
                     if (null != tag) {
-                        platform = Platform.Type.valueOf(String.valueOf(tag));
+                        platform = PlatformType.valueOf(String.valueOf(tag));
                     }
                     break;
                 }
