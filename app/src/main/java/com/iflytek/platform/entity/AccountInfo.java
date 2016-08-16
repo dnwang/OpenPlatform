@@ -21,6 +21,8 @@ public class AccountInfo implements Serializable {
     public String id;
     public String nikename;
     public boolean gender;
+    public String token;
+    public int expireDate;
 
     private Map<String, String> extra;
 

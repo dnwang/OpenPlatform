@@ -136,11 +136,11 @@ final class SinaWeibo extends Platform implements Socialize {
                 }
             }
         });
-
     }
 
     @Override
     public void login(final Callback2<AccountInfo> callback) {
+        // TODO: 2016/8/16  code:21322 后端未配置REDIRECT_URL
         ssoHandler = new SsoHandler((Activity) getContext(), authInfo);
         ssoHandler.authorize(new WeiboAuthListener() {
             @Override
@@ -162,6 +162,6 @@ final class SinaWeibo extends Platform implements Socialize {
 
     @Override
     public void getFriends(Callback2<List<AccountInfo>> callback) {
-
+        // TODO: 2016/8/16
     }
 }

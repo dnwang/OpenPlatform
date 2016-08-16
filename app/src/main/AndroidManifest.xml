@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.iflytek.platform">
+    package="com.iflytek.ihou.chang.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -9,11 +9,9 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="OtherPlatformDemo"
-        android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault">
+        android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
 
         <activity android:name="com.iflytek.demo.DemoActivity">
             <intent-filter>
@@ -22,17 +20,16 @@
             </intent-filter>
         </activity>
 
-        <!--微博分享-->
+        <!--微博认证-->
         <activity
             android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser"
             android:configChanges="keyboardHidden|orientation"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
-        <!--微博分享-->
+        <!--微博认证-->
 
-        <!--腾讯分享-->
+        <!--腾讯认证-->
         <activity
             android:name="com.tencent.tauth.AuthActivity"
             android:launchMode="singleTask"
@@ -53,7 +50,17 @@
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
-        <!--腾讯分享-->
+        <!--腾讯认证-->
+
+        <!--微信回调-->
+        <!--注意:singleInstance,exported,包名,类名-->
+        <activity
+            android:name=".wxapi.WXEntryActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" />
+        <!--微信回调-->
 
     </application>
 

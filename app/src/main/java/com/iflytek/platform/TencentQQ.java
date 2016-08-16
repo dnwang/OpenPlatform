@@ -38,7 +38,7 @@ final class TencentQQ extends Platform implements Socialize {
     static final String APP_KEY = "20bca3e9e564042b7d1e2ec6ee261b1c";
 
     private Tencent shareApi;
-    private Callback2 callback2;
+    private Callback2<AccountInfo> loginCallback;
 
     public TencentQQ(Context context) {
         super(context);
@@ -51,8 +51,8 @@ final class TencentQQ extends Platform implements Socialize {
             Tencent.onActivityResultData(requestCode, resultCode, data, new IUiListener() {
                 @Override
                 public void onComplete(Object obj) {
-                    if (null != callback2) {
-                        callback2.call(obj, true, null, 0);// TODO: 8/15/16  code
+                    if (null != loginCallback) {
+                        loginCallback.call(new AccountInfo(), true, null, 0);// TODO: 8/15/16  code
                     }
 
                     if (null == obj) {
@@ -69,18 +69,19 @@ final class TencentQQ extends Platform implements Socialize {
 
                 @Override
                 public void onError(UiError e) {
-                    if (null != callback2) {
-                        callback2.call(null, false, e.errorMessage, StateCodes.ERROR);
+                    if (null != loginCallback) {
+                        loginCallback.call(null, false, e.errorMessage, StateCodes.ERROR);
                     }
                 }
 
                 @Override
                 public void onCancel() {
-                    if (null != callback2) {
-                        callback2.call(null, false, null, StateCodes.ERROR_CANCEL);
+                    if (null != loginCallback) {
+                        loginCallback.call(null, false, null, StateCodes.ERROR_CANCEL);
                     }
                 }
             });
+            loginCallback = null;
         }
     }
 
@@ -121,11 +122,14 @@ final class TencentQQ extends Platform implements Socialize {
 
     @Override
     public void login(Callback2<AccountInfo> callback) {
-        this.callback2 = callback;
+        loginCallback = callback;
+        // TODO: 2016/8/16
     }
 
     @Override
     public void getFriends(Callback2<List<AccountInfo>> callback) {
-
+        if (null != callback) {
+            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+        }
     }
 }

@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.iflytek.ihou.chang.app.R;
 import com.iflytek.platform.PlatformHelper;
 import com.iflytek.platform.PlatformType;
-import com.iflytek.platform.R;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
@@ -97,6 +97,8 @@ public class DemoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         registerListener();
+        platformHelper.select(PlatformType.WEIXIN);
+        platformHelper.onCreate(this, savedInstanceState);
     }
 
     @Override
