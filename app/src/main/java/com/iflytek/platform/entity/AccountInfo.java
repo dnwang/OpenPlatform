@@ -18,9 +18,9 @@ import java.util.Map;
  */
 public class AccountInfo implements Serializable {
 
-    public String id;
+    public String uid;
     public String nickName;
-    public boolean gender; // true:男
+    public int gender; // 1：男、2：女、0：未知
     public String headerImg;
     public String token;
     public int expireDate;
@@ -43,6 +43,11 @@ public class AccountInfo implements Serializable {
             return "";
         }
         return extra.get(key);
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(uid);
     }
 
 }

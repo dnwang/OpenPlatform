@@ -14,6 +14,7 @@ import android.content.Context;
  */
 public enum PlatformType {
 
+    SMS(UMengSMS.class),
     WEIBO(SinaWeibo.class),
     QQ(TencentQQ.class),
     QZONE(TencentQZone.class),

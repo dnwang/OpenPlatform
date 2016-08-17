@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.nfc.FormatException;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -15,7 +16,7 @@ import android.widget.TextView;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.StateCodes;
-import com.iflytek.platform.utils.HttpUtils;
+import com.iflytek.platform.utils.HttpsUtils;
 import com.iflytek.platform.utils.Tools;
 import com.tencent.mm.sdk.openapi.BaseReq;
 import com.tencent.mm.sdk.openapi.BaseResp;
@@ -48,6 +49,15 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
     private static final String APP_SECRET = "9299bfd1ec0104a4cad2faa23010a580";
     private static final String CLASS_WXAPI = ".wxapi.WXEntryActivity";// 固定api类名，必须存在
 
+    /**
+     * 通过认证Code换取token
+     */
+    private static final String API_GET_TOKEN = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code";
+    /**
+     * 通过token换取用户信息
+     */
+    private static final String API_GET_USER = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s";
+
     public static final String FLAG_CODE = "code";
     public static final String FLAG_TYPE = "type";
     public static final String FLAG_CONTENT = "content";
@@ -72,8 +82,9 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
     private Object content;
 
     public static boolean startActivity(Activity activity, int type, Serializable content) {
-
-
+        if (type < 0) {
+            return false;
+        }
         Class wxApiActivity = getWXApiActivity(activity);
         if (null == wxApiActivity) {
             return false;
@@ -99,7 +110,7 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(getContentView());
+//        setContentView(getContentView());
         getWindow().getDecorView().setBackgroundColor(0);
         wxApi = WXAPIFactory.createWXAPI(this, APP_ID, false);
         wxApi.handleIntent(getIntent(), this);
@@ -119,7 +130,7 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
         FrameLayout container = new FrameLayout(this);
         TextView tips = new TextView(this);
         tips.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-        tips.setShadowLayer(5, 0, 0, Color.DKGRAY);
+        tips.setShadowLayer(3, 0, 0, Color.DKGRAY);
         tips.setTextColor(Color.WHITE);
         tips.setText("请稍等...");
         container.addView(tips, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
@@ -221,6 +232,9 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
                         @Override
                         public void run() {
                             final AccountInfo accountInfo = getUserInfo(code);
+                            if (isFinishing()) {
+                                return;
+                            }
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -251,17 +265,17 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
     }
 
     private AccountInfo getUserInfo(final String code) {
-        final String url4Token = String.format(Locale.PRC, "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", APP_ID, APP_SECRET, code);
+        final String url4Token = String.format(Locale.PRC, API_GET_TOKEN, APP_ID, APP_SECRET, code);
         // get token info
-        final String tokenInfo = HttpUtils.get(url4Token);
+        final String tokenInfo = HttpsUtils.get(url4Token);
         try {
             // tokenInfo:{access_token,expires_in,refresh_token,openid,scope,unionid}
             JSONObject json = new JSONObject(tokenInfo);
             final String assessToken = Tools.getJsonString(json, "access_token");
             final String openId = Tools.getJsonString(json, "openid");
             // get user info
-            final String url4User = String.format(Locale.PRC, "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s", assessToken, openId);
-            final String userInfo = HttpUtils.get(url4User);
+            final String url4User = String.format(Locale.PRC, API_GET_USER, assessToken, openId);
+            final String userInfo = HttpsUtils.get(url4User);
             return toAccountInfo(userInfo);
         } catch (Exception e) {
             return null;
@@ -285,17 +299,18 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
     }
 
     private AccountInfo toAccountInfo(String userInfo) throws Exception {
-        // {errcode}
         // user:{subscribe,openid,nickname,sex,language,city,province,country,headimgurl,subscribe_time}
         JSONObject json = new JSONObject(userInfo);
-        if (!TextUtils.isEmpty(Tools.getJsonString(json, "errcode"))) {
-            throw new RuntimeException(userInfo);
+        final String openId = Tools.getJsonString(json, "openid");
+        if (TextUtils.isEmpty(openId)) {
+            throw new FormatException(userInfo);
         }
         AccountInfo accountInfo = new AccountInfo();
         accountInfo.nickName = Tools.getJsonString(json, "nickname");
         accountInfo.headerImg = Tools.getJsonString(json, "headimgurl");
-        accountInfo.gender = Tools.getJsonInt(json, "sex", 0) == 1;
-        accountInfo.putExtra("openId", Tools.getJsonString(json, "openid"));
+        accountInfo.gender = Tools.getJsonInt(json, "sex", 0);
+        accountInfo.putExtra("openId", openId);
+        accountInfo.putExtra("language", Tools.getJsonString(json, "language"));
         accountInfo.putExtra("city", Tools.getJsonString(json, "city"));
         accountInfo.putExtra("province", Tools.getJsonString(json, "province"));
         accountInfo.putExtra("country", Tools.getJsonString(json, "country"));

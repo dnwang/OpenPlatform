@@ -14,7 +14,7 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDirs = ["libs", "libs/weibo"]
+            jniLibs.srcDirs = ["libs", "libs/weibo", "libs/weixin", "libs/tencent", "libs/umeng"]
         }
     }
 
@@ -31,4 +31,5 @@ dependencies {
     compile fileTree(dir: 'libs/weibo', include: ['*.jar'])
     compile fileTree(dir: 'libs/weixin', include: ['*.jar'])
     compile fileTree(dir: 'libs/tencent', include: ['*.jar'])
+    compile fileTree(dir: 'libs/umeng', include: ['*.jar'])
 }

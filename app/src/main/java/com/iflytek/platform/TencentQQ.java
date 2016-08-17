@@ -124,6 +124,9 @@ final class TencentQQ extends Platform implements Socialize {
     public void login(Callback2<AccountInfo> callback) {
         loginCallback = callback;
         // TODO: 2016/8/16
+        if (null != callback) {
+            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+        }
     }
 
     @Override
