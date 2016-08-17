@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.iflytek.platform.callbacks.Callback;
-import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.StateCodes;
@@ -100,7 +99,7 @@ final class SinaWeibo extends Platform implements Socialize {
     }
 
     @Override
-    public void share(final ShareContent content, final Callback callback) {
+    public void share(final ShareContent content, final Callback<Object> callback) {
         if (null == content) {
             return;
         }
@@ -128,7 +127,7 @@ final class SinaWeibo extends Platform implements Socialize {
             @Override
             public void onWeiboException(WeiboException e) {
                 if (null != callback) {
-                    callback.call(false, e.getMessage(), StateCodes.ERROR);
+                    callback.call(null, e.getMessage(), StateCodes.ERROR);
                 }
             }
 
@@ -136,21 +135,21 @@ final class SinaWeibo extends Platform implements Socialize {
             public void onComplete(Bundle bundle) {
                 final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
                 if (null != callback) {
-                    callback.call(true, null, StateCodes.SUCCESS);
+                    callback.call(null, null, StateCodes.SUCCESS);
                 }
             }
 
             @Override
             public void onCancel() {
                 if (null != callback) {
-                    callback.call(false, null, StateCodes.ERROR_CANCEL);
+                    callback.call(null, null, StateCodes.ERROR_CANCEL);
                 }
             }
         });
     }
 
     @Override
-    public void login(final Callback2<AccountInfo> callback) {
+    public void login(final Callback<AccountInfo> callback) {
         ssoHandler = new SsoHandler((Activity) getContext(), authInfo);
         ssoHandler.authorize(new WeiboAuthListener() {
             @Override
@@ -160,7 +159,7 @@ final class SinaWeibo extends Platform implements Socialize {
                 }
                 final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
                 if (null == tokenInfo || !tokenInfo.isSessionValid()) {
-                    callback.call(null, false, null, StateCodes.ERROR);
+                    callback.call(null, null, StateCodes.ERROR);
                     return;
                 }
                 new Thread() {
@@ -175,7 +174,7 @@ final class SinaWeibo extends Platform implements Socialize {
                             @Override
                             public void run() {
                                 final boolean isSuccess = (null != accountInfo);
-                                callback.call(accountInfo, isSuccess, null, isSuccess ? StateCodes.SUCCESS : StateCodes.ERROR);
+                                callback.call(accountInfo, null, isSuccess ? StateCodes.SUCCESS : StateCodes.ERROR);
                             }
                         });
                     }
@@ -185,24 +184,24 @@ final class SinaWeibo extends Platform implements Socialize {
             @Override
             public void onWeiboException(WeiboException e) {
                 if (null != callback) {
-                    callback.call(null, false, e.getMessage(), StateCodes.ERROR);
+                    callback.call(null, e.getMessage(), StateCodes.ERROR);
                 }
             }
 
             @Override
             public void onCancel() {
                 if (null != callback) {
-                    callback.call(null, false, null, StateCodes.ERROR_CANCEL);
+                    callback.call(null, null, StateCodes.ERROR_CANCEL);
                 }
             }
         });
     }
 
     @Override
-    public void getFriends(Callback2<List<AccountInfo>> callback) {
+    public void getFriends(Callback<List<AccountInfo>> callback) {
         // TODO: 2016/8/16
         if (null != callback) {
-            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
         }
     }
 
@@ -227,7 +226,7 @@ final class SinaWeibo extends Platform implements Socialize {
             throw new FormatException(userInfo);
         }
         AccountInfo accountInfo = new AccountInfo();
-        accountInfo.uid = uid;
+        accountInfo.id = uid;
         accountInfo.nickName = Tools.getJsonString(json, "name");
         accountInfo.headerImg = Tools.getJsonString(json, "profile_image_url");
         final String gender = Tools.getJsonString(json, "gender").toLowerCase();

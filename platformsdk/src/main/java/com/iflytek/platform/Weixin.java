@@ -4,9 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import com.iflytek.platform.callbacks.Callback;
-import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.callbacks.AbsWeixinApiActivity;
+import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.StateCodes;
@@ -25,8 +24,8 @@ import java.util.List;
  */
 final class Weixin extends Platform implements Socialize {
 
-    private Callback shareCallback;
-    private Callback2<AccountInfo> loginCallback;
+    private Callback<Object> shareCallback;
+    private Callback<AccountInfo> loginCallback;
 
     public Weixin(Context context) {
         super(context);
@@ -38,11 +37,11 @@ final class Weixin extends Platform implements Socialize {
             final int code = data.getIntExtra(AbsWeixinApiActivity.FLAG_CODE, -1);
             final Object obj = data.getSerializableExtra(AbsWeixinApiActivity.FLAG_CONTENT);
             if (null != shareCallback) {
-                shareCallback.call(StateCodes.SUCCESS == code, null, code);
+                shareCallback.call(null, null, code);
             }
             if (null != loginCallback) {
                 final AccountInfo accountInfo = (null != obj && obj instanceof AccountInfo) ? (AccountInfo) obj : null;
-                loginCallback.call(accountInfo, StateCodes.SUCCESS == code, null, code);
+                loginCallback.call(accountInfo, null, code);
             }
         }
         shareCallback = null;
@@ -50,7 +49,7 @@ final class Weixin extends Platform implements Socialize {
     }
 
     @Override
-    public void share(ShareContent content, Callback callback) {
+    public void share(ShareContent content, Callback<Object> callback) {
         shareCallback = null;
         if (null == content) {
             return;
@@ -61,7 +60,7 @@ final class Weixin extends Platform implements Socialize {
     }
 
     @Override
-    public void login(Callback2<AccountInfo> callback) {
+    public void login(Callback<AccountInfo> callback) {
         loginCallback = null;
         if (AbsWeixinApiActivity.startActivity((Activity) getContext(), AbsWeixinApiActivity.TYPE_LOGIN, null)) {
             loginCallback = callback;
@@ -69,9 +68,9 @@ final class Weixin extends Platform implements Socialize {
     }
 
     @Override
-    public void getFriends(Callback2<List<AccountInfo>> callback) {
+    public void getFriends(Callback<List<AccountInfo>> callback) {
         if (null != callback) {
-            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
         }
     }
 

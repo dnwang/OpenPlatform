@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class AccountInfo implements Serializable {
 
-    public String uid;
+    public String id;
     public String nickName;
     public int gender; // 1:男;2女;0:未知
     public String headerImg;
@@ -45,7 +45,7 @@ public class AccountInfo implements Serializable {
 
     @Override
     public String toString() {
-        return String.valueOf(uid);
+        return String.valueOf(id);
     }
 
 }

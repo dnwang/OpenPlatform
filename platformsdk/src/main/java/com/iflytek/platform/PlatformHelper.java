@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.iflytek.platform.callbacks.Callback;
-import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
@@ -30,135 +29,121 @@ public final class PlatformHelper implements ActivityLifecycleCallbacks, Sociali
     private Context context;
 
     private Map<PlatformType, Platform> cache;
-    private Map<PlatformType, Platform> selected;
+    private Platform selected;
 
     public PlatformHelper(Context context) {
         this.context = context;
         this.cache = new HashMap<>();
-        this.selected = new HashMap<>();
     }
 
-    public PlatformHelper select(PlatformType... types) {
-        selected.clear();
-        if (null != types && types.length > 0) {
-            for (PlatformType type : types) {
-                if (null == type) {
-                    continue;
-                }
-                Platform platform = cache.get(type);
-                if (null == platform) {
-                    platform = type.getInstance(context);
-                    cache.put(type, platform);
-                }
-                selected.put(type, platform);
+    public PlatformHelper select(PlatformType type) {
+        selected = null;
+        if (null != type) {
+            Platform platform = cache.get(type);
+            if (null == platform) {
+                platform = type.getInstance(context);
+                cache.put(type, platform);
             }
+            selected = platform;
         }
         return this;
     }
 
     public PlatformHelper clear() {
-        selected.clear();
+        selected = null;
         cache.clear();
         return this;
     }
 
     @Override
-    public void pay(PayInfo payInfo, Callback callback) {
-        for (Platform platform : selected.values()) {
-            if (platform instanceof Payable) {
-                ((Payable) platform).pay(payInfo, callback);
-            }
+    public void pay(PayInfo payInfo, Callback<Object> callback) {
+        if (null != selected && selected instanceof Payable) {
+            ((Payable) selected).pay(payInfo, callback);
         }
     }
 
     @Override
-    public void share(ShareContent content, Callback callback) {
-        for (Platform platform : selected.values()) {
-            if (platform instanceof Socialize) {
-                ((Socialize) platform).share(content, callback);
-            }
+    public void share(ShareContent content, Callback<Object> callback) {
+        if (null != selected && selected instanceof Socialize) {
+            ((Socialize) selected).share(content, callback);
         }
     }
 
     @Override
-    public void login(Callback2<AccountInfo> callback) {
-        for (Platform platform : selected.values()) {
-            if (platform instanceof Socialize) {
-                ((Socialize) platform).login(callback);
-            }
+    public void login(Callback<AccountInfo> callback) {
+        if (null != selected && selected instanceof Socialize) {
+            ((Socialize) selected).login(callback);
         }
     }
 
     @Override
-    public void getFriends(Callback2<List<AccountInfo>> callback) {
-        for (Platform platform : selected.values()) {
-            if (platform instanceof Socialize) {
-                ((Socialize) platform).getFriends(callback);
-            }
+    public void getFriends(Callback<List<AccountInfo>> callback) {
+        if (null != selected && selected instanceof Socialize) {
+            ((Socialize) selected).getFriends(callback);
         }
     }
 
 
     @Override
     public void onCreate(Activity activity, Bundle bundle) {
-        for (Platform platform : selected.values()) {
-            platform.onCreate(activity, bundle);
+        if (null != selected) {
+            selected.onCreate(activity, bundle);
         }
     }
 
     @Override
     public void onStart(Activity activity) {
-        for (Platform platform : selected.values()) {
-            platform.onStart(activity);
+        if (null != selected) {
+            selected.onStart(activity);
         }
     }
 
     @Override
     public void onRestart(Activity activity) {
-        for (Platform platform : selected.values()) {
-            platform.onRestart(activity);
+        if (null != selected) {
+            selected.onRestart(activity);
         }
     }
 
     @Override
     public void onResume(Activity activity) {
-        for (Platform platform : selected.values()) {
-            platform.onResume(activity);
+        if (null != selected) {
+            selected.onResume(activity);
         }
     }
 
     @Override
     public void onStop(Activity activity) {
-        for (Platform platform : selected.values()) {
-            platform.onStop(activity);
+        if (null != selected) {
+            selected.onStop(activity);
         }
     }
 
     @Override
     public void onDestroy(Activity activity) {
-        for (Platform platform : selected.values()) {
-            platform.onDestroy(activity);
+        if (null != selected) {
+            selected.onDestroy(activity);
         }
     }
 
     @Override
     public void onSaveInstanceState(Activity activity, Bundle bundle) {
-        for (Platform platform : selected.values()) {
-            platform.onSaveInstanceState(activity, bundle);
+        if (null != selected) {
+            selected.onSaveInstanceState(activity, bundle);
         }
     }
 
     @Override
     public void onNewIntent(Activity activity, Intent intent) {
-        for (Platform platform : selected.values()) {
-            platform.onNewIntent(activity, intent);
+        if (null != selected) {
+            selected.onNewIntent(activity, intent);
         }
     }
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        for (Platform platform : selected.values()) {
-            platform.onActivityResult(activity, requestCode, resultCode, data);
+        if (null != selected) {
+            selected.onActivityResult(activity, requestCode, resultCode, data);
         }
     }
 

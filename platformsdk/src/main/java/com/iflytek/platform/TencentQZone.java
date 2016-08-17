@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.iflytek.platform.callbacks.Callback;
-import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.StateCodes;
@@ -53,7 +52,7 @@ final class TencentQZone extends Platform implements Socialize {
     }
 
     @Override
-    public void share(ShareContent content, final Callback callback) {
+    public void share(ShareContent content, final Callback<Object> callback) {
         if (null == content || TextUtils.isEmpty(content.targetUrl)) {
             return;
         }
@@ -68,16 +67,16 @@ final class TencentQZone extends Platform implements Socialize {
     }
 
     @Override
-    public void login(Callback2<AccountInfo> callback) {
+    public void login(Callback<AccountInfo> callback) {
         if (null != callback) {
-            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
         }
     }
 
     @Override
-    public void getFriends(Callback2<List<AccountInfo>> callback) {
+    public void getFriends(Callback<List<AccountInfo>> callback) {
         if (null != callback) {
-            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
         }
     }
 

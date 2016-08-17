@@ -6,7 +6,6 @@ import android.content.Intent;
 
 import com.iflytek.platform.callbacks.AbsWeixinApiActivity;
 import com.iflytek.platform.callbacks.Callback;
-import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.StateCodes;
@@ -25,7 +24,7 @@ import java.util.List;
  */
 final class WeixinCircle extends Platform implements Socialize {
 
-    private Callback shareCallback;
+    private Callback<Object> shareCallback;
 
     public WeixinCircle(Context context) {
         super(context);
@@ -36,14 +35,14 @@ final class WeixinCircle extends Platform implements Socialize {
         if (AbsWeixinApiActivity.REQ_WEIXIN == requestCode && Activity.RESULT_OK == resultCode) {
             final int code = data.getIntExtra(AbsWeixinApiActivity.FLAG_CODE, -1);
             if (null != shareCallback) {
-                shareCallback.call(StateCodes.SUCCESS == code, null, code);
+                shareCallback.call(null, null, code);
             }
         }
         shareCallback = null;
     }
 
     @Override
-    public void share(ShareContent content, Callback callback) {
+    public void share(ShareContent content, Callback<Object> callback) {
         shareCallback = null;
         if (null == content) {
             return;
@@ -54,16 +53,16 @@ final class WeixinCircle extends Platform implements Socialize {
     }
 
     @Override
-    public void login(Callback2<AccountInfo> callback) {
+    public void login(Callback<AccountInfo> callback) {
         if (null != callback) {
-            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
         }
     }
 
     @Override
-    public void getFriends(Callback2<List<AccountInfo>> callback) {
+    public void getFriends(Callback<List<AccountInfo>> callback) {
         if (null != callback) {
-            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
         }
     }
 

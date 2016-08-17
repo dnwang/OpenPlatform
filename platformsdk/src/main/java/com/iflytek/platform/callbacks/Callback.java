@@ -10,8 +10,8 @@ package com.iflytek.platform.callbacks;
  * @version 8/13/16,08:07
  * @see
  */
-public interface Callback {
+public interface Callback<T> {
 
-    void call(boolean isSuccess, String msg, int code);
+    void call(T t, String msg, int code);
 
 }

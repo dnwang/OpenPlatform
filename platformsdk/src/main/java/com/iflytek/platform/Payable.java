@@ -15,6 +15,6 @@ import com.iflytek.platform.entity.PayInfo;
  */
 interface Payable {
 
-    void pay(PayInfo payInfo, Callback callback);
+    void pay(PayInfo payInfo, Callback<Object> callback);
 
 }

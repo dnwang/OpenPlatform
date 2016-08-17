@@ -306,6 +306,7 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
             throw new FormatException(userInfo);
         }
         AccountInfo accountInfo = new AccountInfo();
+        accountInfo.id = openId;
         accountInfo.nickName = Tools.getJsonString(json, "nickname");
         accountInfo.headerImg = Tools.getJsonString(json, "headimgurl");
         accountInfo.gender = Tools.getJsonInt(json, "sex", 0);

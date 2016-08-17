@@ -13,6 +13,7 @@ import com.iflytek.platform.PlatformHelper;
 import com.iflytek.platform.PlatformType;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
+import com.iflytek.platform.entity.StateCodes;
 
 /**
  * Copyright (C), 2016 <br>
@@ -37,8 +38,8 @@ public class DemoActivity extends Activity {
                     .imageUrl("http://www.weipet.cn/common/images/pic/a347.jpg")
                     .targetUrl("http://www.baidu.com")
                     .create();
-            platformHelper.select(getSelectedType()).share(content, (isSuccess, msg, code) -> {
-                Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
+            platformHelper.select(getSelectedType()).share(content, (obj, msg, code) -> {
+                Toast.makeText(getApplicationContext(), code + ", " + msg, Toast.LENGTH_SHORT).show();
             });
         }
     };
@@ -46,8 +47,14 @@ public class DemoActivity extends Activity {
     private final View.OnClickListener loginClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            platformHelper.select(getSelectedType()).login((accountInfo, isSuccess, msg, code) -> {
-                Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
+            platformHelper.select(getSelectedType()).login((user, msg, code) -> {
+                String tips;
+                if (StateCodes.SUCCESS == code) {
+                    tips = user.id + ", " + code + ", " + msg;
+                } else {
+                    tips = code + ", " + msg;
+                }
+                Toast.makeText(getApplicationContext(), tips, Toast.LENGTH_SHORT).show();
             });
         }
     };
@@ -55,8 +62,8 @@ public class DemoActivity extends Activity {
     private final View.OnClickListener getFriendsClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            platformHelper.select(getSelectedType()).getFriends((accountInfos, isSuccess, msg, code) -> {
-                Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
+            platformHelper.select(getSelectedType()).getFriends((userList, msg, code) -> {
+                Toast.makeText(getApplicationContext(), userList.size() + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
             });
         }
     };

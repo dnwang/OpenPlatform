@@ -23,9 +23,9 @@ final class AliPay extends Platform implements Payable {
     }
 
     @Override
-    public void pay(PayInfo payInfo, Callback callback) {
+    public void pay(PayInfo payInfo, Callback<Object> callback) {
         if (null != callback) {
-            callback.call(false, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
         }
     }
 }

@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.iflytek.platform.callbacks.Callback;
-import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.StateCodes;
@@ -65,7 +64,7 @@ final class TencentQQ extends Platform implements Socialize {
     }
 
     @Override
-    public void share(ShareContent content, final Callback callback) {
+    public void share(ShareContent content, final Callback<Object> callback) {
         if (null == content || TextUtils.isEmpty(content.targetUrl)) {
             return;
         }
@@ -80,21 +79,21 @@ final class TencentQQ extends Platform implements Socialize {
     }
 
     @Override
-    public void login(final Callback2<AccountInfo> callback) {
-        loginCallback = new SampleUIListener<Callback2<AccountInfo>>(callback) {
+    public void login(final Callback<AccountInfo> callback) {
+        loginCallback = new SampleUIListener<AccountInfo>(callback) {
             @Override
             public void onComplete(Object obj) {
                 if (null == getCallback()) {
                     return;
                 }
                 if (null == obj) {
-                    getCallback().call(null, false, null, StateCodes.ERROR);
+                    getCallback().call(null, null, StateCodes.ERROR);
                     return;
                 }
                 JSONObject json = (JSONObject) obj;
                 final String token = Tools.getJsonString(json, Constants.PARAM_ACCESS_TOKEN);
-                String expires = Tools.getJsonString(json, Constants.PARAM_EXPIRES_IN);
-                String openId = Tools.getJsonString(json, Constants.PARAM_OPEN_ID);
+                final String expires = Tools.getJsonString(json, Constants.PARAM_EXPIRES_IN);
+                final String openId = Tools.getJsonString(json, Constants.PARAM_OPEN_ID);
 
                 QQToken qqToken = new QQToken(APP_ID);
                 qqToken.setAuthSource(QQToken.AUTH_QQ);
@@ -102,14 +101,13 @@ final class TencentQQ extends Platform implements Socialize {
                 qqToken.setOpenId(openId);
 
                 UserInfo userInfo = new UserInfo(getContext(), qqToken);
-                userInfo.getUserInfo(new SampleUIListener<Callback2<AccountInfo>>(getCallback()) {
+                userInfo.getUserInfo(new SampleUIListener<AccountInfo>(getCallback()) {
                     @Override
                     public void onComplete(Object obj) {
                         try {
-                            callback.call(toAccountInfo(String.valueOf(obj)), true, null, StateCodes.SUCCESS);
+                            getCallback().call(toAccountInfo(openId, String.valueOf(obj)), null, StateCodes.SUCCESS);
                         } catch (Exception e) {
-                            callback.call(null, false, null, StateCodes.ERROR);
-                            e.printStackTrace();
+                            getCallback().call(null, e.getMessage(), StateCodes.ERROR);
                         }
                     }
                 });
@@ -119,13 +117,13 @@ final class TencentQQ extends Platform implements Socialize {
     }
 
     @Override
-    public void getFriends(Callback2<List<AccountInfo>> callback) {
+    public void getFriends(Callback<List<AccountInfo>> callback) {
         if (null != callback) {
-            callback.call(null, false, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
         }
     }
 
-    private AccountInfo toAccountInfo(String userInfo) throws Exception {
+    private AccountInfo toAccountInfo(String openId, String userInfo) throws Exception {
         // user:{ret,msg,is_lost,nickname,gender,province,city,figureurl,figureurl_1,figureurl_2,figureurl_qq_1,figureurl_qq_2}
         JSONObject json = new JSONObject(userInfo);
         final String nickName = Tools.getJsonString(json, "nickname");
@@ -133,7 +131,7 @@ final class TencentQQ extends Platform implements Socialize {
             throw new FormatException(userInfo);
         }
         AccountInfo accountInfo = new AccountInfo();
-        accountInfo.uid = "";// 无唯一标识信息
+        accountInfo.id = openId;
         accountInfo.nickName = nickName;
         accountInfo.headerImg = Tools.getJsonString(json, "figureurl");
         final String gender = Tools.getJsonString(json, "gender");
@@ -148,13 +146,13 @@ final class TencentQQ extends Platform implements Socialize {
 
     static class SampleUIListener<T> implements IUiListener {
 
-        private T callback;
+        private Callback<T> callback;
 
-        SampleUIListener(T callback) {
+        SampleUIListener(Callback<T> callback) {
             this.callback = callback;
         }
 
-        protected T getCallback() {
+        protected Callback<T> getCallback() {
             return callback;
         }
 
@@ -163,11 +161,7 @@ final class TencentQQ extends Platform implements Socialize {
             if (null == callback) {
                 return;
             }
-            if (callback instanceof Callback) {
-                ((Callback) callback).call(true, null, StateCodes.SUCCESS);
-            } else if (callback instanceof Callback2) {
-                ((Callback2) callback).call(null, true, null, StateCodes.SUCCESS);
-            }
+            callback.call(null, null, StateCodes.SUCCESS);
         }
 
         @Override
@@ -175,11 +169,7 @@ final class TencentQQ extends Platform implements Socialize {
             if (null == callback) {
                 return;
             }
-            if (callback instanceof Callback) {
-                ((Callback) callback).call(false, null, StateCodes.ERROR_CANCEL);
-            } else if (callback instanceof Callback2) {
-                ((Callback2) callback).call(null, false, null, StateCodes.ERROR_CANCEL);
-            }
+            callback.call(null, null, StateCodes.ERROR_CANCEL);
         }
 
         @Override
@@ -187,11 +177,7 @@ final class TencentQQ extends Platform implements Socialize {
             if (null == callback) {
                 return;
             }
-            if (callback instanceof Callback) {
-                ((Callback) callback).call(false, String.valueOf(uiError.errorCode), StateCodes.ERROR);
-            } else if (callback instanceof Callback2) {
-                ((Callback2) callback).call(null, false, String.valueOf(uiError.errorCode), StateCodes.ERROR);
-            }
+            callback.call(null, String.valueOf(uiError.errorCode), StateCodes.ERROR);
         }
     }
 

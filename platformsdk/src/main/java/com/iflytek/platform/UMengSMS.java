@@ -3,7 +3,6 @@ package com.iflytek.platform;
 import android.content.Context;
 
 import com.iflytek.platform.callbacks.Callback;
-import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
 
@@ -32,17 +31,17 @@ final class UMengSMS extends Platform implements Socialize {
     }
 
     @Override
-    public void share(ShareContent content, Callback callback) {
+    public void share(ShareContent content, Callback<Object> callback) {
 
     }
 
     @Override
-    public void login(Callback2<AccountInfo> callback) {
+    public void login(Callback<AccountInfo> callback) {
 
     }
 
     @Override
-    public void getFriends(Callback2<List<AccountInfo>> callback) {
+    public void getFriends(Callback<List<AccountInfo>> callback) {
 
     }
 }
