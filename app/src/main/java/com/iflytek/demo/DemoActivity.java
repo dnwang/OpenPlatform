@@ -62,8 +62,14 @@ public class DemoActivity extends Activity {
     private final View.OnClickListener getFriendsClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            platformHelper.select(getSelectedType()).getFriends((userList, msg, code) -> {
-                Toast.makeText(getApplicationContext(), userList.size() + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
+            platformHelper.select(getSelectedType()).getFriends((users, msg, code) -> {
+                String tips;
+                if (StateCodes.SUCCESS == code) {
+                    tips = users.size() + ", " + code + ", " + msg;
+                } else {
+                    tips = code + ", " + msg;
+                }
+                Toast.makeText(getApplicationContext(), tips, Toast.LENGTH_SHORT).show();
             });
         }
     };

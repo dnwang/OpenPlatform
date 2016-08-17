@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.nfc.FormatException;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
@@ -13,7 +14,6 @@ import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.StateCodes;
 import com.iflytek.platform.utils.HttpsUtils;
 import com.iflytek.platform.utils.Tools;
-import com.sina.weibo.sdk.api.ImageObject;
 import com.sina.weibo.sdk.api.TextObject;
 import com.sina.weibo.sdk.api.WeiboMultiMessage;
 import com.sina.weibo.sdk.api.share.BaseResponse;
@@ -25,6 +25,7 @@ import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
+import com.sina.weibo.sdk.constant.WBConstants;
 import com.sina.weibo.sdk.exception.WeiboException;
 
 import org.json.JSONObject;
@@ -65,8 +66,18 @@ final class SinaWeibo extends Platform implements Socialize {
 
     private final IWeiboHandler.Response response = new IWeiboHandler.Response() {
         @Override
-        public void onResponse(BaseResponse baseResponse) {
-            // TODO: 8/13/16
+        public void onResponse(BaseResponse baseResp) {
+            if (baseResp != null) {
+                Log.d("-- weibo --", baseResp.errMsg);
+                switch (baseResp.errCode) {
+                    case WBConstants.ErrorCode.ERR_OK:
+                        break;
+                    case WBConstants.ErrorCode.ERR_CANCEL:
+                        break;
+                    case WBConstants.ErrorCode.ERR_FAIL:
+                        break;
+                }
+            }
         }
     };
 
@@ -79,7 +90,7 @@ final class SinaWeibo extends Platform implements Socialize {
 
     @Override
     public void onCreate(Activity activity, Bundle bundle) {
-        if (null != shareAPI && null != bundle) {
+        if (null != shareAPI) {
             shareAPI.handleWeiboResponse(activity.getIntent(), response);
         }
     }
@@ -110,12 +121,8 @@ final class SinaWeibo extends Platform implements Socialize {
         textObject.text = content.content;
         textObject.title = content.title;
 
-        ImageObject imageObject = new ImageObject();
-        imageObject.imagePath = content.imageUrl;
-
         WeiboMultiMessage message = new WeiboMultiMessage();
         message.textObject = textObject;
-        message.imageObject = imageObject;
 
         SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
         // 用transaction唯一标识一个请求
@@ -123,7 +130,6 @@ final class SinaWeibo extends Platform implements Socialize {
         request.multiMessage = message;
 
         shareAPI.sendRequest((Activity) getContext(), request, authInfo, "", new WeiboAuthListener() {
-
             @Override
             public void onWeiboException(WeiboException e) {
                 if (null != callback) {
