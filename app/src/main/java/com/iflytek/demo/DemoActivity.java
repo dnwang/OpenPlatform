@@ -11,13 +11,8 @@ import android.widget.Toast;
 import com.iflytek.ihou.chang.app.R;
 import com.iflytek.platform.PlatformHelper;
 import com.iflytek.platform.PlatformType;
-import com.iflytek.platform.callbacks.Callback;
-import com.iflytek.platform.callbacks.Callback2;
-import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
-
-import java.util.List;
 
 /**
  * Copyright (C), 2016 <br>
@@ -42,13 +37,8 @@ public class DemoActivity extends Activity {
                     .imageUrl("http://www.weipet.cn/common/images/pic/a347.jpg")
                     .targetUrl("http://www.baidu.com")
                     .create();
-
-            // share
-            platformHelper.select(getSelectedType()).share(content, new Callback() {
-                @Override
-                public void call(boolean isSuccess, String msg, int code) {
-                    Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
-                }
+            platformHelper.select(getSelectedType()).share(content, (isSuccess, msg, code) -> {
+                Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
             });
         }
     };
@@ -56,11 +46,8 @@ public class DemoActivity extends Activity {
     private final View.OnClickListener loginClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            platformHelper.select(getSelectedType()).login(new Callback2<AccountInfo>() {
-                @Override
-                public void call(AccountInfo accountInfo, boolean isSuccess, String msg, int code) {
-                    Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
-                }
+            platformHelper.select(getSelectedType()).login((accountInfo, isSuccess, msg, code) -> {
+                Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
             });
         }
     };
@@ -68,11 +55,8 @@ public class DemoActivity extends Activity {
     private final View.OnClickListener getFriendsClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            platformHelper.select(getSelectedType()).getFriends(new Callback2<List<AccountInfo>>() {
-                @Override
-                public void call(List<AccountInfo> accountInfos, boolean isSuccess, String msg, int code) {
-                    Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
-                }
+            platformHelper.select(getSelectedType()).getFriends((accountInfos, isSuccess, msg, code) -> {
+                Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
             });
         }
     };
@@ -81,12 +65,8 @@ public class DemoActivity extends Activity {
         @Override
         public void onClick(View view) {
             final PayInfo payInfo = new PayInfo();
-
-            platformHelper.select(getSelectedType()).pay(payInfo, new Callback() {
-                @Override
-                public void call(boolean isSuccess, String msg, int code) {
-                    Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
-                }
+            platformHelper.select(getSelectedType()).pay(payInfo, (isSuccess, msg, code) -> {
+                Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
             });
         }
     };
