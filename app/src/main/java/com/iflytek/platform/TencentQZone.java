@@ -2,6 +2,7 @@ package com.iflytek.platform;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -10,10 +11,10 @@ import com.iflytek.platform.callbacks.Callback2;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.StateCodes;
+import com.tencent.connect.common.Constants;
 import com.tencent.connect.share.QzoneShare;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
-import com.tencent.tauth.UiError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +35,21 @@ final class TencentQZone extends Platform implements Socialize {
     private static final String APP_KEY = TencentQQ.APP_KEY;
 
     private Tencent shareApi;
+    private IUiListener shareCallback;
 
     public TencentQZone(Context context) {
         super(context);
         shareApi = Tencent.createInstance(APP_ID, context);
+    }
+
+    @Override
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        if (requestCode == Constants.REQUEST_QZONE_SHARE) {
+            if (null != shareCallback) {
+                Tencent.onActivityResultData(requestCode, resultCode, data, shareCallback);
+            }
+            shareCallback = null;
+        }
     }
 
     @Override
@@ -51,28 +63,8 @@ final class TencentQZone extends Platform implements Socialize {
         params.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, content.content);
         params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, new ArrayList<String>());
 
-        shareApi.shareToQzone((Activity) getContext(), params, new IUiListener() {
-            @Override
-            public void onCancel() {
-                if (null != callback) {
-                    callback.call(false, null, StateCodes.ERROR_CANCEL);
-                }
-            }
-
-            @Override
-            public void onComplete(Object response) {
-                if (null != callback) {
-                    callback.call(true, null, StateCodes.SUCCESS);
-                }
-            }
-
-            @Override
-            public void onError(UiError e) {
-                if (null != callback) {
-                    callback.call(false, e.errorMessage, StateCodes.ERROR);
-                }
-            }
-        });
+        shareCallback = new TencentQQ.SampleUIListener<>(callback);
+        shareApi.shareToQzone((Activity) getContext(), params, shareCallback);
     }
 
     @Override

@@ -46,12 +46,12 @@ import java.util.Locale;
  */
 final class SinaWeibo extends Platform implements Socialize {
 
-    private static String APP_KEY = "778164658";
-    private static String APP_SECRET = "06552db3dc303529ba971b257379c49e";
+    private static final String APP_KEY = "778164658";
+    private static final String APP_SECRET = "06552db3dc303529ba971b257379c49e";
 
     // 由于后端没有配置，始终出现21322，以下URL摘自友盟新浪分享，可用作默认值
-    private static String REDIRECT_URL = "http://sns.whalecloud.com/sina2/callback";
-    private static String SCOPE = "email,direct_messages_read,direct_messages_write," +
+    private static final String REDIRECT_URL = "http://sns.whalecloud.com/sina2/callback";
+    private static final String SCOPE = "email,direct_messages_read,direct_messages_write," +
             "friendships_groups_read,friendships_groups_write,statuses_to_me_read,follow_app_official_microblog,invitation_write";
 
     /**
@@ -134,7 +134,7 @@ final class SinaWeibo extends Platform implements Socialize {
 
             @Override
             public void onComplete(Bundle bundle) {
-                final Oauth2AccessToken token = Oauth2AccessToken.parseAccessToken(bundle);
+                final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
                 if (null != callback) {
                     callback.call(true, null, StateCodes.SUCCESS);
                 }
@@ -223,14 +223,14 @@ final class SinaWeibo extends Platform implements Socialize {
         // user:{...}
         JSONObject json = new JSONObject(userInfo);
         final String uid = Tools.getJsonString(json, "id");
-        AccountInfo accountInfo = new AccountInfo();
         if (TextUtils.isEmpty(uid)) {
             throw new FormatException(userInfo);
         }
+        AccountInfo accountInfo = new AccountInfo();
         accountInfo.uid = uid;
         accountInfo.nickName = Tools.getJsonString(json, "name");
         accountInfo.headerImg = Tools.getJsonString(json, "profile_image_url");
-        final String gender = Tools.getJsonString(json, "gender");
+        final String gender = Tools.getJsonString(json, "gender").toLowerCase();
         accountInfo.gender = "m".equals(gender) ? 1 : ("w".equals(gender) ? 2 : 0);
         accountInfo.putExtra("avatar_large", Tools.getJsonString(json, "avatar_large"));
         accountInfo.putExtra("avatar_hd", Tools.getJsonString(json, "avatar_hd"));

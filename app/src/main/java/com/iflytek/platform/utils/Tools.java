@@ -3,8 +3,12 @@ package com.iflytek.platform.utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * Copyright (C), 2016 <br>
@@ -54,6 +58,38 @@ public final class Tools {
         } catch (JSONException e) {
             return false;
         }
+    }
+
+    public static <T> T clone(T object) {
+        T result = null;
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        ObjectInputStream objectInputStream = null;
+        try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream oo = new ObjectOutputStream(byteArrayOutputStream);
+            oo.writeObject(object);
+            objectInputStream = new ObjectInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+            result = (T) objectInputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            if (byteArrayOutputStream != null) {
+                try {
+                    byteArrayOutputStream.flush();
+                    byteArrayOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (objectInputStream != null) {
+                try {
+                    objectInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;
     }
 
 }
