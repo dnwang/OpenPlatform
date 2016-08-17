@@ -20,10 +20,8 @@ public class AccountInfo implements Serializable {
 
     public String uid;
     public String nickName;
-    public int gender; // 1：男、2：女、0：未知
+    public int gender; // 1:男;2女;0:未知
     public String headerImg;
-    public String token;
-    public int expireDate;
 
     private Map<String, String> extra;
 

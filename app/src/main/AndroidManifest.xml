@@ -10,7 +10,7 @@
 
     <application
         android:icon="@mipmap/ic_launcher"
-        android:label="OtherPlatformDemo"
+        android:label="OpenPlatform"
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
 
         <activity android:name="com.iflytek.demo.DemoActivity">
