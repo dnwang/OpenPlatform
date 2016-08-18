@@ -62,6 +62,13 @@
             android:screenOrientation="portrait" />
         <!--微信回调-->
 
+        <!--淘宝授权-->
+        <activity
+            android:name="com.iflytek.platform.callbacks.TaobaoAuthActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="portrait" />
+        <!--淘宝授权-->
+
     </application>
 
 </manifest>

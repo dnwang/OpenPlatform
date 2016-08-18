@@ -8,7 +8,7 @@ import com.iflytek.platform.callbacks.AbsWeixinApiActivity;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
-import com.iflytek.platform.entity.StateCodes;
+import com.iflytek.platform.entity.Constants;
 
 import java.util.List;
 
@@ -55,14 +55,14 @@ final class WeixinCircle extends Platform implements Socialize {
     @Override
     public void login(Callback<AccountInfo> callback) {
         if (null != callback) {
-            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
         }
     }
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
         if (null != callback) {
-            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
         }
     }
 

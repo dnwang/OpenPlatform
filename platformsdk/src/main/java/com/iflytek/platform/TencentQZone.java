@@ -9,8 +9,7 @@ import android.text.TextUtils;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
-import com.iflytek.platform.entity.StateCodes;
-import com.tencent.connect.common.Constants;
+import com.iflytek.platform.entity.Constants;
 import com.tencent.connect.share.QzoneShare;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
@@ -43,7 +42,7 @@ final class TencentQZone extends Platform implements Socialize {
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        if (requestCode == Constants.REQUEST_QZONE_SHARE) {
+        if (requestCode == com.tencent.connect.common.Constants.REQUEST_QZONE_SHARE) {
             if (null != shareCallback) {
                 Tencent.onActivityResultData(requestCode, resultCode, data, shareCallback);
             }
@@ -69,14 +68,14 @@ final class TencentQZone extends Platform implements Socialize {
     @Override
     public void login(Callback<AccountInfo> callback) {
         if (null != callback) {
-            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
         }
     }
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
         if (null != callback) {
-            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
         }
     }
 

@@ -9,12 +9,11 @@ import android.text.TextUtils;
 
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
+import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
-import com.iflytek.platform.entity.StateCodes;
 import com.iflytek.platform.utils.Tools;
 import com.tencent.connect.UserInfo;
 import com.tencent.connect.auth.QQToken;
-import com.tencent.connect.common.Constants;
 import com.tencent.connect.share.QQShare;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
@@ -50,12 +49,13 @@ final class TencentQQ extends Platform implements Socialize {
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        if (requestCode == Constants.REQUEST_LOGIN || requestCode == Constants.REQUEST_APPBAR) {
+        if (requestCode == com.tencent.connect.common.Constants.REQUEST_LOGIN
+                || requestCode == com.tencent.connect.common.Constants.REQUEST_APPBAR) {
             if (null != loginCallback) {
                 Tencent.onActivityResultData(requestCode, resultCode, data, loginCallback);
             }
             loginCallback = null;
-        } else if (requestCode == Constants.REQUEST_QQ_SHARE) {
+        } else if (requestCode == com.tencent.connect.common.Constants.REQUEST_QQ_SHARE) {
             if (null != shareCallback) {
                 Tencent.onActivityResultData(requestCode, resultCode, data, shareCallback);
             }
@@ -87,13 +87,13 @@ final class TencentQQ extends Platform implements Socialize {
                     return;
                 }
                 if (null == obj) {
-                    getCallback().call(null, null, StateCodes.ERROR);
+                    getCallback().call(null, null, Constants.Code.ERROR);
                     return;
                 }
                 JSONObject json = (JSONObject) obj;
-                final String token = Tools.getJsonString(json, Constants.PARAM_ACCESS_TOKEN);
-                final String expires = Tools.getJsonString(json, Constants.PARAM_EXPIRES_IN);
-                final String openId = Tools.getJsonString(json, Constants.PARAM_OPEN_ID);
+                final String token = Tools.getJsonString(json, com.tencent.connect.common.Constants.PARAM_ACCESS_TOKEN);
+                final String expires = Tools.getJsonString(json, com.tencent.connect.common.Constants.PARAM_EXPIRES_IN);
+                final String openId = Tools.getJsonString(json, com.tencent.connect.common.Constants.PARAM_OPEN_ID);
 
                 QQToken qqToken = new QQToken(APP_ID);
                 qqToken.setAuthSource(QQToken.AUTH_QQ);
@@ -105,9 +105,9 @@ final class TencentQQ extends Platform implements Socialize {
                     @Override
                     public void onComplete(Object obj) {
                         try {
-                            getCallback().call(toAccountInfo(openId, String.valueOf(obj)), null, StateCodes.SUCCESS);
+                            getCallback().call(toAccountInfo(openId, String.valueOf(obj)), null, Constants.Code.SUCCESS);
                         } catch (Exception e) {
-                            getCallback().call(null, e.getMessage(), StateCodes.ERROR);
+                            getCallback().call(null, e.getMessage(), Constants.Code.ERROR);
                         }
                     }
                 });
@@ -119,7 +119,7 @@ final class TencentQQ extends Platform implements Socialize {
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
         if (null != callback) {
-            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
         }
     }
 
@@ -161,7 +161,7 @@ final class TencentQQ extends Platform implements Socialize {
             if (null == callback) {
                 return;
             }
-            callback.call(null, null, StateCodes.SUCCESS);
+            callback.call(null, null, Constants.Code.SUCCESS);
         }
 
         @Override
@@ -169,7 +169,7 @@ final class TencentQQ extends Platform implements Socialize {
             if (null == callback) {
                 return;
             }
-            callback.call(null, null, StateCodes.ERROR_CANCEL);
+            callback.call(null, null, Constants.Code.ERROR_CANCEL);
         }
 
         @Override
@@ -177,7 +177,7 @@ final class TencentQQ extends Platform implements Socialize {
             if (null == callback) {
                 return;
             }
-            callback.call(null, String.valueOf(uiError.errorCode), StateCodes.ERROR);
+            callback.call(null, String.valueOf(uiError.errorCode), Constants.Code.ERROR);
         }
     }
 

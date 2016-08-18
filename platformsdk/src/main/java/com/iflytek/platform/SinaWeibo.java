@@ -11,7 +11,7 @@ import android.util.Log;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
-import com.iflytek.platform.entity.StateCodes;
+import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.utils.HttpsUtils;
 import com.iflytek.platform.utils.Tools;
 import com.sina.weibo.sdk.api.TextObject;
@@ -133,7 +133,7 @@ final class SinaWeibo extends Platform implements Socialize {
             @Override
             public void onWeiboException(WeiboException e) {
                 if (null != callback) {
-                    callback.call(null, e.getMessage(), StateCodes.ERROR);
+                    callback.call(null, e.getMessage(), Constants.Code.ERROR);
                 }
             }
 
@@ -141,14 +141,14 @@ final class SinaWeibo extends Platform implements Socialize {
             public void onComplete(Bundle bundle) {
                 final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
                 if (null != callback) {
-                    callback.call(null, null, StateCodes.SUCCESS);
+                    callback.call(null, null, Constants.Code.SUCCESS);
                 }
             }
 
             @Override
             public void onCancel() {
                 if (null != callback) {
-                    callback.call(null, null, StateCodes.ERROR_CANCEL);
+                    callback.call(null, null, Constants.Code.ERROR_CANCEL);
                 }
             }
         });
@@ -165,7 +165,7 @@ final class SinaWeibo extends Platform implements Socialize {
                 }
                 final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
                 if (null == tokenInfo || !tokenInfo.isSessionValid()) {
-                    callback.call(null, null, StateCodes.ERROR);
+                    callback.call(null, null, Constants.Code.ERROR);
                     return;
                 }
                 new Thread() {
@@ -180,7 +180,7 @@ final class SinaWeibo extends Platform implements Socialize {
                             @Override
                             public void run() {
                                 final boolean isSuccess = (null != accountInfo);
-                                callback.call(accountInfo, null, isSuccess ? StateCodes.SUCCESS : StateCodes.ERROR);
+                                callback.call(accountInfo, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
                             }
                         });
                     }
@@ -190,14 +190,14 @@ final class SinaWeibo extends Platform implements Socialize {
             @Override
             public void onWeiboException(WeiboException e) {
                 if (null != callback) {
-                    callback.call(null, e.getMessage(), StateCodes.ERROR);
+                    callback.call(null, e.getMessage(), Constants.Code.ERROR);
                 }
             }
 
             @Override
             public void onCancel() {
                 if (null != callback) {
-                    callback.call(null, null, StateCodes.ERROR_CANCEL);
+                    callback.call(null, null, Constants.Code.ERROR_CANCEL);
                 }
             }
         });
@@ -207,7 +207,7 @@ final class SinaWeibo extends Platform implements Socialize {
     public void getFriends(Callback<List<AccountInfo>> callback) {
         // TODO: 2016/8/16
         if (null != callback) {
-            callback.call(null, null, StateCodes.ERROR_NOT_SUPPORT);
+            callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
         }
     }
 

@@ -13,7 +13,7 @@ import com.iflytek.platform.PlatformHelper;
 import com.iflytek.platform.PlatformType;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
-import com.iflytek.platform.entity.StateCodes;
+import com.iflytek.platform.entity.Constants;
 
 /**
  * Copyright (C), 2016 <br>
@@ -49,7 +49,7 @@ public class DemoActivity extends Activity {
         public void onClick(View view) {
             platformHelper.select(getSelectedType()).login((user, msg, code) -> {
                 String tips;
-                if (StateCodes.SUCCESS == code) {
+                if (Constants.Code.SUCCESS == code) {
                     tips = user.id + ", " + code + ", " + msg;
                 } else {
                     tips = code + ", " + msg;
@@ -64,7 +64,7 @@ public class DemoActivity extends Activity {
         public void onClick(View view) {
             platformHelper.select(getSelectedType()).getFriends((users, msg, code) -> {
                 String tips;
-                if (StateCodes.SUCCESS == code) {
+                if (Constants.Code.SUCCESS == code) {
                     tips = users.size() + ", " + code + ", " + msg;
                 } else {
                     tips = code + ", " + msg;

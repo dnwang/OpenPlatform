@@ -50,6 +50,12 @@
             android:layout_height="wrap_content"
             android:tag="ALIPAY"
             android:text="支付宝" />
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag="TAOBAO"
+            android:text="淘宝" />
     </RadioGroup>
 
     <LinearLayout

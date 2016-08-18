@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
-import com.iflytek.platform.entity.StateCodes;
+import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.utils.HttpsUtils;
 import com.iflytek.platform.utils.Tools;
 import com.tencent.mm.sdk.openapi.BaseReq;
@@ -220,12 +220,12 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
             case BaseResp.ErrCode.ERR_OK: {
                 if (TYPE_LOGIN == type) {
                     if (!(resp instanceof SendAuth.Resp)) {
-                        onResult(StateCodes.ERROR, null);
+                        onResult(Constants.Code.ERROR, null);
                         return;
                     }
                     final String code = ((SendAuth.Resp) resp).token;
                     if (TextUtils.isEmpty(code)) {
-                        onResult(StateCodes.ERROR, null);
+                        onResult(Constants.Code.ERROR, null);
                         return;
                     }
                     new Thread() {
@@ -238,27 +238,27 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    onResult(null == accountInfo ? StateCodes.ERROR : StateCodes.SUCCESS, accountInfo);
+                                    onResult(null == accountInfo ? Constants.Code.ERROR : Constants.Code.SUCCESS, accountInfo);
                                 }
                             });
                         }
                     }.start();
                 } else {
                     // other type
-                    onResult(StateCodes.SUCCESS, null);
+                    onResult(Constants.Code.SUCCESS, null);
                 }
                 break;
             }
             case BaseResp.ErrCode.ERR_USER_CANCEL: {
-                onResult(StateCodes.ERROR_CANCEL, null);
+                onResult(Constants.Code.ERROR_CANCEL, null);
                 break;
             }
             case BaseResp.ErrCode.ERR_AUTH_DENIED: {
-                onResult(StateCodes.ERROR_AUTH_DENIED, null);
+                onResult(Constants.Code.ERROR_AUTH_DENIED, null);
                 break;
             }
             default: {
-                onResult(StateCodes.ERROR, null);
+                onResult(Constants.Code.ERROR, null);
                 break;
             }
         }

@@ -20,7 +20,8 @@ public enum PlatformType {
     QZONE(TencentQZone.class),
     WEIXIN(Weixin.class),
     WEIXIN_CIRCLE(WeixinCircle.class),
-    ALIPAY(AliPay.class);
+    ALIPAY(AliPay.class),
+    TAOBAO(Taobao.class);
 
     private Class<? extends Platform> cls;
 
