@@ -1,4 +1,4 @@
-package com.iflytek.platform;
+package com.iflytek.platform.channel;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.iflytek.platform.Channel;
+import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
@@ -27,14 +29,14 @@ import java.util.List;
  * @version 8/11/16,22:55
  * @see
  */
-final class TencentQZone extends Platform implements Socialize {
+final class TencentQZone extends Channel implements Socialize {
 
     private Tencent shareApi;
     private IUiListener shareCallback;
 
     public TencentQZone(Context context) {
         super(context);
-        shareApi = Tencent.createInstance(PlatformConfig.TENCENT_ID, context);
+        shareApi = Tencent.createInstance(PlatformConfig.INSTANCE.getTencentId(), context);
     }
 
     @Override

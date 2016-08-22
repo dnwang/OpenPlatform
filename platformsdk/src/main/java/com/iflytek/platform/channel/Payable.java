@@ -1,4 +1,4 @@
-package com.iflytek.platform;
+package com.iflytek.platform.channel;
 
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.PayInfo;
@@ -13,7 +13,7 @@ import com.iflytek.platform.entity.PayInfo;
  * @version 8/13/16,08:06
  * @see
  */
-interface Payable {
+public interface Payable {
 
     void pay(PayInfo payInfo, Callback<Object> callback);
 

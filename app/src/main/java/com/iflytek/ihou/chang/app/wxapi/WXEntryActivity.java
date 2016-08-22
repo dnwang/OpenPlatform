@@ -1,6 +1,6 @@
 package com.iflytek.ihou.chang.app.wxapi;
 
-import com.iflytek.platform.WeixinAuthActivity;
+import com.iflytek.platform.channel.WeixinAuthActivity;
 
 /**
  * Copyright (C), 2016 <br>

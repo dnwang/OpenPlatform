@@ -1,4 +1,4 @@
-package com.iflytek.platform;
+package com.iflytek.platform.channel;
 
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
@@ -16,7 +16,7 @@ import java.util.List;
  * @version 8/13/16,08:06
  * @see
  */
-interface Socialize {
+public interface Socialize {
 
     void share(ShareContent content, Callback<Object> callback);
 

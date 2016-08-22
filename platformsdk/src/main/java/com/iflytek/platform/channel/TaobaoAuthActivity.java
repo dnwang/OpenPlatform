@@ -1,4 +1,4 @@
-package com.iflytek.platform;
+package com.iflytek.platform.channel;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.utils.HttpsUtils;
@@ -94,7 +95,7 @@ public class TaobaoAuthActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(getContentView("淘宝登录"));
-        webView.loadUrl(String.format(Locale.PRC, API_AUTH, PlatformConfig.TAOBAO_KEY));
+        webView.loadUrl(String.format(Locale.PRC, API_AUTH, PlatformConfig.INSTANCE.getTaobaoKey()));
     }
 
     private View getContentView(String title) {
@@ -252,7 +253,7 @@ public class TaobaoAuthActivity extends Activity {
         public static AccountInfo getAccountInfo(String token) {
             Map<String, String> params = new TreeMap<>();
             // 参数顺序 a-z
-            params.put("app_key", PlatformConfig.TAOBAO_KEY);
+            params.put("app_key", PlatformConfig.INSTANCE.getTaobaoKey());
             params.put("format", "json");
             params.put("fields", FIELDS);
             params.put("method", METHOD_GET_BUYER);
@@ -260,7 +261,7 @@ public class TaobaoAuthActivity extends Activity {
             params.put("session", token);
             params.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.PRC).format(new Date()));
             params.put("v", "2.0");
-            params.put("sign", md5Signature(params, PlatformConfig.TAOBAO_SECRET));
+            params.put("sign", md5Signature(params, PlatformConfig.INSTANCE.getTaobaoSecret()));
 
             final String url = getUrlString(API_BASE_URL, params);
             Log.e("taobao api --> ", String.valueOf(url));

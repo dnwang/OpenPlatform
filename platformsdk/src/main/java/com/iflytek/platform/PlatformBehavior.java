@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.iflytek.platform.callbacks.Callback;
+import com.iflytek.platform.channel.Payable;
+import com.iflytek.platform.channel.Socialize;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
@@ -25,32 +27,32 @@ import java.util.Map;
  * @version 8/11/16,20:30
  * @see
  */
-public final class PlatformHelper implements ActivityLifecycleCallbacks, Socialize, Payable {
+public final class PlatformBehavior implements ActivityLifecycleCallbacks, Socialize, Payable {
 
     private Context context;
 
-    private Map<PlatformType, Platform> cache;
-    private Platform selected;
+    private Map<ChannelType, Channel> cache;
+    private Channel selected;
 
-    public PlatformHelper(Context context) {
+    public PlatformBehavior(Context context) {
         this.context = context;
         this.cache = new HashMap<>();
     }
 
-    public PlatformHelper select(PlatformType type) {
+    public PlatformBehavior select(ChannelType type) {
         selected = null;
         if (null != type) {
-            Platform platform = cache.get(type);
-            if (null == platform) {
-                platform = type.getInstance(context);
-                cache.put(type, platform);
+            Channel channel = cache.get(type);
+            if (null == channel) {
+                channel = getChannel(context, type);
+                cache.put(type, channel);
             }
-            selected = platform;
+            selected = channel;
         }
         return this;
     }
 
-    public PlatformHelper clear() {
+    public PlatformBehavior clear() {
         selected = null;
         cache.clear();
         return this;
@@ -138,6 +140,13 @@ public final class PlatformHelper implements ActivityLifecycleCallbacks, Sociali
     }
 
     @Override
+    public void onPause(Activity activity) {
+        if (null != selected) {
+            selected.onPause(activity);
+        }
+    }
+
+    @Override
     public void onStop(Activity activity) {
         if (null != selected) {
             selected.onStop(activity);
@@ -172,4 +181,16 @@ public final class PlatformHelper implements ActivityLifecycleCallbacks, Sociali
         }
     }
 
+
+    private static final String PACKAGE_CHANNEL = Payable.class.getPackage().getName();
+
+    private static Channel getChannel(Context context, ChannelType type) {
+        try {
+            Class<Channel> cls = (Class<Channel>) Class.forName(PACKAGE_CHANNEL + "." + type.getClassName());
+            return cls.getConstructor(Context.class).newInstance(context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

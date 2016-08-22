@@ -1,7 +1,8 @@
-package com.iflytek.platform;
+package com.iflytek.platform.channel;
 
 import android.content.Context;
 
+import com.iflytek.platform.Channel;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.ShareContent;
@@ -18,7 +19,7 @@ import java.util.List;
  * @version 2016/8/17,11:03
  * @see
  */
-final class UMengSMS extends Platform implements Socialize {
+final class UMengSMS extends Channel implements Socialize {
 
     private static final String APP_KEY = "5281d19656240bee4f069f1d";
 

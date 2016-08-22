@@ -1,5 +1,9 @@
 package com.iflytek.platform;
 
+import android.text.TextUtils;
+
+import com.iflytek.platform.entity.Constants;
+
 /**
  * Copyright (C), 2016 <br>
  * <br>
@@ -10,42 +14,102 @@ package com.iflytek.platform;
  * @version 2016/8/18,10:43
  * @see
  */
-public final class PlatformConfig {
+public enum PlatformConfig {
 
-    static String WEIXIN_ID;
-    static String WEIXIN_SECRET;
+    INSTANCE;
 
-    static String TENCENT_ID;
-    static String TENCENT_KEY;
+    private String weixinId;
+    private String weixinSecret;
 
-    static String SINA_KEY;
-    static String SINA_SECRET;
+    private String tencentId;
+    private String tencentKey;
 
-    static String TAOBAO_KEY;
-    static String TAOBAO_SECRET;
+    private String sinaKey;
+    private String sinaSecret;
 
-    public static void setWeixin(String id, String secret) {
-        WEIXIN_ID = id;
-        WEIXIN_SECRET = secret;
+    private String taobaoKey;
+    private String taobaoSecret;
+
+    private int initializedPlatforms;
+
+    PlatformConfig() {
+
     }
 
-    public static void setTencent(String id, String key) {
-        TENCENT_ID = id;
-        TENCENT_KEY = key;
+    public boolean isInitialized(ChannelType type) {
+        return (initializedPlatforms & type.getFlag()) == type.getFlag();
     }
 
-    public static void setSina(String key, String secret) {
-        SINA_KEY = key;
-        SINA_SECRET = secret;
+    public void setSina(String key, String secret) {
+        sinaKey = key;
+        sinaSecret = secret;
+        if (TextUtils.isEmpty(key) && TextUtils.isEmpty(secret)) {
+            initializedPlatforms |= Constants.PlatformFlag.SINA;
+        } else {
+            initializedPlatforms &= ~Constants.PlatformFlag.SINA;
+        }
     }
 
-    public static void setTaobao(String key, String secret) {
-        TAOBAO_KEY = key;
-        TAOBAO_SECRET = secret;
+    public void setWeixin(String id, String secret) {
+        weixinId = id;
+        weixinSecret = secret;
+        if (TextUtils.isEmpty(id) && TextUtils.isEmpty(secret)) {
+            initializedPlatforms |= Constants.PlatformFlag.WEIXIN;
+        } else {
+            initializedPlatforms &= ~Constants.PlatformFlag.WEIXIN;
+        }
     }
 
-    private PlatformConfig() {
-        throw new AssertionError();
+    public void setTencent(String id, String key) {
+        tencentId = id;
+        tencentKey = key;
+        if (TextUtils.isEmpty(id) && TextUtils.isEmpty(key)) {
+            initializedPlatforms |= Constants.PlatformFlag.TENCENT;
+        } else {
+            initializedPlatforms &= ~Constants.PlatformFlag.TENCENT;
+        }
+    }
+
+    public void setTaobao(String key, String secret) {
+        taobaoKey = key;
+        taobaoSecret = secret;
+        if (TextUtils.isEmpty(key) && TextUtils.isEmpty(key)) {
+            initializedPlatforms |= Constants.PlatformFlag.TAOBAO;
+        } else {
+            initializedPlatforms &= ~Constants.PlatformFlag.TAOBAO;
+        }
+    }
+
+    public String getWeixinId() {
+        return weixinId;
+    }
+
+    public String getWeixinSecret() {
+        return weixinSecret;
+    }
+
+    public String getTencentId() {
+        return tencentId;
+    }
+
+    public String getTencentKey() {
+        return tencentKey;
+    }
+
+    public String getSinaKey() {
+        return sinaKey;
+    }
+
+    public String getSinaSecret() {
+        return sinaSecret;
+    }
+
+    public String getTaobaoKey() {
+        return taobaoKey;
+    }
+
+    public String getTaobaoSecret() {
+        return taobaoSecret;
     }
 
 }

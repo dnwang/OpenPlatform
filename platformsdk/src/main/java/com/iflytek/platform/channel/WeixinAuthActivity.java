@@ -1,4 +1,4 @@
-package com.iflytek.platform;
+package com.iflytek.platform.channel;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -106,9 +107,10 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
 //        setContentView(getContentView());
         getWindow().getDecorView().setBackgroundColor(0);
-        wxApi = WXAPIFactory.createWXAPI(this, PlatformConfig.WEIXIN_ID, false);
+        wxApi = WXAPIFactory.createWXAPI(this, PlatformConfig.INSTANCE.getWeixinId(), false);
         wxApi.handleIntent(getIntent(), this);
         parseIntent();
         dispatchEvent();
@@ -261,7 +263,11 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
     }
 
     private AccountInfo getUserInfo(final String code) {
-        final String url4Token = String.format(Locale.PRC, API_GET_TOKEN, PlatformConfig.WEIXIN_ID, PlatformConfig.WEIXIN_SECRET, code);
+        final String url4Token = String.format(Locale.PRC,
+                API_GET_TOKEN,
+                PlatformConfig.INSTANCE.getWeixinId(),
+                PlatformConfig.INSTANCE.getWeixinSecret(),
+                code);
         // get token info
         final String tokenInfo = HttpsUtils.get(url4Token);
         try {

@@ -15,11 +15,11 @@ import android.os.Bundle;
  * @version 8/11/16,20:52
  * @see
  */
-abstract class Platform implements ActivityLifecycleCallbacks {
+public abstract class Channel implements ActivityLifecycleCallbacks {
 
     private Context context;
 
-    public Platform(Context context) {
+    public Channel(Context context) {
         this.context = context;
     }
 
@@ -44,6 +44,11 @@ abstract class Platform implements ActivityLifecycleCallbacks {
 
     @Override
     public void onResume(Activity activity) {
+
+    }
+
+    @Override
+    public void onPause(Activity activity) {
 
     }
 

@@ -1,7 +1,8 @@
-package com.iflytek.platform;
+package com.iflytek.platform.channel;
 
 import android.content.Context;
 
+import com.iflytek.platform.Channel;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.Constants;
@@ -16,7 +17,7 @@ import com.iflytek.platform.entity.Constants;
  * @version 8/11/16,22:55
  * @see
  */
-final class AliPay extends Platform implements Payable {
+final class AliPay extends Channel implements Payable {
 
     public AliPay(Context context) {
         super(context);

@@ -20,6 +20,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="com.iflytek.platform.wrapper.PlatformProxy" />
+
         <!--微博认证-->
         <activity
             android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser"
@@ -64,7 +66,7 @@
 
         <!--淘宝授权-->
         <activity
-            android:name="com.iflytek.platform.TaobaoAuthActivity"
+            android:name="com.iflytek.platform.channel.TaobaoAuthActivity"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait" />
         <!--淘宝授权-->

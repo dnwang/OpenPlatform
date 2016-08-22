@@ -1,4 +1,4 @@
-package com.iflytek.platform;
+package com.iflytek.platform.channel;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +7,8 @@ import android.nfc.FormatException;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.iflytek.platform.Channel;
+import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
@@ -33,7 +35,7 @@ import java.util.List;
  * @version 8/11/16,22:55
  * @see
  */
-final class TencentQQ extends Platform implements Socialize {
+final class TencentQQ extends Channel implements Socialize {
 
     private Tencent shareApi;
     private IUiListener shareCallback;
@@ -41,7 +43,7 @@ final class TencentQQ extends Platform implements Socialize {
 
     public TencentQQ(Context context) {
         super(context);
-        shareApi = Tencent.createInstance(PlatformConfig.TENCENT_ID, context);
+        shareApi = Tencent.createInstance(PlatformConfig.INSTANCE.getTencentId(), context);
     }
 
     @Override
@@ -92,7 +94,7 @@ final class TencentQQ extends Platform implements Socialize {
                 final String expires = Tools.getJsonString(json, com.tencent.connect.common.Constants.PARAM_EXPIRES_IN);
                 final String openId = Tools.getJsonString(json, com.tencent.connect.common.Constants.PARAM_OPEN_ID);
 
-                QQToken qqToken = new QQToken(PlatformConfig.TENCENT_ID);
+                QQToken qqToken = new QQToken(PlatformConfig.INSTANCE.getTencentId());
                 qqToken.setAuthSource(QQToken.AUTH_QQ);
                 qqToken.setAccessToken(token, expires);
                 qqToken.setOpenId(openId);

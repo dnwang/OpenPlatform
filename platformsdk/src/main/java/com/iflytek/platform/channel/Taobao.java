@@ -1,9 +1,10 @@
-package com.iflytek.platform;
+package com.iflytek.platform.channel;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import com.iflytek.platform.Channel;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
@@ -21,7 +22,7 @@ import java.util.List;
  * @version 2016/8/18,10:05
  * @see
  */
-class Taobao extends Platform implements Socialize {
+class Taobao extends Channel implements Socialize {
 
     private Callback<AccountInfo> loginCallback;
 
