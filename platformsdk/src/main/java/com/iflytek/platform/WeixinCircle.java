@@ -4,11 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import com.iflytek.platform.callbacks.AbsWeixinApiActivity;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
-import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.Constants;
+import com.iflytek.platform.entity.ShareContent;
 
 import java.util.List;
 
@@ -32,8 +31,8 @@ final class WeixinCircle extends Platform implements Socialize {
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        if (AbsWeixinApiActivity.REQ_WEIXIN == requestCode && Activity.RESULT_OK == resultCode) {
-            final int code = data.getIntExtra(AbsWeixinApiActivity.FLAG_CODE, -1);
+        if (WeixinAuthActivity.REQ_WEIXIN == requestCode && Activity.RESULT_OK == resultCode) {
+            final int code = data.getIntExtra(Constants.KEY_CODE, -1);
             if (null != shareCallback) {
                 shareCallback.call(null, null, code);
             }
@@ -47,7 +46,7 @@ final class WeixinCircle extends Platform implements Socialize {
         if (null == content) {
             return;
         }
-        if (AbsWeixinApiActivity.startActivity((Activity) getContext(), AbsWeixinApiActivity.TYPE_SHARE_CIRCLE, content)) {
+        if (WeixinAuthActivity.startActivity((Activity) getContext(), WeixinAuthActivity.TYPE_SHARE_CIRCLE, content)) {
             shareCallback = callback;
         }
     }

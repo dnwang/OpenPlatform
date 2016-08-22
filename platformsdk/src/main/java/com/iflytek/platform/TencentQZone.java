@@ -8,8 +8,8 @@ import android.text.TextUtils;
 
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
-import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.Constants;
+import com.iflytek.platform.entity.ShareContent;
 import com.tencent.connect.share.QzoneShare;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
@@ -29,15 +29,12 @@ import java.util.List;
  */
 final class TencentQZone extends Platform implements Socialize {
 
-    private static final String APP_ID = TencentQQ.APP_ID;
-    private static final String APP_KEY = TencentQQ.APP_KEY;
-
     private Tencent shareApi;
     private IUiListener shareCallback;
 
     public TencentQZone(Context context) {
         super(context);
-        shareApi = Tencent.createInstance(APP_ID, context);
+        shareApi = Tencent.createInstance(PlatformConfig.TENCENT_ID, context);
     }
 
     @Override

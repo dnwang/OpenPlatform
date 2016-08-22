@@ -1,4 +1,4 @@
-package com.iflytek.platform.callbacks;
+package com.iflytek.platform;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,9 +13,10 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.entity.AccountInfo;
-import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.Constants;
+import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.utils.HttpsUtils;
 import com.iflytek.platform.utils.Tools;
 import com.tencent.mm.sdk.openapi.BaseReq;
@@ -43,10 +44,8 @@ import java.util.Locale;
  * @version 2016/8/16,14:21
  * @see
  */
-public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEventHandler {
+public abstract class WeixinAuthActivity extends Activity implements IWXAPIEventHandler {
 
-    private static final String APP_ID = "wxf04bacbcee9b5cc7";
-    private static final String APP_SECRET = "9299bfd1ec0104a4cad2faa23010a580";
     private static final String CLASS_WXAPI = ".wxapi.WXEntryActivity";// 固定api类名，必须存在
 
     /**
@@ -58,10 +57,7 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
      */
     private static final String API_GET_USER = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s";
 
-    public static final String FLAG_CODE = "code";
     public static final String FLAG_TYPE = "type";
-    public static final String FLAG_CONTENT = "content";
-
     /**
      * 分享到好友
      */
@@ -91,7 +87,7 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
         }
         Intent intent = new Intent(activity, wxApiActivity);
         intent.putExtra(FLAG_TYPE, type);
-        intent.putExtra(FLAG_CONTENT, content);
+        intent.putExtra(Constants.KEY_CONTENT, content);
         activity.startActivityForResult(intent, REQ_WEIXIN);
         activity.overridePendingTransition(0, 0);
         return true;
@@ -112,7 +108,7 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
         super.onCreate(savedInstanceState);
 //        setContentView(getContentView());
         getWindow().getDecorView().setBackgroundColor(0);
-        wxApi = WXAPIFactory.createWXAPI(this, APP_ID, false);
+        wxApi = WXAPIFactory.createWXAPI(this, PlatformConfig.WEIXIN_ID, false);
         wxApi.handleIntent(getIntent(), this);
         parseIntent();
         dispatchEvent();
@@ -140,7 +136,7 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
     private void parseIntent() {
         Intent intent = getIntent();
         type = intent.getIntExtra(FLAG_TYPE, -1);
-        content = intent.getSerializableExtra(FLAG_CONTENT);
+        content = intent.getSerializableExtra(Constants.KEY_CONTENT);
     }
 
     private boolean finishInResume = true;
@@ -265,7 +261,7 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
     }
 
     private AccountInfo getUserInfo(final String code) {
-        final String url4Token = String.format(Locale.PRC, API_GET_TOKEN, APP_ID, APP_SECRET, code);
+        final String url4Token = String.format(Locale.PRC, API_GET_TOKEN, PlatformConfig.WEIXIN_ID, PlatformConfig.WEIXIN_SECRET, code);
         // get token info
         final String tokenInfo = HttpsUtils.get(url4Token);
         try {
@@ -284,9 +280,9 @@ public abstract class AbsWeixinApiActivity extends Activity implements IWXAPIEve
 
     private void onResult(int code, Serializable content) {
         Intent intent = getIntent();
-        intent.putExtra(FLAG_CODE, code);
+        intent.putExtra(Constants.KEY_CODE, code);
         if (null != content) {
-            intent.putExtra(FLAG_CONTENT, content);
+            intent.putExtra(Constants.KEY_CONTENT, content);
         }
         setResult(RESULT_OK, intent);
         finish();

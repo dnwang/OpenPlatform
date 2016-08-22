@@ -35,16 +35,13 @@ import java.util.List;
  */
 final class TencentQQ extends Platform implements Socialize {
 
-    static final String APP_ID = "100526240";
-    static final String APP_KEY = "20bca3e9e564042b7d1e2ec6ee261b1c";
-
     private Tencent shareApi;
     private IUiListener shareCallback;
     private IUiListener loginCallback;
 
     public TencentQQ(Context context) {
         super(context);
-        shareApi = Tencent.createInstance(APP_ID, context);
+        shareApi = Tencent.createInstance(PlatformConfig.TENCENT_ID, context);
     }
 
     @Override
@@ -95,7 +92,7 @@ final class TencentQQ extends Platform implements Socialize {
                 final String expires = Tools.getJsonString(json, com.tencent.connect.common.Constants.PARAM_EXPIRES_IN);
                 final String openId = Tools.getJsonString(json, com.tencent.connect.common.Constants.PARAM_OPEN_ID);
 
-                QQToken qqToken = new QQToken(APP_ID);
+                QQToken qqToken = new QQToken(PlatformConfig.TENCENT_ID);
                 qqToken.setAuthSource(QQToken.AUTH_QQ);
                 qqToken.setAccessToken(token, expires);
                 qqToken.setOpenId(openId);

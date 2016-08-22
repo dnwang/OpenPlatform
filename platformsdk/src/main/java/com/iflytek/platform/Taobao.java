@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.iflytek.platform.callbacks.Callback;
-import com.iflytek.platform.callbacks.TaobaoAuthActivity;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
@@ -22,7 +21,9 @@ import java.util.List;
  * @version 2016/8/18,10:05
  * @see
  */
-public class Taobao extends Platform implements Socialize {
+class Taobao extends Platform implements Socialize {
+
+    private Callback<AccountInfo> loginCallback;
 
     public Taobao(Context context) {
         super(context);
@@ -30,7 +31,15 @@ public class Taobao extends Platform implements Socialize {
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        // TODO: 2016/8/18
+        if (TaobaoAuthActivity.REQ_TAOBAO == requestCode && Activity.RESULT_OK == resultCode) {
+            final int code = data.getIntExtra(Constants.KEY_CODE, -1);
+            final Object obj = data.getSerializableExtra(Constants.KEY_CONTENT);
+            if (null != loginCallback) {
+                final AccountInfo accountInfo = (null != obj && obj instanceof AccountInfo) ? (AccountInfo) obj : null;
+                loginCallback.call(accountInfo, null, code);
+            }
+        }
+        loginCallback = null;
     }
 
     @Override
@@ -43,6 +52,7 @@ public class Taobao extends Platform implements Socialize {
     @Override
     public void login(Callback<AccountInfo> callback) {
         TaobaoAuthActivity.startActivity((Activity) getContext());
+        loginCallback = callback;
     }
 
     @Override

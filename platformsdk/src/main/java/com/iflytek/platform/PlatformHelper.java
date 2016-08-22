@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
+import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
 
@@ -57,29 +58,53 @@ public final class PlatformHelper implements ActivityLifecycleCallbacks, Sociali
 
     @Override
     public void pay(PayInfo payInfo, Callback<Object> callback) {
-        if (null != selected && selected instanceof Payable) {
-            ((Payable) selected).pay(payInfo, callback);
+        if (null != selected) {
+            if (selected instanceof Payable) {
+                ((Payable) selected).pay(payInfo, callback);
+            } else {
+                if (null != callback) {
+                    callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
+                }
+            }
         }
     }
 
     @Override
     public void share(ShareContent content, Callback<Object> callback) {
-        if (null != selected && selected instanceof Socialize) {
-            ((Socialize) selected).share(content, callback);
+        if (null != selected) {
+            if (selected instanceof Socialize) {
+                ((Socialize) selected).share(content, callback);
+            } else {
+                if (null != callback) {
+                    callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
+                }
+            }
         }
     }
 
     @Override
     public void login(Callback<AccountInfo> callback) {
-        if (null != selected && selected instanceof Socialize) {
-            ((Socialize) selected).login(callback);
+        if (null != selected) {
+            if (selected instanceof Socialize) {
+                ((Socialize) selected).login(callback);
+            } else {
+                if (null != callback) {
+                    callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
+                }
+            }
         }
     }
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
-        if (null != selected && selected instanceof Socialize) {
-            ((Socialize) selected).getFriends(callback);
+        if (null != selected) {
+            if (selected instanceof Socialize) {
+                ((Socialize) selected).getFriends(callback);
+            } else {
+                if (null != callback) {
+                    callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
+                }
+            }
         }
     }
 

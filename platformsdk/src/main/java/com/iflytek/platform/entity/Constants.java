@@ -43,4 +43,14 @@ public interface Constants {
          */
         int SUCCESS = 300;
     }
+
+    /**
+     * onActivityResult回调结果中 状态值
+     */
+    String KEY_CODE = "code";
+    /**
+     * onActivityResult回调结果中 内容
+     */
+    String KEY_CONTENT = "content";
+
 }

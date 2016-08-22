@@ -1,6 +1,6 @@
 package com.iflytek.ihou.chang.app.wxapi;
 
-import com.iflytek.platform.callbacks.AbsWeixinApiActivity;
+import com.iflytek.platform.WeixinAuthActivity;
 
 /**
  * Copyright (C), 2016 <br>
@@ -14,6 +14,6 @@ import com.iflytek.platform.callbacks.AbsWeixinApiActivity;
  * @version 2016/8/16,14:34
  * @see
  */
-public class WXEntryActivity extends AbsWeixinApiActivity {
+public class WXEntryActivity extends WeixinAuthActivity {
 
 }

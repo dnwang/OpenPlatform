@@ -10,8 +10,8 @@ import android.util.Log;
 
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
-import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.entity.Constants;
+import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.utils.HttpsUtils;
 import com.iflytek.platform.utils.Tools;
 import com.sina.weibo.sdk.api.TextObject;
@@ -45,9 +45,6 @@ import java.util.Locale;
  * @see
  */
 final class SinaWeibo extends Platform implements Socialize {
-
-    private static final String APP_KEY = "778164658";
-    private static final String APP_SECRET = "06552db3dc303529ba971b257379c49e";
 
     // 由于后端没有配置，始终出现21322，以下URL摘自友盟新浪分享，可用作默认值
     private static final String REDIRECT_URL = "http://sns.whalecloud.com/sina2/callback";
@@ -83,8 +80,8 @@ final class SinaWeibo extends Platform implements Socialize {
 
     public SinaWeibo(Context context) {
         super(context);
-        authInfo = new AuthInfo(context, APP_KEY, REDIRECT_URL, SCOPE);
-        shareAPI = WeiboShareSDK.createWeiboAPI(context, APP_KEY);
+        authInfo = new AuthInfo(context, PlatformConfig.SINA_KEY, REDIRECT_URL, SCOPE);
+        shareAPI = WeiboShareSDK.createWeiboAPI(context, PlatformConfig.SINA_KEY);
         shareAPI.registerApp();
     }
 
@@ -115,7 +112,7 @@ final class SinaWeibo extends Platform implements Socialize {
             return;
         }
 
-        AuthInfo authInfo = new AuthInfo(getContext(), APP_KEY, REDIRECT_URL, SCOPE);
+        AuthInfo authInfo = new AuthInfo(getContext(), PlatformConfig.SINA_KEY, REDIRECT_URL, SCOPE);
 
         TextObject textObject = new TextObject();
         textObject.text = content.content;

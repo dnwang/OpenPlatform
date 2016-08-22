@@ -9,11 +9,12 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.iflytek.ihou.chang.app.R;
+import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.PlatformHelper;
 import com.iflytek.platform.PlatformType;
+import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
-import com.iflytek.platform.entity.Constants;
 
 /**
  * Copyright (C), 2016 <br>
@@ -26,6 +27,13 @@ import com.iflytek.platform.entity.Constants;
  * @see
  */
 public class DemoActivity extends Activity {
+
+    static {
+        PlatformConfig.setWeixin("wxf04bacbcee9b5cc7", "9299bfd1ec0104a4cad2faa23010a580");
+        PlatformConfig.setSina("778164658", "06552db3dc303529ba971b257379c49e");
+        PlatformConfig.setTencent("100526240", "20bca3e9e564042b7d1e2ec6ee261b1c");
+        PlatformConfig.setTaobao("23138012","166503770b46f1abdbfc390e655cf283");
+    }
 
     private PlatformHelper platformHelper;
 
