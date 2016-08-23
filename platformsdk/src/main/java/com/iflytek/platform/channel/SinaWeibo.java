@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.nfc.FormatException;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.iflytek.platform.Channel;
 import com.iflytek.platform.PlatformConfig;
@@ -16,18 +15,10 @@ import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.utils.HttpsUtils;
 import com.iflytek.platform.utils.Tools;
-import com.sina.weibo.sdk.api.TextObject;
-import com.sina.weibo.sdk.api.WeiboMultiMessage;
-import com.sina.weibo.sdk.api.share.BaseResponse;
-import com.sina.weibo.sdk.api.share.IWeiboHandler;
-import com.sina.weibo.sdk.api.share.IWeiboShareAPI;
-import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
-import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
-import com.sina.weibo.sdk.constant.WBConstants;
 import com.sina.weibo.sdk.exception.WeiboException;
 
 import org.json.JSONObject;
@@ -49,60 +40,36 @@ import java.util.Locale;
 final class SinaWeibo extends Channel implements Socialize {
 
     // 由于后端没有配置，始终出现21322，以下URL摘自友盟新浪分享，可用作默认值
-    private static final String REDIRECT_URL = "http://sns.whalecloud.com/sina2/callback";
-    private static final String SCOPE = "email,direct_messages_read,direct_messages_write," +
-            "friendships_groups_read,friendships_groups_write,statuses_to_me_read,follow_app_official_microblog,invitation_write";
+    static final String REDIRECT_URL = "http://sns.whalecloud.com/sina2/callback";
+    static final String SCOPE = "email,direct_messages_read,direct_messages_write," +
+            "friendships_groups_read,friendships_groups_write,statuses_to_me_read," +
+            "follow_app_official_microblog,invitation_write";
 
     /**
      * 认证token获取用户信息
      */
     private static final String API_SHOW_USER = "https://api.weibo.com/2/users/show.json?access_token=%s&uid=%s";
 
-    private IWeiboShareAPI shareAPI;
-
-    private AuthInfo authInfo;
     private SsoHandler ssoHandler;
 
-    private final IWeiboHandler.Response response = new IWeiboHandler.Response() {
-        @Override
-        public void onResponse(BaseResponse baseResp) {
-            if (baseResp != null) {
-                Log.d("-- weibo --", baseResp.errMsg);
-                switch (baseResp.errCode) {
-                    case WBConstants.ErrorCode.ERR_OK:
-                        break;
-                    case WBConstants.ErrorCode.ERR_CANCEL:
-                        break;
-                    case WBConstants.ErrorCode.ERR_FAIL:
-                        break;
-                }
-            }
-        }
-    };
+    private Callback<Object> shareCallback;
 
     public SinaWeibo(Context context) {
         super(context);
-        authInfo = new AuthInfo(context, PlatformConfig.INSTANCE.getSinaKey(), REDIRECT_URL, SCOPE);
-        shareAPI = WeiboShareSDK.createWeiboAPI(context, PlatformConfig.INSTANCE.getSinaKey());
-        shareAPI.registerApp();
-    }
-
-    @Override
-    public void onCreate(Activity activity, Bundle bundle) {
-        if (null != shareAPI) {
-            shareAPI.handleWeiboResponse(activity.getIntent(), response);
-        }
-    }
-
-    @Override
-    public void onNewIntent(Activity activity, Intent intent) {
-        if (null != shareAPI) {
-            shareAPI.handleWeiboResponse(intent, response);
-        }
     }
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        // 分享回调
+        if (SinaWeiboShareActivity.REQ_SINA_WEIBO == requestCode && Activity.RESULT_OK == resultCode) {
+            final int code = data.getIntExtra(Constants.KEY_CODE, -1);
+            final Object obj = data.getSerializableExtra(Constants.KEY_CONTENT);
+            if (null != shareCallback) {
+                shareCallback.call(null, null, code);
+            }
+        }
+        shareCallback = null;
+        // 登录回调
         if (ssoHandler != null) {
             ssoHandler.authorizeCallBack(requestCode, resultCode, data);
         }
@@ -113,48 +80,13 @@ final class SinaWeibo extends Channel implements Socialize {
         if (null == content) {
             return;
         }
-
-        AuthInfo authInfo = new AuthInfo(getContext(), PlatformConfig.INSTANCE.getSinaKey(), REDIRECT_URL, SCOPE);
-
-        TextObject textObject = new TextObject();
-        textObject.text = content.content;
-        textObject.title = content.title;
-
-        WeiboMultiMessage message = new WeiboMultiMessage();
-        message.textObject = textObject;
-
-        SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
-        // 用transaction唯一标识一个请求
-        request.transaction = String.valueOf(System.currentTimeMillis());
-        request.multiMessage = message;
-
-        shareAPI.sendRequest((Activity) getContext(), request, authInfo, "", new WeiboAuthListener() {
-            @Override
-            public void onWeiboException(WeiboException e) {
-                if (null != callback) {
-                    callback.call(null, e.getMessage(), Constants.Code.ERROR);
-                }
-            }
-
-            @Override
-            public void onComplete(Bundle bundle) {
-                final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
-                if (null != callback) {
-                    callback.call(null, null, Constants.Code.SUCCESS);
-                }
-            }
-
-            @Override
-            public void onCancel() {
-                if (null != callback) {
-                    callback.call(null, null, Constants.Code.ERROR_CANCEL);
-                }
-            }
-        });
+        SinaWeiboShareActivity.startActivity((Activity) getContext(), content);
+        shareCallback = callback;
     }
 
     @Override
     public void login(final Callback<AccountInfo> callback) {
+        AuthInfo authInfo = new AuthInfo(getContext(), PlatformConfig.INSTANCE.getSinaKey(), REDIRECT_URL, SCOPE);
         ssoHandler = new SsoHandler((Activity) getContext(), authInfo);
         ssoHandler.authorize(new WeiboAuthListener() {
             @Override

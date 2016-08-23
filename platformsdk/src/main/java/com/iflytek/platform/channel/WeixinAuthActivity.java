@@ -3,16 +3,10 @@ package com.iflytek.platform.channel;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.nfc.FormatException;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.View;
 import android.view.Window;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.entity.AccountInfo;
@@ -58,7 +52,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
      */
     private static final String API_GET_USER = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s";
 
-    public static final String FLAG_TYPE = "type";
+    private static final String FLAG_TYPE = "type";
     /**
      * 分享到好友
      */
@@ -124,17 +118,6 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         finishInResume = false;
     }
 
-    private View getContentView() {
-        FrameLayout container = new FrameLayout(this);
-        TextView tips = new TextView(this);
-        tips.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-        tips.setShadowLayer(3, 0, 0, Color.DKGRAY);
-        tips.setTextColor(Color.WHITE);
-        tips.setText("请稍等...");
-        container.addView(tips, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
-        return container;
-    }
-
     private void parseIntent() {
         Intent intent = getIntent();
         type = intent.getIntExtra(FLAG_TYPE, -1);
@@ -158,17 +141,25 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
             case TYPE_SHARE_FRIEND: {
                 if (null != content) {
                     share2Session((ShareContent) content);
+                } else {
+                    finish();
                 }
                 break;
             }
             case TYPE_SHARE_CIRCLE: {
                 if (null != content) {
                     share2Timeline((ShareContent) content);
+                } else {
+                    finish();
                 }
                 break;
             }
             case TYPE_LOGIN: {
                 login();
+                break;
+            }
+            default: {
+                finish();
                 break;
             }
         }
@@ -285,6 +276,9 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
     }
 
     private void onResult(int code, Serializable content) {
+        if (isFinishing()) {
+            return;
+        }
         Intent intent = new Intent();
         intent.putExtra(Constants.KEY_CODE, code);
         if (null != content) {

@@ -84,6 +84,9 @@ public final class PlatformProxy extends Activity {
             intent.putExtra(FLAG_CONTENT, content);
         }
         context.startActivity(intent);
+        if (content instanceof Activity) {
+            ((Activity) content).overridePendingTransition(0, 0);
+        }
     }
 
     private static long getGlobCallbackHash() {
@@ -161,6 +164,12 @@ public final class PlatformProxy extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         platformBehavior.onActivityResult(this, requestCode, resultCode, data);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, 0);
     }
 
     private void dispatchBehavior() {

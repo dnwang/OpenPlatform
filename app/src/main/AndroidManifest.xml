@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <application
         android:name="com.iflytek.demo.App"
@@ -22,19 +23,32 @@
             </intent-filter>
         </activity>
 
-        <!-- 集成api封装调用;非必需; -->
-        <activity android:name="com.iflytek.platform.wrapper.PlatformProxy" />
+        <!--(非必要)集成api封装调用-->
+        <activity
+            android:name="com.iflytek.platform.wrapper.PlatformProxy"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="portrait"/>
 
-        <!--微博认证-->
+        <!--(必要)微博认证-->
         <activity
             android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser"
             android:configChanges="keyboardHidden|orientation"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
-        <!--微博认证-->
 
-        <!--腾讯认证-->
+        <activity
+            android:name="com.iflytek.platform.channel.SinaWeiboShareActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <!--(必要)微博认证-->
+
+        <!--(必要)腾讯认证-->
         <activity
             android:name="com.tencent.tauth.AuthActivity"
             android:launchMode="singleTask"
@@ -53,11 +67,10 @@
         <activity
             android:name="com.tencent.connect.common.AssistActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
-        <!--腾讯认证-->
+            android:screenOrientation="portrait" />
+        <!--(必要)腾讯认证-->
 
-        <!--微信回调-->
+        <!--(必要)微信回调-->
         <!--注意:singleInstance,exported,包名,类名-->
         <activity
             android:name=".wxapi.WXEntryActivity"
@@ -65,14 +78,14 @@
             android:exported="true"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" />
-        <!--微信回调-->
+        <!--(必要)微信回调-->
 
-        <!--淘宝授权-->
+        <!--(必要)淘宝授权-->
         <activity
             android:name="com.iflytek.platform.channel.TaobaoAuthActivity"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait" />
-        <!--淘宝授权-->
+        <!--(必要)淘宝授权-->
 
     </application>
 
