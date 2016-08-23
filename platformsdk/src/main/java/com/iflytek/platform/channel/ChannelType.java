@@ -16,7 +16,7 @@ import com.iflytek.platform.Channel;
  */
 public enum ChannelType {
 
-    SMS(UMengSMS.class),
+    SMS(Sms.class),
     WEIBO(SinaWeibo.class),
     QQ(TencentQQ.class),
     QZONE(TencentQZone.class),
@@ -24,6 +24,15 @@ public enum ChannelType {
     WEIXIN_CIRCLE(WeixinCircle.class),
     ALIPAY(AliPay.class),
     TAOBAO(Taobao.class);
+
+    public static ChannelType convert(String name) {
+        for (ChannelType type : ChannelType.values()) {
+            if (type.toString().equalsIgnoreCase(name)) {
+                return type;
+            }
+        }
+        return null;
+    }
 
     public static Channel getEntity(Context context, ChannelType type) {
         try {

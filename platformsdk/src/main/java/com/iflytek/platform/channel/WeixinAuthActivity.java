@@ -285,7 +285,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
     }
 
     private void onResult(int code, Serializable content) {
-        Intent intent = getIntent();
+        Intent intent = new Intent();
         intent.putExtra(Constants.KEY_CODE, code);
         if (null != content) {
             intent.putExtra(Constants.KEY_CONTENT, content);

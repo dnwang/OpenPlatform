@@ -47,7 +47,7 @@ import java.util.TreeMap;
  * @version 2016/8/18,10:41
  * @see
  */
-public class TaobaoAuthActivity extends Activity {
+public final class TaobaoAuthActivity extends Activity {
 
     private static final String API_AUTH = "https://oauth.taobao.com/authorize?response_type=token&client_id=%s&view=wap";
 
@@ -216,7 +216,7 @@ public class TaobaoAuthActivity extends Activity {
     }
 
     private void onResult(int code, Serializable content) {
-        Intent intent = getIntent();
+        Intent intent = new Intent();
         intent.putExtra(Constants.KEY_CODE, code);
         if (null != content) {
             intent.putExtra(Constants.KEY_CONTENT, content);
@@ -227,9 +227,9 @@ public class TaobaoAuthActivity extends Activity {
 
     @Override
     public void finish() {
-        Intent intent = getIntent();
+        Intent intent = new Intent();
         intent.putExtra(Constants.KEY_CODE, Constants.Code.ERROR_CANCEL);
-        setResult(RESULT_OK, null);
+        setResult(RESULT_OK, intent);
         super.finish();
     }
 

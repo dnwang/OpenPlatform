@@ -1,14 +1,19 @@
 package com.iflytek.platform.wrapper;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Window;
 
 import com.iflytek.platform.PlatformBehavior;
-import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.callbacks.Callback;
+import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.entity.AccountInfo;
+import com.iflytek.platform.entity.PayInfo;
+import com.iflytek.platform.entity.ShareContent;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -21,29 +26,91 @@ import java.util.List;
  * @version 8/22/16,21:38
  * @see
  */
-public class PlatformProxy extends Activity {
+public final class PlatformProxy extends Activity {
 
+    private static final String FLAG_BEHAVIOR = "behavior";
+    private static final String FLAG_CHANNEL = "channel";
+    private static final String FLAG_CONTENT = "content";
+    private static final String FLAG_CALLBACK = "callback";
 
-    public static void share(ChannelType type, Callback<Object> callback) {
+    private static final int BEHAVIOR_SHARE = 0x01;
+    private static final int BEHAVIOR_LOGIN = 0x02;
+    private static final int BEHAVIOR_GET_FRIENDS = 0x03;
+    private static final int BEHAVIOR_PAY = 0x04;
 
+    private static Callback callback;
+
+    public static void share(Context context, ChannelType type, ShareContent content, Callback<Object> callback) {
+        if (null == type) {
+            return;
+        }
+        PlatformProxy.callback = callback;
+        startActivity(context, BEHAVIOR_SHARE, type, content, getGlobCallbackHash());
     }
 
-    public static void login(ChannelType type, Callback<AccountInfo> callback) {
-
+    public static void login(Context context, ChannelType type, Callback<AccountInfo> callback) {
+        if (null == type) {
+            return;
+        }
+        PlatformProxy.callback = callback;
+        startActivity(context, BEHAVIOR_LOGIN, type, null, getGlobCallbackHash());
     }
 
-    public static void getFriends(ChannelType type, Callback<List<AccountInfo>> callback) {
+    public static void getFriends(Context context, ChannelType type, Callback<List<AccountInfo>> callback) {
+        if (null == type) {
+            return;
+        }
+        PlatformProxy.callback = callback;
+        startActivity(context, BEHAVIOR_GET_FRIENDS, type, null, getGlobCallbackHash());
+    }
 
+    public static void pay(Context context, ChannelType type, PayInfo payInfo, Callback<Object> callback) {
+        if (null == type) {
+            return;
+        }
+        PlatformProxy.callback = callback;
+        startActivity(context, BEHAVIOR_PAY, type, payInfo, getGlobCallbackHash());
+    }
+
+    private static void startActivity(Context context, int behavior, ChannelType type, Serializable content, long callback) {
+        if (null == context) {
+            return;
+        }
+        Intent intent = new Intent(context, PlatformProxy.class);
+        intent.putExtra(FLAG_CHANNEL, type);
+        intent.putExtra(FLAG_BEHAVIOR, behavior);
+        intent.putExtra(FLAG_CALLBACK, callback);
+        if (null != content) {
+            intent.putExtra(FLAG_CONTENT, content);
+        }
+        context.startActivity(intent);
+    }
+
+    private static long getGlobCallbackHash() {
+        return null == PlatformProxy.callback ? -1 : PlatformProxy.callback.hashCode();
     }
 
     private PlatformBehavior platformBehavior;
+
+    private int behavior;
+    private ChannelType channelType;
+    private Serializable content;
+    private long callbackHash;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         platformBehavior = new PlatformBehavior(this);
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().getDecorView().setBackgroundColor(0);
         platformBehavior.onCreate(this, savedInstanceState);
+
+        Intent intent = getIntent();
+        channelType = (ChannelType) intent.getSerializableExtra(FLAG_CHANNEL);
+        behavior = intent.getIntExtra(FLAG_BEHAVIOR, -1);
+        content = intent.getSerializableExtra(FLAG_CONTENT);
+        callbackHash = intent.getLongExtra(FLAG_CALLBACK, -1);
+        dispatchBehavior();
     }
 
     @Override
@@ -87,12 +154,74 @@ public class PlatformProxy extends Activity {
         platformBehavior.clear();
         super.onDestroy();
         platformBehavior.onDestroy(this);
+        PlatformProxy.callback = null;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         platformBehavior.onActivityResult(this, requestCode, resultCode, data);
+    }
+
+    private void dispatchBehavior() {
+        if (null == channelType) {
+            return;
+        }
+        platformBehavior.select(channelType);
+        switch (behavior) {
+            case BEHAVIOR_SHARE: {
+                if (null != content && content instanceof ShareContent) {
+                    platformBehavior.share((ShareContent) content, new Callback<Object>() {
+                        @Override
+                        public void call(Object obj, String msg, int code) {
+                            if (getGlobCallbackHash() == callbackHash) {
+                                PlatformProxy.callback.call(obj, msg, code);
+                            }
+                            finish();
+                        }
+                    });
+                }
+                break;
+            }
+            case BEHAVIOR_PAY: {
+                if (null != content && content instanceof PayInfo) {
+                    platformBehavior.pay((PayInfo) content, new Callback<Object>() {
+                        @Override
+                        public void call(Object obj, String msg, int code) {
+                            if (getGlobCallbackHash() == callbackHash) {
+                                PlatformProxy.callback.call(obj, msg, code);
+                            }
+                            finish();
+                        }
+                    });
+                }
+                break;
+            }
+            case BEHAVIOR_LOGIN: {
+                platformBehavior.login(new Callback<AccountInfo>() {
+                    @Override
+                    public void call(AccountInfo accountInfo, String msg, int code) {
+                        if (getGlobCallbackHash() == callbackHash) {
+                            PlatformProxy.callback.call(accountInfo, msg, code);
+                        }
+                        finish();
+                    }
+                });
+                break;
+            }
+            case BEHAVIOR_GET_FRIENDS: {
+                platformBehavior.getFriends(new Callback<List<AccountInfo>>() {
+                    @Override
+                    public void call(List<AccountInfo> accountInfos, String msg, int code) {
+                        if (getGlobCallbackHash() == callbackHash) {
+                            PlatformProxy.callback.call(accountInfos, msg, code);
+                        }
+                        finish();
+                    }
+                });
+                break;
+            }
+        }
     }
 
 }

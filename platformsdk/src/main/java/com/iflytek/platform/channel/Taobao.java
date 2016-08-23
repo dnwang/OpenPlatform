@@ -22,7 +22,7 @@ import java.util.List;
  * @version 2016/8/18,10:05
  * @see
  */
-class Taobao extends Channel implements Socialize {
+final class Taobao extends Channel implements Socialize {
 
     private Callback<AccountInfo> loginCallback;
 

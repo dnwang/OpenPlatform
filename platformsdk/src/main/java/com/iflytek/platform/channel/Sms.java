@@ -22,9 +22,9 @@ import java.util.List;
  * @version 2016/8/17,11:03
  * @see
  */
-final class UMengSMS extends Channel implements Socialize {
+final class Sms extends Channel implements Socialize {
 
-    public UMengSMS(Context context) {
+    public Sms(Context context) {
         super(context);
     }
 

@@ -9,17 +9,20 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
+        android:name="com.iflytek.demo.App"
         android:icon="@mipmap/ic_launcher"
         android:label="OpenPlatform"
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
 
-        <activity android:name="com.iflytek.demo.DemoActivity">
+        <!--<activity android:name="com.iflytek.demo.DemoActivity">-->
+        <activity android:name="com.iflytek.demo.DemoWrapperActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- 集成api封装调用;非必需; -->
         <activity android:name="com.iflytek.platform.wrapper.PlatformProxy" />
 
         <!--微博认证-->

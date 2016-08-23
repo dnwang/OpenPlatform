@@ -1,7 +1,6 @@
 package com.iflytek.demo;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +8,11 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.iflytek.ihou.chang.app.R;
-import com.iflytek.platform.PlatformBehavior;
 import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
+import com.iflytek.platform.wrapper.PlatformProxy;
 
 /**
  * Copyright (C), 2016 <br>
@@ -25,9 +24,7 @@ import com.iflytek.platform.entity.ShareContent;
  * @version 8/11/16,20:30
  * @see
  */
-public class DemoActivity extends Activity {
-
-    private PlatformBehavior platformBehavior;
+public class DemoWrapperActivity extends Activity {
 
     private final View.OnClickListener shareClick = view -> {
         final ChannelType type = getSelectedType();
@@ -37,7 +34,7 @@ public class DemoActivity extends Activity {
                 .imageUrl("http://www.weipet.cn/common/images/pic/a347.jpg")
                 .targetUrl("http://www.baidu.com")
                 .create();
-        platformBehavior.select(type).share(content, (obj, msg, code) -> {
+        PlatformProxy.share(DemoWrapperActivity.this, type, content, (obj, msg, code) -> {
             // TODO: 2016/8/23
             Toast.makeText(getApplicationContext(), code + ", " + msg, Toast.LENGTH_SHORT).show();
         });
@@ -45,7 +42,7 @@ public class DemoActivity extends Activity {
 
     private final View.OnClickListener loginClick = view -> {
         final ChannelType type = getSelectedType();
-        platformBehavior.select(type).login((user, msg, code) -> {
+        PlatformProxy.login(DemoWrapperActivity.this, type, (user, msg, code) -> {
             // TODO: 2016/8/23
             String tips;
             if (Constants.Code.SUCCESS == code) {
@@ -59,7 +56,7 @@ public class DemoActivity extends Activity {
 
     private final View.OnClickListener getFriendsClick = view -> {
         final ChannelType type = getSelectedType();
-        platformBehavior.select(type).getFriends((users, msg, code) -> {
+        PlatformProxy.getFriends(DemoWrapperActivity.this, type, (users, msg, code) -> {
             // TODO: 2016/8/23
             String tips;
             if (Constants.Code.SUCCESS == code) {
@@ -74,7 +71,7 @@ public class DemoActivity extends Activity {
     private final View.OnClickListener payClick = view -> {
         final ChannelType type = getSelectedType();
         final PayInfo payInfo = new PayInfo();
-        platformBehavior.select(type).pay(payInfo, (isSuccess, msg, code) -> {
+        PlatformProxy.pay(DemoWrapperActivity.this, type, payInfo, (isSuccess, msg, code) -> {
             // TODO: 2016/8/23
             Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
         });
@@ -82,17 +79,9 @@ public class DemoActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        platformBehavior = new PlatformBehavior(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         registerListener();
-        platformBehavior.onCreate(this, savedInstanceState);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        platformBehavior.onActivityResult(this, requestCode, resultCode, data);
     }
 
     private void registerListener() {
