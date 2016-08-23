@@ -12,18 +12,6 @@ package com.iflytek.platform.entity;
  */
 public interface Constants {
 
-    /**
-     * 平台标示
-     */
-    interface PlatformFlag {
-        int SINA = 1;
-        int WEIXIN = 1 << 1;
-        int TENCENT = 1 << 2;
-        int UMENG = 1 << 3;
-        int TAOBAO = 1 << 4;
-        int ALIPAY = 1 << 5;
-    }
-
     interface Code {
         /**
          * 未知错误

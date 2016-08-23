@@ -9,9 +9,9 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.iflytek.ihou.chang.app.R;
-import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.PlatformBehavior;
-import com.iflytek.platform.ChannelType;
+import com.iflytek.platform.PlatformConfig;
+import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
@@ -27,13 +27,6 @@ import com.iflytek.platform.entity.ShareContent;
  * @see
  */
 public class DemoActivity extends Activity {
-
-    static {
-        PlatformConfig.INSTANCE.setWeixin("wxf04bacbcee9b5cc7", "9299bfd1ec0104a4cad2faa23010a580");
-        PlatformConfig.INSTANCE.setSina("778164658", "06552db3dc303529ba971b257379c49e");
-        PlatformConfig.INSTANCE.setTencent("100526240", "20bca3e9e564042b7d1e2ec6ee261b1c");
-        PlatformConfig.INSTANCE.setTaobao("23138012","166503770b46f1abdbfc390e655cf283");
-    }
 
     private PlatformBehavior platformBehavior;
 
@@ -94,6 +87,9 @@ public class DemoActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // 初始化平台配置, Application中
+        PlatformConfig.INSTANCE.loadConfig(getApplicationContext());
+
         platformBehavior = new PlatformBehavior(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

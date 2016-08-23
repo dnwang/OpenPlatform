@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -25,7 +26,6 @@ import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.utils.HttpsUtils;
-import com.umeng.socialize.utils.Log;
 
 import java.io.Serializable;
 import java.net.URLDecoder;

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.iflytek.platform.PlatformBehavior;
-import com.iflytek.platform.ChannelType;
+import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
 

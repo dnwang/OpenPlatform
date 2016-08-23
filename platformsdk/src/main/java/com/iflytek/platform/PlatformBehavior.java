@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.iflytek.platform.callbacks.Callback;
+import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.channel.Payable;
 import com.iflytek.platform.channel.Socialize;
 import com.iflytek.platform.entity.AccountInfo;
@@ -13,7 +14,7 @@ import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ public final class PlatformBehavior implements ActivityLifecycleCallbacks, Socia
 
     public PlatformBehavior(Context context) {
         this.context = context;
-        this.cache = new HashMap<>();
+        this.cache = new EnumMap<>(ChannelType.class);
     }
 
     public PlatformBehavior select(ChannelType type) {
@@ -44,7 +45,7 @@ public final class PlatformBehavior implements ActivityLifecycleCallbacks, Socia
         if (null != type) {
             Channel channel = cache.get(type);
             if (null == channel) {
-                channel = getChannel(context, type);
+                channel = ChannelType.getEntity(context, type);
                 cache.put(type, channel);
             }
             selected = channel;
@@ -181,16 +182,4 @@ public final class PlatformBehavior implements ActivityLifecycleCallbacks, Socia
         }
     }
 
-
-    private static final String PACKAGE_CHANNEL = Payable.class.getPackage().getName();
-
-    private static Channel getChannel(Context context, ChannelType type) {
-        try {
-            Class<Channel> cls = (Class<Channel>) Class.forName(PACKAGE_CHANNEL + "." + type.getClassName());
-            return cls.getConstructor(Context.class).newInstance(context);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }
