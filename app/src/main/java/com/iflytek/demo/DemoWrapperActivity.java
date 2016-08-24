@@ -36,7 +36,7 @@ public class DemoWrapperActivity extends Activity {
                 .create();
         PlatformProxy.share(DemoWrapperActivity.this, type, content, (obj, msg, code) -> {
             // TODO: 2016/8/23
-            Toast.makeText(getApplicationContext(), code + ", " + msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), covertCode(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
     };
 
@@ -44,11 +44,9 @@ public class DemoWrapperActivity extends Activity {
         final ChannelType type = getSelectedType();
         PlatformProxy.login(DemoWrapperActivity.this, type, (user, msg, code) -> {
             // TODO: 2016/8/23
-            String tips;
+            String tips = covertCode(code) + ", " + msg;
             if (Constants.Code.SUCCESS == code) {
-                tips = user.id + ", " + code + ", " + msg;
-            } else {
-                tips = code + ", " + msg;
+                tips = user.id + ", " + tips;
             }
             Toast.makeText(getApplicationContext(), tips, Toast.LENGTH_SHORT).show();
         });
@@ -58,11 +56,9 @@ public class DemoWrapperActivity extends Activity {
         final ChannelType type = getSelectedType();
         PlatformProxy.getFriends(DemoWrapperActivity.this, type, (users, msg, code) -> {
             // TODO: 2016/8/23
-            String tips;
+            String tips = covertCode(code) + ", " + msg;
             if (Constants.Code.SUCCESS == code) {
-                tips = users.size() + ", " + code + ", " + msg;
-            } else {
-                tips = code + ", " + msg;
+                tips = users.size() + ", " + tips;
             }
             Toast.makeText(getApplicationContext(), tips, Toast.LENGTH_SHORT).show();
         });
@@ -73,7 +69,7 @@ public class DemoWrapperActivity extends Activity {
         final PayInfo payInfo = new PayInfo();
         PlatformProxy.pay(DemoWrapperActivity.this, type, payInfo, (isSuccess, msg, code) -> {
             // TODO: 2016/8/23
-            Toast.makeText(getApplicationContext(), isSuccess + ", " + code + ", " + msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), isSuccess + ", " + covertCode(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
     };
 
@@ -108,6 +104,27 @@ public class DemoWrapperActivity extends Activity {
             }
         }
         return channelType;
+    }
+
+    private static String covertCode(int code) {
+        switch (code) {
+            case Constants.Code.ERROR:
+                return "error";
+            case Constants.Code.ERROR_AUTH_DENIED:
+                return "auth error";
+            case Constants.Code.ERROR_CANCEL:
+                return "cancel";
+            case Constants.Code.ERROR_LOGIN:
+                return "login error";
+            case Constants.Code.ERROR_NOT_INSTALL:
+                return "not install app";
+            case Constants.Code.ERROR_NOT_SUPPORT:
+                return "not support";
+            case Constants.Code.SUCCESS:
+                return "success";
+            default:
+                return "unknown";
+        }
     }
 
 }

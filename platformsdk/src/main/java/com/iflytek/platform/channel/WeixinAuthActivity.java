@@ -130,8 +130,10 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
     protected void onResume() {
         super.onResume();
         // 没有安装微信 || 点击"留在微信中"之后再返回要关闭
-        if (!wxApi.isWXAppInstalled() || finishInResume) {
-            finish();
+        final boolean isInstalled = wxApi.isWXAppInstalled();
+        if (!isInstalled || finishInResume) {
+            int code = !isInstalled ? Constants.Code.ERROR_NOT_INSTALL : Constants.Code.SUCCESS;
+            onResult(code, null);
         }
         finishInResume = true;
     }
@@ -142,7 +144,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
                 if (null != content) {
                     share2Session((ShareContent) content);
                 } else {
-                    finish();
+                    onResult(Constants.Code.ERROR, null);
                 }
                 break;
             }
@@ -150,7 +152,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
                 if (null != content) {
                     share2Timeline((ShareContent) content);
                 } else {
-                    finish();
+                    onResult(Constants.Code.ERROR, null);
                 }
                 break;
             }
@@ -159,7 +161,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
                 break;
             }
             default: {
-                finish();
+                onResult(Constants.Code.ERROR_NOT_SUPPORT, null);
                 break;
             }
         }
