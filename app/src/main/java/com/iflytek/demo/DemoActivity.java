@@ -14,6 +14,7 @@ import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
+import com.iflytek.platform.utils.Tools;
 
 /**
  * Copyright (C), 2016 <br>
@@ -39,7 +40,7 @@ public class DemoActivity extends Activity {
                 .create();
         platformBehavior.select(type).share(content, (obj, msg, code) -> {
             // TODO: 2016/8/23
-            Toast.makeText(getApplicationContext(), covertCode(code) + ", " + msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
     };
 
@@ -47,7 +48,7 @@ public class DemoActivity extends Activity {
         final ChannelType type = getSelectedType();
         platformBehavior.select(type).login((user, msg, code) -> {
             // TODO: 2016/8/23
-            String tips = covertCode(code) + ", " + msg;
+            String tips = Tools.getSimpleTips(code) + ", " + msg;
             if (Constants.Code.SUCCESS == code) {
                 tips = user.id + ", " + tips;
             }
@@ -59,7 +60,7 @@ public class DemoActivity extends Activity {
         final ChannelType type = getSelectedType();
         platformBehavior.select(type).getFriends((users, msg, code) -> {
             // TODO: 2016/8/23
-            String tips = covertCode(code) + ", " + msg;
+            String tips = Tools.getSimpleTips(code) + ", " + msg;
             if (Constants.Code.SUCCESS == code) {
                 tips = users.size() + ", " + tips;
             }
@@ -72,7 +73,7 @@ public class DemoActivity extends Activity {
         final PayInfo payInfo = new PayInfo();
         platformBehavior.select(type).pay(payInfo, (isSuccess, msg, code) -> {
             // TODO: 2016/8/23
-            Toast.makeText(getApplicationContext(), isSuccess + ", " + covertCode(code) + ", " + msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), isSuccess + ", " + Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
     };
 
@@ -115,28 +116,6 @@ public class DemoActivity extends Activity {
             }
         }
         return channelType;
-    }
-
-
-    private static String covertCode(int code) {
-        switch (code) {
-            case Constants.Code.ERROR:
-                return "error";
-            case Constants.Code.ERROR_AUTH_DENIED:
-                return "auth error";
-            case Constants.Code.ERROR_CANCEL:
-                return "cancel";
-            case Constants.Code.ERROR_LOGIN:
-                return "login error";
-            case Constants.Code.ERROR_NOT_INSTALL:
-                return "not install app";
-            case Constants.Code.ERROR_NOT_SUPPORT:
-                return "not support";
-            case Constants.Code.SUCCESS:
-                return "success";
-            default:
-                return "unknown";
-        }
     }
 
 }

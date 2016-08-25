@@ -26,6 +26,7 @@ import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.utils.HttpsUtils;
+import com.iflytek.platform.utils.Tools;
 
 import java.io.Serializable;
 import java.net.URLDecoder;
@@ -134,7 +135,7 @@ public final class TaobaoAuthActivity extends Activity {
         titleTxt.setGravity(Gravity.CENTER);
         titleTxt.setTextColor(Color.DKGRAY);
         titleTxt.setText(title);
-        titleBar.addView(closeBtn, new FrameLayout.LayoutParams(dip2px(48), -1, Gravity.LEFT | Gravity.CENTER));
+        titleBar.addView(closeBtn, new FrameLayout.LayoutParams(Tools.dip2px(this, 48), -1, Gravity.LEFT | Gravity.CENTER));
         titleBar.addView(titleTxt, new FrameLayout.LayoutParams(-1, -1, Gravity.CENTER));
         View divider = new View(getApplicationContext());
         divider.setBackgroundColor(Color.LTGRAY);
@@ -146,13 +147,13 @@ public final class TaobaoAuthActivity extends Activity {
         progressBar = new ProgressBar(getApplicationContext(), null, android.R.attr.progressBarStyleHorizontal);
         progressBar.setMax(100);
         contentLayout.addView(webView, -1, -1);
-        contentLayout.addView(progressBar, new FrameLayout.LayoutParams(-1, dip2px(2), Gravity.TOP));
+        contentLayout.addView(progressBar, new FrameLayout.LayoutParams(-1, Tools.dip2px(this, 2), Gravity.TOP));
         // root
         LinearLayout container = new LinearLayout(getApplicationContext());
         container.setBackgroundColor(Color.WHITE);
         container.setOrientation(LinearLayout.VERTICAL);
 
-        container.addView(titleBar, new LinearLayout.LayoutParams(-1, dip2px(48)));
+        container.addView(titleBar, new LinearLayout.LayoutParams(-1, Tools.dip2px(this, 48)));
         container.addView(divider, new LinearLayout.LayoutParams(-1, 1));
         container.addView(contentLayout, new LinearLayout.LayoutParams(-1, 0, 1));
         return container;
@@ -231,11 +232,6 @@ public final class TaobaoAuthActivity extends Activity {
         intent.putExtra(Constants.KEY_CODE, Constants.Code.ERROR_CANCEL);
         setResult(RESULT_OK, intent);
         super.finish();
-    }
-
-    private int dip2px(float dipValue) {
-        final float scale = getResources().getDisplayMetrics().density;
-        return (int) (dipValue * scale + 0.5f);
     }
 
     /**

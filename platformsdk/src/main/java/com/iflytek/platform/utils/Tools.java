@@ -1,5 +1,9 @@
 package com.iflytek.platform.utils;
 
+import android.content.Context;
+
+import com.iflytek.platform.entity.Constants;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,6 +28,11 @@ public final class Tools {
 
     private Tools() {
         throw new AssertionError();
+    }
+
+    public static int dip2px(Context context, float dipValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dipValue * scale + 0.5f);
     }
 
     public static void close(Closeable closeable) {
@@ -90,6 +99,27 @@ public final class Tools {
             }
         }
         return result;
+    }
+
+    public static String getSimpleTips(int code) {
+        switch (code) {
+            case Constants.Code.ERROR:
+                return "失败";
+            case Constants.Code.ERROR_AUTH_DENIED:
+                return "认证失败";
+            case Constants.Code.ERROR_CANCEL:
+                return "取消";
+            case Constants.Code.ERROR_LOGIN:
+                return "登录失败";
+            case Constants.Code.ERROR_NOT_INSTALL:
+                return "应用程序未安装";
+            case Constants.Code.ERROR_NOT_SUPPORT:
+                return "不支持此功能";
+            case Constants.Code.SUCCESS:
+                return "成功";
+            default:
+                return "未知";
+        }
     }
 
 }

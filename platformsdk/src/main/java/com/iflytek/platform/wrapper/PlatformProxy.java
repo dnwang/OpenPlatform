@@ -3,8 +3,16 @@ package com.iflytek.platform.wrapper;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
 import android.view.Window;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.iflytek.platform.PlatformBehavior;
 import com.iflytek.platform.callbacks.Callback;
@@ -12,9 +20,11 @@ import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
+import com.iflytek.platform.utils.Tools;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Copyright (C), 2016 <br>
@@ -102,18 +112,41 @@ public final class PlatformProxy extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         platformBehavior = new PlatformBehavior(this);
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        parseIntent();
+        setContentView(getContentView());
         getWindow().getDecorView().setBackgroundColor(0);
         platformBehavior.onCreate(this, savedInstanceState);
+        dispatchBehavior();
+    }
 
-        Intent intent = getIntent();
+    private void parseIntent() {
+        final Intent intent = getIntent();
         channelType = (ChannelType) intent.getSerializableExtra(FLAG_CHANNEL);
         behavior = intent.getIntExtra(FLAG_BEHAVIOR, -1);
         content = intent.getSerializableExtra(FLAG_CONTENT);
         callbackHash = intent.getLongExtra(FLAG_CALLBACK, -1);
-        dispatchBehavior();
+    }
+
+    private View getContentView() {
+        FrameLayout container = new FrameLayout(this);
+        LinearLayout waiting = new LinearLayout(this);
+        waiting.setBackgroundColor(Color.parseColor("#aa000000"));
+        final int padding = Tools.dip2px(this, 12);
+        waiting.setPadding(padding, padding, padding, padding);
+        waiting.setGravity(Gravity.CENTER);
+        ProgressBar progress = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
+        TextView tipsTxt = new TextView(this);
+        tipsTxt.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+        tipsTxt.setTextColor(Color.LTGRAY);
+        final String tipStr = behavior == BEHAVIOR_SHARE ? "正在分享" : (behavior == BEHAVIOR_LOGIN ? "正在登录" : "请稍等");
+        tipsTxt.setText(String.format(Locale.PRC, " %s...", tipStr));
+        waiting.addView(progress);
+        waiting.addView(tipsTxt);
+        container.addView(waiting, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
+        return container;
     }
 
     @Override

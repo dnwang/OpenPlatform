@@ -12,6 +12,7 @@ import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
+import com.iflytek.platform.utils.Tools;
 import com.iflytek.platform.wrapper.PlatformProxy;
 
 /**
@@ -36,7 +37,7 @@ public class DemoWrapperActivity extends Activity {
                 .create();
         PlatformProxy.share(DemoWrapperActivity.this, type, content, (obj, msg, code) -> {
             // TODO: 2016/8/23
-            Toast.makeText(getApplicationContext(), covertCode(code) + ", " + msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
     };
 
@@ -44,7 +45,7 @@ public class DemoWrapperActivity extends Activity {
         final ChannelType type = getSelectedType();
         PlatformProxy.login(DemoWrapperActivity.this, type, (user, msg, code) -> {
             // TODO: 2016/8/23
-            String tips = covertCode(code) + ", " + msg;
+            String tips = Tools.getSimpleTips(code) + ", " + msg;
             if (Constants.Code.SUCCESS == code) {
                 tips = user.id + ", " + tips;
             }
@@ -56,7 +57,7 @@ public class DemoWrapperActivity extends Activity {
         final ChannelType type = getSelectedType();
         PlatformProxy.getFriends(DemoWrapperActivity.this, type, (users, msg, code) -> {
             // TODO: 2016/8/23
-            String tips = covertCode(code) + ", " + msg;
+            String tips = Tools.getSimpleTips(code) + ", " + msg;
             if (Constants.Code.SUCCESS == code) {
                 tips = users.size() + ", " + tips;
             }
@@ -69,7 +70,7 @@ public class DemoWrapperActivity extends Activity {
         final PayInfo payInfo = new PayInfo();
         PlatformProxy.pay(DemoWrapperActivity.this, type, payInfo, (isSuccess, msg, code) -> {
             // TODO: 2016/8/23
-            Toast.makeText(getApplicationContext(), isSuccess + ", " + covertCode(code) + ", " + msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), isSuccess + ", " + Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
     };
 
@@ -104,27 +105,6 @@ public class DemoWrapperActivity extends Activity {
             }
         }
         return channelType;
-    }
-
-    private static String covertCode(int code) {
-        switch (code) {
-            case Constants.Code.ERROR:
-                return "error";
-            case Constants.Code.ERROR_AUTH_DENIED:
-                return "auth error";
-            case Constants.Code.ERROR_CANCEL:
-                return "cancel";
-            case Constants.Code.ERROR_LOGIN:
-                return "login error";
-            case Constants.Code.ERROR_NOT_INSTALL:
-                return "not install app";
-            case Constants.Code.ERROR_NOT_SUPPORT:
-                return "not support";
-            case Constants.Code.SUCCESS:
-                return "success";
-            default:
-                return "unknown";
-        }
     }
 
 }
