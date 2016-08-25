@@ -42,6 +42,12 @@ public class DemoWrapperActivity extends Activity {
             // TODO: 2016/8/23
             Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
+//        PlatformProxy.share(DemoWrapperActivity.this, type, content, new Callback<Object>() {
+//            @Override
+//            public void call(Object o, String msg, int code) {
+//
+//            }
+//        });
     };
 
     /**

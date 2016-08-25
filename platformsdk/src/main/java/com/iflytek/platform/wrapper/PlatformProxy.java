@@ -133,7 +133,7 @@ public final class PlatformProxy extends Activity {
     private View getContentView() {
         FrameLayout container = new FrameLayout(this);
         LinearLayout waiting = new LinearLayout(this);
-        waiting.setBackgroundColor(Color.parseColor("#aa000000"));
+        waiting.setBackgroundColor(Color.parseColor("#70000000"));
         final int padding = Tools.dip2px(this, 12);
         waiting.setPadding(padding, padding, padding, padding);
         waiting.setGravity(Gravity.CENTER);
