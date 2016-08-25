@@ -216,7 +216,7 @@ public final class PlatformProxy extends Activity {
                     platformBehavior.share((ShareContent) content, new Callback<Object>() {
                         @Override
                         public void call(Object obj, String msg, int code) {
-                            if (getGlobCallbackHash() == callbackHash) {
+                            if (null != PlatformProxy.callback && getGlobCallbackHash() == callbackHash) {
                                 PlatformProxy.callback.call(obj, msg, code);
                             }
                             finish();
@@ -230,7 +230,7 @@ public final class PlatformProxy extends Activity {
                     platformBehavior.pay((PayInfo) content, new Callback<Object>() {
                         @Override
                         public void call(Object obj, String msg, int code) {
-                            if (getGlobCallbackHash() == callbackHash) {
+                            if (null != PlatformProxy.callback && getGlobCallbackHash() == callbackHash) {
                                 PlatformProxy.callback.call(obj, msg, code);
                             }
                             finish();
@@ -243,7 +243,7 @@ public final class PlatformProxy extends Activity {
                 platformBehavior.login(new Callback<AccountInfo>() {
                     @Override
                     public void call(AccountInfo accountInfo, String msg, int code) {
-                        if (getGlobCallbackHash() == callbackHash) {
+                        if (null != PlatformProxy.callback && getGlobCallbackHash() == callbackHash) {
                             PlatformProxy.callback.call(accountInfo, msg, code);
                         }
                         finish();
@@ -255,7 +255,7 @@ public final class PlatformProxy extends Activity {
                 platformBehavior.getFriends(new Callback<List<AccountInfo>>() {
                     @Override
                     public void call(List<AccountInfo> accountInfos, String msg, int code) {
-                        if (getGlobCallbackHash() == callbackHash) {
+                        if (null != PlatformProxy.callback && getGlobCallbackHash() == callbackHash) {
                             PlatformProxy.callback.call(accountInfos, msg, code);
                         }
                         finish();
