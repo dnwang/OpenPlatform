@@ -28,8 +28,14 @@ import com.iflytek.platform.utils.Tools;
  */
 public class DemoActivity extends Activity {
 
+    /**
+     * 基础API调用接口
+     */
     private PlatformBehavior platformBehavior;
 
+    /**
+     * 分享
+     */
     private final View.OnClickListener shareClick = view -> {
         final ChannelType type = getSelectedType();
         final ShareContent content = new ShareContent.Builder()
@@ -44,6 +50,9 @@ public class DemoActivity extends Activity {
         });
     };
 
+    /**
+     * 登录
+     */
     private final View.OnClickListener loginClick = view -> {
         final ChannelType type = getSelectedType();
         platformBehavior.select(type).login((user, msg, code) -> {
@@ -56,6 +65,9 @@ public class DemoActivity extends Activity {
         });
     };
 
+    /**
+     * 获取朋友列表
+     */
     private final View.OnClickListener getFriendsClick = view -> {
         final ChannelType type = getSelectedType();
         platformBehavior.select(type).getFriends((users, msg, code) -> {
@@ -68,6 +80,9 @@ public class DemoActivity extends Activity {
         });
     };
 
+    /**
+     * 支付
+     */
     private final View.OnClickListener payClick = view -> {
         final ChannelType type = getSelectedType();
         final PayInfo payInfo = new PayInfo();
@@ -79,16 +94,19 @@ public class DemoActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // 初始化基础API接口绑定Activity
         platformBehavior = new PlatformBehavior(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         registerListener();
+        // 生命周期回调
         platformBehavior.onCreate(this, savedInstanceState);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        // 生命周期回调
         platformBehavior.onActivityResult(this, requestCode, resultCode, data);
     }
 

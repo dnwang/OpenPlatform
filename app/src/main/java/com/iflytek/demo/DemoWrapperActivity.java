@@ -27,6 +27,9 @@ import com.iflytek.platform.wrapper.PlatformProxy;
  */
 public class DemoWrapperActivity extends Activity {
 
+    /**
+     * 分享
+     */
     private final View.OnClickListener shareClick = view -> {
         final ChannelType type = getSelectedType();
         final ShareContent content = new ShareContent.Builder()
@@ -41,6 +44,9 @@ public class DemoWrapperActivity extends Activity {
         });
     };
 
+    /**
+     * 登录
+     */
     private final View.OnClickListener loginClick = view -> {
         final ChannelType type = getSelectedType();
         PlatformProxy.login(DemoWrapperActivity.this, type, (user, msg, code) -> {
@@ -53,6 +59,9 @@ public class DemoWrapperActivity extends Activity {
         });
     };
 
+    /**
+     * 获取朋友列表
+     */
     private final View.OnClickListener getFriendsClick = view -> {
         final ChannelType type = getSelectedType();
         PlatformProxy.getFriends(DemoWrapperActivity.this, type, (users, msg, code) -> {
@@ -65,6 +74,9 @@ public class DemoWrapperActivity extends Activity {
         });
     };
 
+    /**
+     * 支付
+     */
     private final View.OnClickListener payClick = view -> {
         final ChannelType type = getSelectedType();
         final PayInfo payInfo = new PayInfo();
@@ -78,10 +90,6 @@ public class DemoWrapperActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        registerListener();
-    }
-
-    private void registerListener() {
         findViewById(R.id.btn_share).setOnClickListener(shareClick);
         findViewById(R.id.btn_login).setOnClickListener(loginClick);
         findViewById(R.id.btn_friends).setOnClickListener(getFriendsClick);
