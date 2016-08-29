@@ -21,9 +21,11 @@ import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -49,6 +51,12 @@ final class SinaWeibo extends Channel implements Socialize {
      * 认证token获取用户信息
      */
     private static final String API_SHOW_USER = "https://api.weibo.com/2/users/show.json?access_token=%s&uid=%s";
+
+    /**
+     * 获取好友关注列表
+     * 单页最大count=200
+     */
+    private static final String API_GET_FRIENDS = "https://api.weibo.com/2/friendships/friends.json?access_token=%s&uid=%s&count=200&cursor=0";
 
     private SsoHandler ssoHandler;
 
@@ -80,25 +88,18 @@ final class SinaWeibo extends Channel implements Socialize {
         if (null == content) {
             return;
         }
+        // 分享在“取消”时只能通过Activity接收消息
         SinaWeiboShareActivity.startActivity((Activity) getContext(), content);
         shareCallback = callback;
     }
 
     @Override
-    public void login(final Callback<AccountInfo> callback) {
+    public void login(Callback<AccountInfo> callback) {
         AuthInfo authInfo = new AuthInfo(getContext(), PlatformConfig.INSTANCE.getSinaKey(), REDIRECT_URL, SCOPE);
         ssoHandler = new SsoHandler((Activity) getContext(), authInfo);
-        ssoHandler.authorize(new WeiboAuthListener() {
+        ssoHandler.authorize(new WeiboAuthListenerWrapper<AccountInfo>(callback) {
             @Override
-            public void onComplete(Bundle bundle) {
-                if (null == callback) {
-                    return;
-                }
-                final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
-                if (null == tokenInfo || !tokenInfo.isSessionValid()) {
-                    callback.call(null, null, Constants.Code.ERROR);
-                    return;
-                }
+            void onAuthComplete(final Oauth2AccessToken tokenInfo) {
                 new Thread() {
                     @Override
                     public void run() {
@@ -111,56 +112,88 @@ final class SinaWeibo extends Channel implements Socialize {
                             @Override
                             public void run() {
                                 final boolean isSuccess = (null != accountInfo);
-                                callback.call(accountInfo, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
+                                getCallback().call(accountInfo, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
                             }
                         });
                     }
                 }.start();
-            }
-
-            @Override
-            public void onWeiboException(WeiboException e) {
-                if (null != callback) {
-                    callback.call(null, e.getMessage(), Constants.Code.ERROR);
-                }
-            }
-
-            @Override
-            public void onCancel() {
-                if (null != callback) {
-                    callback.call(null, null, Constants.Code.ERROR_CANCEL);
-                }
             }
         });
     }
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
-        // TODO: 2016/8/16
-        if (null != callback) {
-            callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
-        }
+        AuthInfo authInfo = new AuthInfo(getContext(), PlatformConfig.INSTANCE.getSinaKey(), REDIRECT_URL, SCOPE);
+        ssoHandler = new SsoHandler((Activity) getContext(), authInfo);
+        ssoHandler.authorize(new WeiboAuthListenerWrapper<List<AccountInfo>>(callback) {
+            @Override
+            void onAuthComplete(final Oauth2AccessToken tokenInfo) {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        final List<AccountInfo> accountInfoList = getFriendsList(tokenInfo.getUid(), tokenInfo.getToken());
+                        final Activity activity = (Activity) getContext();
+                        if (activity.isFinishing()) {
+                            return;
+                        }
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                final boolean isSuccess = (null != accountInfoList);
+                                getCallback().call(accountInfoList, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
+                            }
+                        });
+                    }
+                }.start();
+            }
+        });
     }
 
+    /**
+     * 获取用户信息
+     */
     private AccountInfo getAccountInfo(String uid, String token) {
         try {
             uid = URLEncoder.encode(uid, "UTF-8");
             token = URLEncoder.encode(token, "UTF-8");
             final String url4User = String.format(Locale.PRC, API_SHOW_USER, token, uid);
+            // {"name":"test","id":"test",...}
             String result = HttpsUtils.get(url4User);
-            return toAccountInfo(result);
+            return toAccountInfo(new JSONObject(result));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private AccountInfo toAccountInfo(String userInfo) throws Exception {
-        // user:{...}
-        JSONObject json = new JSONObject(userInfo);
+    /**
+     * 获取用户的关注列表
+     */
+    private List<AccountInfo> getFriendsList(String uid, String token) {
+        try {
+            token = URLEncoder.encode(token, "UTF-8");
+            final String url4Friends = String.format(Locale.PRC, API_GET_FRIENDS, token, uid);
+            String result = HttpsUtils.get(url4Friends);
+            // {"users":[],"next_cursor":0,"previous_cursor":0,"total_number":1}
+            JSONObject json = new JSONObject(result);
+            JSONArray jsonArray = json.getJSONArray("users");
+            final int size = jsonArray.length();
+            List<AccountInfo> accountInfoList = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                AccountInfo accountInfo = toAccountInfo(jsonArray.getJSONObject(i));
+                accountInfoList.add(accountInfo);
+            }
+            return accountInfoList;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private AccountInfo toAccountInfo(JSONObject json) throws Exception {
         final String uid = Tools.getJsonString(json, "id");
         if (TextUtils.isEmpty(uid)) {
-            throw new FormatException(userInfo);
+            throw new FormatException("account json is not contains user id.");
         }
         AccountInfo accountInfo = new AccountInfo();
         accountInfo.id = uid;
@@ -174,6 +207,48 @@ final class SinaWeibo extends Channel implements Socialize {
         accountInfo.putExtra("location", Tools.getJsonString(json, "location"));
         accountInfo.putExtra("description", Tools.getJsonString(json, "description"));
         return accountInfo;
+    }
+
+    private abstract class WeiboAuthListenerWrapper<T> implements WeiboAuthListener {
+
+        private Callback<T> callback;
+
+        private WeiboAuthListenerWrapper(Callback<T> callback) {
+            this.callback = callback;
+        }
+
+        public Callback<T> getCallback() {
+            return callback;
+        }
+
+        abstract void onAuthComplete(Oauth2AccessToken tokenInfo);
+
+        @Override
+        public void onComplete(Bundle bundle) {
+            if (null == callback) {
+                return;
+            }
+            final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
+            if (null == tokenInfo || !tokenInfo.isSessionValid()) {
+                callback.call(null, null, Constants.Code.ERROR);
+                return;
+            }
+            onAuthComplete(tokenInfo);
+        }
+
+        @Override
+        public void onWeiboException(WeiboException e) {
+            if (null != callback) {
+                callback.call(null, e.getMessage(), Constants.Code.ERROR);
+            }
+        }
+
+        @Override
+        public void onCancel() {
+            if (null != callback) {
+                callback.call(null, null, Constants.Code.ERROR_CANCEL);
+            }
+        }
     }
 
 }

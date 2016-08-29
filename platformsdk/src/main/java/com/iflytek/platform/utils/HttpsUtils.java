@@ -29,6 +29,8 @@ import javax.net.ssl.X509TrustManager;
  */
 public final class HttpsUtils {
 
+    private static final int TIME_OUT = 20 * 1000;
+
     private HttpsUtils() {
         throw new AssertionError();
     }
@@ -51,8 +53,8 @@ public final class HttpsUtils {
                 connection = (HttpURLConnection) new URL(url).openConnection();
             }
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(20 * 1000);
-            connection.setReadTimeout(20 * 1000);
+            connection.setConnectTimeout(TIME_OUT);
+            connection.setReadTimeout(TIME_OUT);
             connection.connect();
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             StringBuilder stringBuilder = new StringBuilder();
