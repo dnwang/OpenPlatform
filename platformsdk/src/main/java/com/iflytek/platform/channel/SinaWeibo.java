@@ -57,7 +57,8 @@ final class SinaWeibo extends Channel implements Socialize {
      * 获取好友关注列表
      * 单页最大count=200
      */
-    private static final String API_GET_FRIENDS = "https://api.weibo.com/2/friendships/friends.json?access_token=%s&uid=%s&count=200&cursor=0";
+    private static final String API_GET_FRIENDS = "https://api.weibo.com/2/friendships/friends.json?access_token=%s&uid=%s&count=%d&cursor=%d";
+    private static final int PAGE_SIZE = 200;
 
     private SsoHandler ssoHandler;
 
@@ -182,11 +183,15 @@ final class SinaWeibo extends Channel implements Socialize {
 
     /**
      * 获取用户的关注列表
+     *
+     * 只返回同样授权本应用的用户，非授权用户将不返回；
+     * 例如一次调用count是50，但其中授权本应用的用户只有10条，则实际只返回10条；
+     * 使用官方移动SDK调用，多返回30%的非同样授权本应用的用户，总上限为500；
      */
     private List<AccountInfo> getFriendsList(String uid, String token) {
         try {
             token = URLEncoder.encode(token, "UTF-8");
-            final String url4Friends = String.format(Locale.PRC, API_GET_FRIENDS, token, uid);
+            final String url4Friends = String.format(Locale.PRC, API_GET_FRIENDS, token, uid, PAGE_SIZE, 0);
             String result = HttpsUtils.get(url4Friends);
             // {"users":[],"next_cursor":0,"previous_cursor":0,"total_number":1}
             JSONObject json = new JSONObject(result);

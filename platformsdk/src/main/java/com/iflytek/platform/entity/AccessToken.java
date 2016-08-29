@@ -44,6 +44,7 @@ public final class AccessToken implements Serializable {
         return createToken(uid, token);
     }
 
+    // 微信uid=openId
     private String uid;
     private String token;
 
