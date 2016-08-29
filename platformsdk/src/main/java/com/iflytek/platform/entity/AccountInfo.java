@@ -22,6 +22,7 @@ public class AccountInfo implements Serializable {
     public String nickName;
     public int gender; // 1:男;2女;0:未知
     public String headerImg;
+    public AccessToken token;
 
     private Map<String, String> extra;
 

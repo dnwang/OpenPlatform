@@ -17,7 +17,9 @@ import android.widget.TextView;
 import com.iflytek.platform.PlatformBehavior;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.channel.ChannelType;
+import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.AccountInfo;
+import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.utils.Tools;
@@ -41,6 +43,7 @@ public final class PlatformProxy extends Activity {
     private static final String FLAG_BEHAVIOR = "behavior";
     private static final String FLAG_CHANNEL = "channel";
     private static final String FLAG_CONTENT = "content";
+    private static final String FLAG_TOKEN = "token";
     private static final String FLAG_CALLBACK = "callback";
 
     private static final int BEHAVIOR_SHARE = 0x01;
@@ -55,7 +58,7 @@ public final class PlatformProxy extends Activity {
             return;
         }
         PlatformProxy.callback = callback;
-        startActivity(context, BEHAVIOR_SHARE, type, content, getGlobCallbackHash());
+        startActivity(context, BEHAVIOR_SHARE, type, null, content, getGlobCallbackHash());
     }
 
     public static void login(Context context, ChannelType type, Callback<AccountInfo> callback) {
@@ -63,7 +66,7 @@ public final class PlatformProxy extends Activity {
             return;
         }
         PlatformProxy.callback = callback;
-        startActivity(context, BEHAVIOR_LOGIN, type, null, getGlobCallbackHash());
+        startActivity(context, BEHAVIOR_LOGIN, type, null, null, getGlobCallbackHash());
     }
 
     public static void getFriends(Context context, ChannelType type, Callback<List<AccountInfo>> callback) {
@@ -71,7 +74,15 @@ public final class PlatformProxy extends Activity {
             return;
         }
         PlatformProxy.callback = callback;
-        startActivity(context, BEHAVIOR_GET_FRIENDS, type, null, getGlobCallbackHash());
+        startActivity(context, BEHAVIOR_GET_FRIENDS, type, null, null, getGlobCallbackHash());
+    }
+
+    public static void getFriends(Context context, ChannelType type, AccessToken token, Callback<List<AccountInfo>> callback) {
+        if (null == type) {
+            return;
+        }
+        PlatformProxy.callback = callback;
+        startActivity(context, BEHAVIOR_GET_FRIENDS, type, token, null, getGlobCallbackHash());
     }
 
     public static void pay(Context context, ChannelType type, PayInfo payInfo, Callback<Object> callback) {
@@ -79,10 +90,10 @@ public final class PlatformProxy extends Activity {
             return;
         }
         PlatformProxy.callback = callback;
-        startActivity(context, BEHAVIOR_PAY, type, payInfo, getGlobCallbackHash());
+        startActivity(context, BEHAVIOR_PAY, type, null, payInfo, getGlobCallbackHash());
     }
 
-    private static void startActivity(Context context, int behavior, ChannelType type, Serializable content, long callback) {
+    private static void startActivity(Context context, int behavior, ChannelType type, AccessToken token, Serializable content, long callback) {
         if (null == context) {
             return;
         }
@@ -90,6 +101,9 @@ public final class PlatformProxy extends Activity {
         intent.putExtra(FLAG_CHANNEL, type);
         intent.putExtra(FLAG_BEHAVIOR, behavior);
         intent.putExtra(FLAG_CALLBACK, callback);
+        if (null != token) {
+            intent.putExtra(FLAG_TOKEN, token);
+        }
         if (null != content) {
             intent.putExtra(FLAG_CONTENT, content);
         }
@@ -107,6 +121,7 @@ public final class PlatformProxy extends Activity {
 
     private int behavior;
     private ChannelType channelType;
+    private AccessToken token;
     private Serializable content;
     private long callbackHash;
 
@@ -126,8 +141,12 @@ public final class PlatformProxy extends Activity {
         final Intent intent = getIntent();
         channelType = (ChannelType) intent.getSerializableExtra(FLAG_CHANNEL);
         behavior = intent.getIntExtra(FLAG_BEHAVIOR, -1);
-        content = intent.getSerializableExtra(FLAG_CONTENT);
         callbackHash = intent.getLongExtra(FLAG_CALLBACK, -1);
+        content = intent.getSerializableExtra(FLAG_CONTENT);
+        final Object obj = intent.getSerializableExtra(FLAG_TOKEN);
+        if (null != obj && obj instanceof AccessToken) {
+            token = (AccessToken) obj;
+        }
     }
 
     private View getContentView() {
@@ -205,6 +224,13 @@ public final class PlatformProxy extends Activity {
         overridePendingTransition(0, 0);
     }
 
+    private void finishWithInfo(Object object, String msg, int code) {
+        if (null != PlatformProxy.callback && getGlobCallbackHash() == callbackHash) {
+            PlatformProxy.callback.call(object, msg, code);
+        }
+        finish();
+    }
+
     private void dispatchBehavior() {
         if (null == channelType) {
             return;
@@ -216,12 +242,11 @@ public final class PlatformProxy extends Activity {
                     platformBehavior.share((ShareContent) content, new Callback<Object>() {
                         @Override
                         public void call(Object obj, String msg, int code) {
-                            if (null != PlatformProxy.callback && getGlobCallbackHash() == callbackHash) {
-                                PlatformProxy.callback.call(obj, msg, code);
-                            }
-                            finish();
+                            finishWithInfo(obj, msg, code);
                         }
                     });
+                } else {
+                    finishWithInfo(null, null, Constants.Code.ERROR);
                 }
                 break;
             }
@@ -230,37 +255,35 @@ public final class PlatformProxy extends Activity {
                     platformBehavior.pay((PayInfo) content, new Callback<Object>() {
                         @Override
                         public void call(Object obj, String msg, int code) {
-                            if (null != PlatformProxy.callback && getGlobCallbackHash() == callbackHash) {
-                                PlatformProxy.callback.call(obj, msg, code);
-                            }
-                            finish();
+                            finishWithInfo(obj, msg, code);
                         }
                     });
+                } else {
+                    finishWithInfo(null, null, Constants.Code.ERROR);
                 }
                 break;
             }
             case BEHAVIOR_LOGIN: {
                 platformBehavior.login(new Callback<AccountInfo>() {
                     @Override
-                    public void call(AccountInfo accountInfo, String msg, int code) {
-                        if (null != PlatformProxy.callback && getGlobCallbackHash() == callbackHash) {
-                            PlatformProxy.callback.call(accountInfo, msg, code);
-                        }
-                        finish();
+                    public void call(AccountInfo obj, String msg, int code) {
+                        finishWithInfo(obj, msg, code);
                     }
                 });
                 break;
             }
             case BEHAVIOR_GET_FRIENDS: {
-                platformBehavior.getFriends(new Callback<List<AccountInfo>>() {
+                final Callback<List<AccountInfo>> callback = new Callback<List<AccountInfo>>() {
                     @Override
-                    public void call(List<AccountInfo> accountInfos, String msg, int code) {
-                        if (null != PlatformProxy.callback && getGlobCallbackHash() == callbackHash) {
-                            PlatformProxy.callback.call(accountInfos, msg, code);
-                        }
-                        finish();
+                    public void call(List<AccountInfo> obj, String msg, int code) {
+                        finishWithInfo(obj, msg, code);
                     }
-                });
+                };
+                if (null != token) {
+                    platformBehavior.getFriends(token, callback);
+                } else {
+                    platformBehavior.getFriends(callback);
+                }
                 break;
             }
         }

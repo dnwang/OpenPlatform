@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.Window;
 
 import com.iflytek.platform.PlatformConfig;
+import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
@@ -271,7 +272,9 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
             // get user info
             final String url4User = String.format(Locale.PRC, API_GET_USER, assessToken, openId);
             final String userInfo = HttpsUtils.get(url4User);
-            return toAccountInfo(userInfo);
+            final AccountInfo accountInfo = toAccountInfo(userInfo);
+            accountInfo.token = AccessToken.createToken(openId, assessToken);
+            return accountInfo;
         } catch (Exception e) {
             return null;
         }

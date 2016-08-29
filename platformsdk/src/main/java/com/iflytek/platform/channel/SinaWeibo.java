@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import com.iflytek.platform.Channel;
 import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.callbacks.Callback;
+import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
@@ -128,25 +129,36 @@ final class SinaWeibo extends Channel implements Socialize {
         ssoHandler.authorize(new WeiboAuthListenerWrapper<List<AccountInfo>>(callback) {
             @Override
             void onAuthComplete(final Oauth2AccessToken tokenInfo) {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        final List<AccountInfo> accountInfoList = getFriendsList(tokenInfo.getUid(), tokenInfo.getToken());
-                        final Activity activity = (Activity) getContext();
-                        if (activity.isFinishing()) {
-                            return;
-                        }
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                final boolean isSuccess = (null != accountInfoList);
-                                getCallback().call(accountInfoList, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
-                            }
-                        });
-                    }
-                }.start();
+                getFriends(AccessToken.createToken(tokenInfo), getCallback());
             }
         });
+    }
+
+    @Override
+    public void getFriends(final AccessToken token, final Callback<List<AccountInfo>> callback) {
+        if (null == token) {
+            if (null != callback) {
+                callback.call(null, null, Constants.Code.ERROR_AUTH_DENIED);
+            }
+            return;
+        }
+        new Thread() {
+            @Override
+            public void run() {
+                final List<AccountInfo> accountInfoList = getFriendsList(token.getUid(), token.getToken());
+                final Activity activity = (Activity) getContext();
+                if (activity.isFinishing()) {
+                    return;
+                }
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final boolean isSuccess = (null != accountInfoList);
+                        callback.call(accountInfoList, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
+                    }
+                });
+            }
+        }.start();
     }
 
     /**
@@ -159,7 +171,9 @@ final class SinaWeibo extends Channel implements Socialize {
             final String url4User = String.format(Locale.PRC, API_SHOW_USER, token, uid);
             // {"name":"test","id":"test",...}
             String result = HttpsUtils.get(url4User);
-            return toAccountInfo(new JSONObject(result));
+            final AccountInfo accountInfo = toAccountInfo(new JSONObject(result));
+            accountInfo.token = AccessToken.createToken(uid, token);
+            return accountInfo;
         } catch (Exception e) {
             e.printStackTrace();
         }

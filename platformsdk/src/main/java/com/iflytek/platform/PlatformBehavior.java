@@ -9,6 +9,7 @@ import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.channel.Payable;
 import com.iflytek.platform.channel.Socialize;
+import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
@@ -61,6 +62,12 @@ public final class PlatformBehavior implements ActivityLifecycleCallbacks, Socia
 
     @Override
     public void pay(PayInfo payInfo, Callback<Object> callback) {
+        if (null == payInfo) {
+            if (null != callback) {
+                callback.call(null, null, Constants.Code.ERROR);
+            }
+            return;
+        }
         if (null != selected) {
             if (selected instanceof Payable) {
                 ((Payable) selected).pay(payInfo, callback);
@@ -74,6 +81,12 @@ public final class PlatformBehavior implements ActivityLifecycleCallbacks, Socia
 
     @Override
     public void share(ShareContent content, Callback<Object> callback) {
+        if (null == content) {
+            if (null != callback) {
+                callback.call(null, null, Constants.Code.ERROR);
+            }
+            return;
+        }
         if (null != selected) {
             if (selected instanceof Socialize) {
                 ((Socialize) selected).share(content, callback);
@@ -111,6 +124,24 @@ public final class PlatformBehavior implements ActivityLifecycleCallbacks, Socia
         }
     }
 
+    @Override
+    public void getFriends(AccessToken token, Callback<List<AccountInfo>> callback) {
+        if (null == token) {
+            if (null != callback) {
+                callback.call(null, null, Constants.Code.ERROR_AUTH_DENIED);
+            }
+            return;
+        }
+        if (null != selected) {
+            if (selected instanceof Socialize) {
+                ((Socialize) selected).getFriends(token, callback);
+            } else {
+                if (null != callback) {
+                    callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
+                }
+            }
+        }
+    }
 
     @Override
     public void onCreate(Activity activity, Bundle bundle) {

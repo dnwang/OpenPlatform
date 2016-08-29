@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import com.iflytek.platform.Channel;
 import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.callbacks.Callback;
+import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
@@ -60,7 +61,7 @@ final class TencentQZone extends Channel implements Socialize {
         params.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, content.content);
         params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, new ArrayList<String>());
 
-        shareCallback = new TencentQQ.SampleUIListener<>(callback);
+        shareCallback = new TencentQQ.UIListenerWrapper<>(callback);
         shareApi.shareToQzone((Activity) getContext(), params, shareCallback);
     }
 
@@ -78,4 +79,10 @@ final class TencentQZone extends Channel implements Socialize {
         }
     }
 
+    @Override
+    public void getFriends(AccessToken token, Callback<List<AccountInfo>> callback) {
+        if (null != callback) {
+            callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
+        }
+    }
 }

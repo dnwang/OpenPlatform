@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import com.iflytek.platform.Channel;
 import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.callbacks.Callback;
+import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
@@ -73,13 +74,13 @@ final class TencentQQ extends Channel implements Socialize {
         params.putString(QQShare.SHARE_TO_QQ_SUMMARY, content.content);
         params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, content.imageUrl);
 
-        shareCallback = new SampleUIListener<>(callback);
+        shareCallback = new UIListenerWrapper<>(callback);
         shareApi.shareToQQ((Activity) getContext(), params, shareCallback);
     }
 
     @Override
     public void login(final Callback<AccountInfo> callback) {
-        loginCallback = new SampleUIListener<AccountInfo>(callback) {
+        loginCallback = new UIListenerWrapper<AccountInfo>(callback) {
             @Override
             public void onComplete(Object obj) {
                 if (null == getCallback()) {
@@ -94,17 +95,19 @@ final class TencentQQ extends Channel implements Socialize {
                 final String expires = Tools.getJsonString(json, com.tencent.connect.common.Constants.PARAM_EXPIRES_IN);
                 final String openId = Tools.getJsonString(json, com.tencent.connect.common.Constants.PARAM_OPEN_ID);
 
-                QQToken qqToken = new QQToken(PlatformConfig.INSTANCE.getTencentId());
+                final QQToken qqToken = new QQToken(PlatformConfig.INSTANCE.getTencentId());
                 qqToken.setAuthSource(QQToken.AUTH_QQ);
                 qqToken.setAccessToken(token, expires);
                 qqToken.setOpenId(openId);
 
                 UserInfo userInfo = new UserInfo(getContext(), qqToken);
-                userInfo.getUserInfo(new SampleUIListener<AccountInfo>(getCallback()) {
+                userInfo.getUserInfo(new UIListenerWrapper<AccountInfo>(getCallback()) {
                     @Override
                     public void onComplete(Object obj) {
                         try {
-                            getCallback().call(toAccountInfo(openId, String.valueOf(obj)), null, Constants.Code.SUCCESS);
+                            final AccountInfo accountInfo = toAccountInfo(openId, String.valueOf(obj));
+                            accountInfo.token = AccessToken.createToken(qqToken);
+                            getCallback().call(accountInfo, null, Constants.Code.SUCCESS);
                         } catch (Exception e) {
                             getCallback().call(null, e.getMessage(), Constants.Code.ERROR);
                         }
@@ -117,6 +120,13 @@ final class TencentQQ extends Channel implements Socialize {
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
+        if (null != callback) {
+            callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
+        }
+    }
+
+    @Override
+    public void getFriends(AccessToken token, Callback<List<AccountInfo>> callback) {
         if (null != callback) {
             callback.call(null, null, Constants.Code.ERROR_NOT_SUPPORT);
         }
@@ -143,11 +153,11 @@ final class TencentQQ extends Channel implements Socialize {
         return accountInfo;
     }
 
-    static class SampleUIListener<T> implements IUiListener {
+    static class UIListenerWrapper<T> implements IUiListener {
 
         private Callback<T> callback;
 
-        SampleUIListener(Callback<T> callback) {
+        UIListenerWrapper(Callback<T> callback) {
             this.callback = callback;
         }
 
