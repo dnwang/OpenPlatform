@@ -214,7 +214,7 @@ final class SinaWeibo extends Channel implements Socialize {
         if (TextUtils.isEmpty(uid)) {
             throw new FormatException("account json is not contains user id.");
         }
-        AccountInfo accountInfo = new AccountInfo();
+        AccountInfo accountInfo = new AccountInfo(ChannelType.WEIBO);
         accountInfo.id = uid;
         accountInfo.nickName = Tools.getJsonString(json, "name");
         accountInfo.headerImg = Tools.getJsonString(json, "profile_image_url");

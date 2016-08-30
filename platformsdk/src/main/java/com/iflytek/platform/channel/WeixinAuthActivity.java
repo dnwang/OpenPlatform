@@ -306,7 +306,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         if (TextUtils.isEmpty(openId)) {
             throw new FormatException(userInfo);
         }
-        AccountInfo accountInfo = new AccountInfo();
+        AccountInfo accountInfo = new AccountInfo(ChannelType.WEIXIN);
         accountInfo.id = openId;
         accountInfo.nickName = Tools.getJsonString(json, "nickname");
         accountInfo.headerImg = Tools.getJsonString(json, "headimgurl");

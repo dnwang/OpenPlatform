@@ -139,7 +139,7 @@ final class TencentQQ extends Channel implements Socialize {
         if (TextUtils.isEmpty(nickName)) {
             throw new FormatException(userInfo);
         }
-        AccountInfo accountInfo = new AccountInfo();
+        AccountInfo accountInfo = new AccountInfo(ChannelType.QQ);
         accountInfo.id = openId;
         accountInfo.nickName = nickName;
         accountInfo.headerImg = Tools.getJsonString(json, "figureurl");

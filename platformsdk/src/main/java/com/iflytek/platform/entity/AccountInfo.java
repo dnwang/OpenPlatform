@@ -2,6 +2,8 @@ package com.iflytek.platform.entity;
 
 import android.text.TextUtils;
 
+import com.iflytek.platform.channel.ChannelType;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,11 +24,14 @@ public class AccountInfo implements Serializable {
     public String nickName;
     public int gender; // 1:男;2女;0:未知
     public String headerImg;
+
+    public ChannelType type;
     public AccessToken token;
 
     private Map<String, String> extra;
 
-    public AccountInfo() {
+    public AccountInfo(ChannelType platform) {
+        type = platform;
         extra = new HashMap<>();
     }
 

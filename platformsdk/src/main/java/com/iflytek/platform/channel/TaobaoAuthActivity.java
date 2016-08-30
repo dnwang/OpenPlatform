@@ -202,7 +202,7 @@ public final class TaobaoAuthActivity extends Activity {
                 try {
                     String value = url.substring(startIndex + key.length(), end);
                     value = URLDecoder.decode(value, "utf-8");
-                    accountInfo = new AccountInfo();
+                    accountInfo = new AccountInfo(ChannelType.TAOBAO);
                     accountInfo.id = value;// 淘宝WAP版免费api只能获取到昵称
                     accountInfo.nickName = value;
                 } catch (Exception e) {
