@@ -8,7 +8,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
     }
 
     sourceSets {
@@ -31,4 +31,5 @@ dependencies {
     compile fileTree(dir: 'libs/weixin', include: ['*.jar'])
     compile fileTree(dir: 'libs/tencent', include: ['*.jar'])
     compile fileTree(dir: 'libs/umeng', include: ['*.jar'])
+    compile 'com.android.support:support-v4:24.2.0'
 }
