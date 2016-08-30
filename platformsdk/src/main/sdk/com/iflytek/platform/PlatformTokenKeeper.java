@@ -1,4 +1,4 @@
-package com.iflytek.platform.wrapper;
+package com.iflytek.platform;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -36,7 +36,7 @@ public enum PlatformTokenKeeper {
         tokenCache = new EnumMap<>(ChannelType.class);
     }
 
-    public void init(Context context) {
+    void init(Context context) {
         this.sp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         loadConfig();
     }

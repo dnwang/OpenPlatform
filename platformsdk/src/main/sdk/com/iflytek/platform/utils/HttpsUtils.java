@@ -9,6 +9,7 @@ import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -35,7 +36,33 @@ public final class HttpsUtils {
         throw new AssertionError();
     }
 
-    public static String get(String url) {
+    public static String get(String url, Map<String, Object> params) {
+        if (TextUtils.isEmpty(url)) {
+            return null;
+        }
+        StringBuilder urlBuilder = new StringBuilder(url);
+        if (!url.endsWith("?")) {
+            urlBuilder.append("?");
+        }
+        if (null != params && !params.isEmpty()) {
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (!TextUtils.isEmpty(key)) {
+                    value = null == value ? "" : value;
+                    urlBuilder.append("&").append(key).append("=").append(value);
+                }
+            }
+        }
+        return get(urlBuilder.toString().replace("?&", "?"));
+    }
+
+    public static String post(String url, Map<String, Object> params) {
+        // TODO: 8/30/16  
+        return null;
+    }
+
+    private static String get(String url) {
         if (TextUtils.isEmpty(url) || !url.startsWith("http")) {
             return null;
         }

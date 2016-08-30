@@ -23,6 +23,13 @@ public class ShareContent implements Serializable {
 
     }
 
+    public String getAllContent() {
+        return title + "\n" +
+                content + "\n" +
+                imageUrl + "\n" +
+                targetUrl;
+    }
+
     public final static class Builder {
 
         private ShareContent shareContent;

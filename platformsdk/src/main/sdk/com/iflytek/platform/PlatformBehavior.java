@@ -9,6 +9,7 @@ import android.util.Pair;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.channel.Payable;
+import com.iflytek.platform.channel.SilentlySocialize;
 import com.iflytek.platform.channel.Socialize;
 import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.AccountInfo;
@@ -30,7 +31,7 @@ import java.util.Map;
  * @version 8/11/16,20:30
  * @see
  */
-public final class PlatformBehavior implements ActivityLifecycleCallbacks, Socialize, Payable {
+public final class PlatformBehavior implements ActivityLifecycleCallbacks, Socialize, SilentlySocialize, Payable {
 
     private Context context;
 
@@ -140,8 +141,28 @@ public final class PlatformBehavior implements ActivityLifecycleCallbacks, Socia
             }
             return;
         }
-        if (channelPair.second instanceof Socialize) {
-            ((Socialize) channelPair.second).getFriends(token, callback);
+        if (channelPair.second instanceof SilentlySocialize) {
+            ((SilentlySocialize) channelPair.second).getFriends(token, callback);
+        } else {
+            if (null != callback) {
+                callback.call(channelPair.first, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+            }
+        }
+    }
+
+    @Override
+    public void share(AccessToken token, ShareContent content, Callback<Object> callback) {
+        if (null == channelPair) {
+            return;
+        }
+        if (null == content) {
+            if (null != callback) {
+                callback.call(channelPair.first, null, null, Constants.Code.ERROR);
+            }
+            return;
+        }
+        if (channelPair.second instanceof SilentlySocialize) {
+            ((SilentlySocialize) channelPair.second).share(token, content, callback);
         } else {
             if (null != callback) {
                 callback.call(channelPair.first, null, null, Constants.Code.ERROR_NOT_SUPPORT);

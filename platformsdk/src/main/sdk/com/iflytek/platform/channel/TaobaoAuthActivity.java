@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -261,9 +260,7 @@ public final class TaobaoAuthActivity extends Activity {
             params.put("sign", md5Signature(params, PlatformConfig.INSTANCE.getTaobaoSecret()));
 
             final String url = getUrlString(API_BASE_URL, params);
-            Log.e("taobao api --> ", String.valueOf(url));
-            String result = HttpsUtils.get(url);
-            Log.e("taobao api --> ", String.valueOf(result));
+            String result = HttpsUtils.get(url, null);
             return null;
         }
 

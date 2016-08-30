@@ -27,8 +27,9 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 
 /**
  * Copyright (C), 2016 <br>
@@ -40,7 +41,7 @@ import java.util.Locale;
  * @version 8/11/16,22:55
  * @see
  */
-final class SinaWeibo extends Channel implements Socialize {
+final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
 
     // 由于后端没有配置，始终出现21322，以下URL摘自友盟新浪分享，可用作默认值
     static final String REDIRECT_URL = "http://sns.whalecloud.com/sina2/callback";
@@ -48,17 +49,6 @@ final class SinaWeibo extends Channel implements Socialize {
             "friendships_groups_read,friendships_groups_write,statuses_to_me_read," +
             "follow_app_official_microblog,invitation_write";
 
-    /**
-     * 认证token获取用户信息
-     */
-    private static final String API_SHOW_USER = "https://api.weibo.com/2/users/show.json?access_token=%s&uid=%s";
-
-    /**
-     * 获取好友关注列表
-     * 单页最大count=200
-     */
-    private static final String API_GET_FRIENDS = "https://api.weibo.com/2/friendships/friends.json?access_token=%s&uid=%s&count=%d&cursor=%d";
-    private static final int PAGE_SIZE = 200;
 
     private SsoHandler ssoHandler;
 
@@ -105,9 +95,17 @@ final class SinaWeibo extends Channel implements Socialize {
                 new Thread() {
                     @Override
                     public void run() {
-                        final AccountInfo accountInfo = getAccountInfo(tokenInfo.getUid(), tokenInfo.getToken());
+                        String uid = null;
+                        String token = null;
+                        try {
+                            uid = URLEncoder.encode(tokenInfo.getUid(), "UTF-8");
+                            token = URLEncoder.encode(tokenInfo.getToken(), "UTF-8");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        final AccountInfo accountInfo = SinaWeiboAPI.getAccountInfo(uid, token);
                         if (null != accountInfo) {
-                            accountInfo.token = AccessToken.createToken(tokenInfo.getUid(), tokenInfo.getToken(), tokenInfo.getExpiresTime());
+                            accountInfo.token = AccessToken.createToken(uid, token, tokenInfo.getExpiresTime());
                         }
                         final Activity activity = (Activity) getContext();
                         if (activity.isFinishing()) {
@@ -116,8 +114,11 @@ final class SinaWeibo extends Channel implements Socialize {
                         activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                final boolean isSuccess = (null != accountInfo);
-                                getCallback().call(ChannelType.WEIBO, accountInfo, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
+                                Callback<AccountInfo> call = getCallback();
+                                if (null != call) {
+                                    final boolean isSuccess = (null != accountInfo);
+                                    getCallback().call(ChannelType.WEIBO, accountInfo, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
+                                }
                             }
                         });
                     }
@@ -149,7 +150,7 @@ final class SinaWeibo extends Channel implements Socialize {
         new Thread() {
             @Override
             public void run() {
-                final List<AccountInfo> accountInfoList = getFriendsList(token.getUid(), token.getToken());
+                final List<AccountInfo> accountInfoList = SinaWeiboAPI.getFriendsList(token.getUid(), token.getToken());
                 final Activity activity = (Activity) getContext();
                 if (activity.isFinishing()) {
                     return;
@@ -157,8 +158,43 @@ final class SinaWeibo extends Channel implements Socialize {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        final boolean isSuccess = (null != accountInfoList);
-                        callback.call(ChannelType.WEIBO, accountInfoList, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
+                        if (null != callback) {
+                            final boolean isSuccess = (null != accountInfoList);
+                            callback.call(ChannelType.WEIBO, accountInfoList, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
+                        }
+                    }
+                });
+            }
+        }.start();
+    }
+
+    @Override
+    public void share(final AccessToken token, final ShareContent content, final Callback<Object> callback) {
+        if (null == token) {
+            if (null != callback) {
+                callback.call(ChannelType.WEIBO, null, null, Constants.Code.ERROR_AUTH_DENIED);
+            }
+            return;
+        }
+        if (null == content) {
+            if (null != callback) {
+                callback.call(ChannelType.WEIBO, null, null, Constants.Code.ERROR);
+            }
+        }
+        new Thread() {
+            @Override
+            public void run() {
+                final boolean isSuccess = SinaWeiboAPI.share(content, token.getToken());
+                final Activity activity = (Activity) getContext();
+                if (activity.isFinishing()) {
+                    return;
+                }
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (null != callback) {
+                            callback.call(ChannelType.WEIBO, null, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
+                        }
                     }
                 });
             }
@@ -166,71 +202,123 @@ final class SinaWeibo extends Channel implements Socialize {
     }
 
     /**
-     * 获取用户信息
+     * 微博API
      */
-    private AccountInfo getAccountInfo(String uid, String token) {
-        try {
-            uid = URLEncoder.encode(uid, "UTF-8");
-            token = URLEncoder.encode(token, "UTF-8");
-            final String url4User = String.format(Locale.PRC, API_SHOW_USER, token, uid);
-            // {"name":"test","id":"test",...}
-            String result = HttpsUtils.get(url4User);
-            return toAccountInfo(new JSONObject(result));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+    private static class SinaWeiboAPI {
 
-    /**
-     * 获取用户的关注列表
-     * <p>
-     * 只返回同样授权本应用的用户，非授权用户将不返回；
-     * 例如一次调用count是50，但其中授权本应用的用户只有10条，则实际只返回10条；
-     * 使用官方移动SDK调用，多返回30%的非同样授权本应用的用户，总上限为500；
-     */
-    private List<AccountInfo> getFriendsList(String uid, String token) {
-        try {
-            token = URLEncoder.encode(token, "UTF-8");
-            final String url4Friends = String.format(Locale.PRC, API_GET_FRIENDS, token, uid, PAGE_SIZE, 0);
-            String result = HttpsUtils.get(url4Friends);
-            // {"users":[],"next_cursor":0,"previous_cursor":0,"total_number":1}
-            JSONObject json = new JSONObject(result);
-            JSONArray jsonArray = json.getJSONArray("users");
-            final int size = jsonArray.length();
-            List<AccountInfo> accountInfoList = new ArrayList<>(size);
-            for (int i = 0; i < size; i++) {
-                AccountInfo accountInfo = toAccountInfo(jsonArray.getJSONObject(i));
-                accountInfoList.add(accountInfo);
+        /**
+         * 分享
+         * token,content
+         */
+        private static final String API_SHARE = "https://api.weibo.com/2/statuses/update.json";
+        /**
+         * 认证token获取用户信息
+         * token,uid
+         */
+        private static final String API_SHOW_USER = "https://api.weibo.com/2/users/show.json";
+        /**
+         * 获取好友关注列表,单页最大count=200
+         * token,uid,count,cursor
+         */
+        private static final String API_GET_FRIENDS = "https://api.weibo.com/2/friendships/friends.json";
+        private static final int PAGE_SIZE = 200;
+
+        private static boolean share(ShareContent shareContent, String token) {
+            if (null == shareContent || TextUtils.isEmpty(token)) {
+                return false;
             }
-            return accountInfoList;
-        } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                String content = URLEncoder.encode(shareContent.getAllContent(), "UTF-8");
+                Map<String, Object> params = new HashMap<>(4);
+                params.put("access_token", token);
+                params.put("status", content);
+                params.put("visible", 0);
+                params.put("annotations", "");
+                final String result = HttpsUtils.post(API_SHARE, params);
+                return null != result && result.contains("created_at");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
         }
-        return null;
+
+        /**
+         * 获取用户信息
+         */
+        private static AccountInfo getAccountInfo(String uid, String token) {
+            if (TextUtils.isEmpty(uid) || TextUtils.isEmpty(token)) {
+                return null;
+            }
+            try {
+                Map<String, Object> params = new HashMap<>(2);
+                params.put("access_token", token);
+                params.put("uid", uid);
+                // {"name":"test","id":"test",...}
+                String result = HttpsUtils.get(API_SHOW_USER, params);
+                return toAccountInfo(new JSONObject(result));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        /**
+         * 获取用户的关注列表
+         * <p>
+         * 只返回同样授权本应用的用户，非授权用户将不返回；
+         * 例如一次调用count是50，但其中授权本应用的用户只有10条，则实际只返回10条；
+         * 使用官方移动SDK调用，多返回30%的非同样授权本应用的用户，总上限为500；
+         */
+        private static List<AccountInfo> getFriendsList(String uid, String token) {
+            if (TextUtils.isEmpty(uid) || TextUtils.isEmpty(token)) {
+                return null;
+            }
+            try {
+                Map<String, Object> params = new HashMap<>(4);
+                params.put("access_token", token);
+                params.put("uid", uid);
+                params.put("count", PAGE_SIZE);
+                params.put("cursor", 0);
+                // {"users":[],"next_cursor":0,"previous_cursor":0,"total_number":1}
+                String result = HttpsUtils.get(API_GET_FRIENDS, params);
+                JSONObject json = new JSONObject(result);
+                JSONArray jsonArray = json.getJSONArray("users");
+                final int size = jsonArray.length();
+                List<AccountInfo> accountInfoList = new ArrayList<>(size);
+                for (int i = 0; i < size; i++) {
+                    AccountInfo accountInfo = toAccountInfo(jsonArray.getJSONObject(i));
+                    accountInfoList.add(accountInfo);
+                }
+                return accountInfoList;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        private static AccountInfo toAccountInfo(JSONObject json) throws Exception {
+            final String uid = Tools.getJsonString(json, "id");
+            if (TextUtils.isEmpty(uid)) {
+                throw new FormatException("account json is not contains user id.");
+            }
+            AccountInfo accountInfo = new AccountInfo(ChannelType.WEIBO);
+            accountInfo.id = uid;
+            accountInfo.nickName = Tools.getJsonString(json, "name");
+            accountInfo.headerImg = Tools.getJsonString(json, "profile_image_url");
+            final String gender = Tools.getJsonString(json, "gender").toLowerCase();
+            accountInfo.gender = "m".equals(gender) ? 1 : ("w".equals(gender) ? 2 : 0);
+            accountInfo.location = Tools.getJsonString(json, "location");
+            accountInfo.putExtra("avatar_large", Tools.getJsonString(json, "avatar_large"));
+            accountInfo.putExtra("avatar_hd", Tools.getJsonString(json, "avatar_hd"));
+            accountInfo.putExtra("language", Tools.getJsonString(json, "lang"));
+            accountInfo.putExtra("location", Tools.getJsonString(json, "location"));
+            accountInfo.putExtra("description", Tools.getJsonString(json, "description"));
+            return accountInfo;
+        }
+
     }
 
-    private AccountInfo toAccountInfo(JSONObject json) throws Exception {
-        final String uid = Tools.getJsonString(json, "id");
-        if (TextUtils.isEmpty(uid)) {
-            throw new FormatException("account json is not contains user id.");
-        }
-        AccountInfo accountInfo = new AccountInfo(ChannelType.WEIBO);
-        accountInfo.id = uid;
-        accountInfo.nickName = Tools.getJsonString(json, "name");
-        accountInfo.headerImg = Tools.getJsonString(json, "profile_image_url");
-        final String gender = Tools.getJsonString(json, "gender").toLowerCase();
-        accountInfo.gender = "m".equals(gender) ? 1 : ("w".equals(gender) ? 2 : 0);
-        accountInfo.location = Tools.getJsonString(json, "location");
-        accountInfo.putExtra("avatar_large", Tools.getJsonString(json, "avatar_large"));
-        accountInfo.putExtra("avatar_hd", Tools.getJsonString(json, "avatar_hd"));
-        accountInfo.putExtra("language", Tools.getJsonString(json, "lang"));
-        accountInfo.putExtra("location", Tools.getJsonString(json, "location"));
-        accountInfo.putExtra("description", Tools.getJsonString(json, "description"));
-        return accountInfo;
-    }
-
-    private abstract class WeiboAuthListenerWrapper<T> implements WeiboAuthListener {
+    private static abstract class WeiboAuthListenerWrapper<T> implements WeiboAuthListener {
 
         private Callback<T> callback;
 

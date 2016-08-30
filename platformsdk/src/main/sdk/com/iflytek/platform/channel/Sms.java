@@ -6,7 +6,6 @@ import android.net.Uri;
 
 import com.iflytek.platform.Channel;
 import com.iflytek.platform.callbacks.Callback;
-import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
@@ -34,7 +33,7 @@ final class Sms extends Channel implements Socialize {
         if (null == content) {
             return;
         }
-        final String smsText = content.title + "\n" + content.content + "\n" + content.targetUrl;
+        final String smsText = content.getAllContent();
         Uri uri = Uri.parse("smsto:");
         Intent intent = new Intent(android.content.Intent.ACTION_SENDTO, uri);
         intent.putExtra("sms_body", smsText);
@@ -58,10 +57,4 @@ final class Sms extends Channel implements Socialize {
         }
     }
 
-    @Override
-    public void getFriends(AccessToken token, Callback<List<AccountInfo>> callback) {
-        if (null != callback) {
-            callback.call(ChannelType.SMS, null, null, Constants.Code.ERROR_NOT_SUPPORT);
-        }
-    }
 }

@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.iflytek.platform.PlatformBehavior;
 import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.channel.ChannelType;
-import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
@@ -43,7 +42,6 @@ public final class PlatformProxy extends Activity {
     private static final String FLAG_BEHAVIOR = "behavior";
     private static final String FLAG_CHANNEL = "channel";
     private static final String FLAG_CONTENT = "content";
-    private static final String FLAG_TOKEN = "token";
     private static final String FLAG_CALLBACK = "callback";
 
     private static final int BEHAVIOR_SHARE = 0x01;
@@ -58,7 +56,7 @@ public final class PlatformProxy extends Activity {
             return;
         }
         PlatformProxy.callback = callback;
-        startActivity(context, BEHAVIOR_SHARE, type, null, content, getGlobCallbackHash());
+        startActivity(context, BEHAVIOR_SHARE, type, content, getGlobCallbackHash());
     }
 
     public static void login(Context context, ChannelType type, Callback<AccountInfo> callback) {
@@ -66,7 +64,7 @@ public final class PlatformProxy extends Activity {
             return;
         }
         PlatformProxy.callback = callback;
-        startActivity(context, BEHAVIOR_LOGIN, type, null, null, getGlobCallbackHash());
+        startActivity(context, BEHAVIOR_LOGIN, type, null, getGlobCallbackHash());
     }
 
     public static void getFriends(Context context, ChannelType type, Callback<List<AccountInfo>> callback) {
@@ -74,15 +72,7 @@ public final class PlatformProxy extends Activity {
             return;
         }
         PlatformProxy.callback = callback;
-        startActivity(context, BEHAVIOR_GET_FRIENDS, type, null, null, getGlobCallbackHash());
-    }
-
-    public static void getFriends(Context context, ChannelType type, AccessToken token, Callback<List<AccountInfo>> callback) {
-        if (null == type) {
-            return;
-        }
-        PlatformProxy.callback = callback;
-        startActivity(context, BEHAVIOR_GET_FRIENDS, type, token, null, getGlobCallbackHash());
+        startActivity(context, BEHAVIOR_GET_FRIENDS, type, null, getGlobCallbackHash());
     }
 
     public static void pay(Context context, ChannelType type, PayInfo payInfo, Callback<Object> callback) {
@@ -90,10 +80,10 @@ public final class PlatformProxy extends Activity {
             return;
         }
         PlatformProxy.callback = callback;
-        startActivity(context, BEHAVIOR_PAY, type, null, payInfo, getGlobCallbackHash());
+        startActivity(context, BEHAVIOR_PAY, type, payInfo, getGlobCallbackHash());
     }
 
-    private static void startActivity(Context context, int behavior, ChannelType type, AccessToken token, Serializable content, long callback) {
+    private static void startActivity(Context context, int behavior, ChannelType type, Serializable content, long callback) {
         if (null == context) {
             return;
         }
@@ -101,9 +91,6 @@ public final class PlatformProxy extends Activity {
         intent.putExtra(FLAG_CHANNEL, type);
         intent.putExtra(FLAG_BEHAVIOR, behavior);
         intent.putExtra(FLAG_CALLBACK, callback);
-        if (null != token) {
-            intent.putExtra(FLAG_TOKEN, token);
-        }
         if (null != content) {
             intent.putExtra(FLAG_CONTENT, content);
         }
@@ -121,7 +108,6 @@ public final class PlatformProxy extends Activity {
 
     private int behavior;
     private ChannelType channelType;
-    private AccessToken token;
     private Serializable content;
     private long callbackHash;
 
@@ -143,10 +129,6 @@ public final class PlatformProxy extends Activity {
         behavior = intent.getIntExtra(FLAG_BEHAVIOR, -1);
         callbackHash = intent.getLongExtra(FLAG_CALLBACK, -1);
         content = intent.getSerializableExtra(FLAG_CONTENT);
-        final Object obj = intent.getSerializableExtra(FLAG_TOKEN);
-        if (null != obj && obj instanceof AccessToken) {
-            token = (AccessToken) obj;
-        }
     }
 
     private View getContentView() {
@@ -279,11 +261,7 @@ public final class PlatformProxy extends Activity {
                         finishWithInfo(type, obj, msg, code);
                     }
                 };
-                if (null != token) {
-                    platformBehavior.getFriends(token, callback);
-                } else {
-                    platformBehavior.getFriends(callback);
-                }
+                platformBehavior.getFriends(callback);
                 break;
             }
         }

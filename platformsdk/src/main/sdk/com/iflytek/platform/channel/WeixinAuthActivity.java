@@ -28,7 +28,8 @@ import com.tencent.mm.sdk.openapi.WXTextObject;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Copyright (C), 2016 <br>
@@ -43,15 +44,6 @@ import java.util.Locale;
 public abstract class WeixinAuthActivity extends Activity implements IWXAPIEventHandler {
 
     private static final String CLASS_WXAPI = ".wxapi.WXEntryActivity";// 固定api类名，必须存在
-
-    /**
-     * 通过认证Code换取token
-     */
-    private static final String API_GET_TOKEN = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code";
-    /**
-     * 通过token换取用户信息
-     */
-    private static final String API_GET_USER = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s";
 
     private static final String FLAG_TYPE = "type";
     /**
@@ -223,7 +215,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
                     new Thread() {
                         @Override
                         public void run() {
-                            final AccountInfo accountInfo = getUserInfo(code);
+                            final AccountInfo accountInfo = WeixinAPI.getAccountInfo(code);
                             if (isFinishing()) {
                                 return;
                             }
@@ -256,30 +248,6 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         }
     }
 
-    private AccountInfo getUserInfo(final String code) {
-        final String url4Token = String.format(Locale.PRC,
-                API_GET_TOKEN,
-                PlatformConfig.INSTANCE.getWeixinId(),
-                PlatformConfig.INSTANCE.getWeixinSecret(),
-                code);
-        // get token info
-        final String tokenInfo = HttpsUtils.get(url4Token);
-        try {
-            // tokenInfo:{access_token,expires_in,refresh_token,openid,scope,unionid}
-            JSONObject json = new JSONObject(tokenInfo);
-            final String assessToken = Tools.getJsonString(json, "access_token");
-            final String openId = Tools.getJsonString(json, "openid");
-            final long expiresIn = Tools.getLong(Tools.getJsonString(json, "expires_in"), 0);
-            // get user info
-            final String url4User = String.format(Locale.PRC, API_GET_USER, assessToken, openId);
-            final String userInfo = HttpsUtils.get(url4User);
-            final AccountInfo accountInfo = toAccountInfo(userInfo);
-            accountInfo.token = AccessToken.createToken(openId, assessToken, expiresIn);
-            return accountInfo;
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
     private void onResult(int code, Serializable content) {
         if (isFinishing()) {
@@ -300,25 +268,65 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         overridePendingTransition(0, 0);
     }
 
-    private AccountInfo toAccountInfo(String userInfo) throws Exception {
-        // user:{subscribe,openid,nickname,sex,language,city,province,country,headimgurl,subscribe_time}
-        JSONObject json = new JSONObject(userInfo);
-        final String openId = Tools.getJsonString(json, "openid");
-        if (TextUtils.isEmpty(openId)) {
-            throw new FormatException(userInfo);
+    private static class WeixinAPI {
+
+        /**
+         * 通过认证Code换取token
+         */
+        private static final String API_GET_TOKEN = "https://api.weixin.qq.com/sns/oauth2/access_token";
+        /**
+         * 通过token换取用户信息
+         */
+        private static final String API_GET_USER = "https://api.weixin.qq.com/sns/userinfo";
+
+        private static AccountInfo getAccountInfo(final String code) {
+            final Map<String, Object> params = new HashMap<>(4);
+            params.put("appid", PlatformConfig.INSTANCE.getWeixinId());
+            params.put("secret", PlatformConfig.INSTANCE.getWeixinSecret());
+            params.put("code", code);
+            params.put("grant_type", "authorization_code");
+            // get token info
+            final String tokenInfo = HttpsUtils.get(API_GET_TOKEN, params);
+            try {
+                // tokenInfo:{access_token,expires_in,refresh_token,openid,scope,unionid}
+                JSONObject json = new JSONObject(tokenInfo);
+                final String assessToken = Tools.getJsonString(json, "access_token");
+                final String openId = Tools.getJsonString(json, "openid");
+                final long expiresIn = Tools.getLong(Tools.getJsonString(json, "expires_in"), 0);
+                // get user info
+                params.clear();
+                params.put("access_token", assessToken);
+                params.put("openid", openId);
+                final String userInfo = HttpsUtils.get(API_GET_USER, params);
+                final AccountInfo accountInfo = toAccountInfo(userInfo);
+                accountInfo.token = AccessToken.createToken(openId, assessToken, expiresIn);
+                return accountInfo;
+            } catch (Exception e) {
+                return null;
+            }
         }
-        AccountInfo accountInfo = new AccountInfo(ChannelType.WEIXIN);
-        accountInfo.id = openId;
-        accountInfo.nickName = Tools.getJsonString(json, "nickname");
-        accountInfo.headerImg = Tools.getJsonString(json, "headimgurl");
-        accountInfo.gender = Tools.getJsonInt(json, "sex", 0);
-        accountInfo.location = Tools.getJsonString(json, "city");
-        accountInfo.putExtra("openId", openId);
-        accountInfo.putExtra("language", Tools.getJsonString(json, "language"));
-        accountInfo.putExtra("city", Tools.getJsonString(json, "city"));
-        accountInfo.putExtra("province", Tools.getJsonString(json, "province"));
-        accountInfo.putExtra("country", Tools.getJsonString(json, "country"));
-        return accountInfo;
+
+        private static AccountInfo toAccountInfo(String userInfo) throws Exception {
+            // user:{subscribe,openid,nickname,sex,language,city,province,country,headimgurl,subscribe_time}
+            JSONObject json = new JSONObject(userInfo);
+            final String openId = Tools.getJsonString(json, "openid");
+            if (TextUtils.isEmpty(openId)) {
+                throw new FormatException(userInfo);
+            }
+            AccountInfo accountInfo = new AccountInfo(ChannelType.WEIXIN);
+            accountInfo.id = openId;
+            accountInfo.nickName = Tools.getJsonString(json, "nickname");
+            accountInfo.headerImg = Tools.getJsonString(json, "headimgurl");
+            accountInfo.gender = Tools.getJsonInt(json, "sex", 0);
+            accountInfo.location = Tools.getJsonString(json, "city");
+            accountInfo.putExtra("openId", openId);
+            accountInfo.putExtra("language", Tools.getJsonString(json, "language"));
+            accountInfo.putExtra("city", Tools.getJsonString(json, "city"));
+            accountInfo.putExtra("province", Tools.getJsonString(json, "province"));
+            accountInfo.putExtra("country", Tools.getJsonString(json, "country"));
+            return accountInfo;
+        }
+
     }
 
 }

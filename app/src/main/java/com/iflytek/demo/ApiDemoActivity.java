@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import com.iflytek.ihou.chang.app.R;
 import com.iflytek.platform.PlatformBehavior;
+import com.iflytek.platform.PlatformTokenKeeper;
+import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
@@ -44,9 +46,17 @@ public class ApiDemoActivity extends Activity {
                 .imageUrl("http://www.weipet.cn/common/images/pic/a347.jpg")
                 .targetUrl("http://www.baidu.com")
                 .create();
-        platformBehavior.select(type).share(content, (channelType, obj, msg, code) -> {
-            // TODO: 2016/8/23
-            Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
+        // 授权分享
+//        platformBehavior.select(type).share(content, (channelType, obj, msg, code) -> {
+//            // TODO: 2016/8/23
+//            Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
+//        });
+        // 静默分享
+        platformBehavior.select(type).share(PlatformTokenKeeper.INSTANCE.getToken(type), content, new Callback<Object>() {
+            @Override
+            public void call(ChannelType type, Object o, String msg, int code) {
+                Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
+            }
         });
     };
 
@@ -62,6 +72,8 @@ public class ApiDemoActivity extends Activity {
                 tips = user.id + ", " + tips;
             }
             Toast.makeText(getApplicationContext(), tips, Toast.LENGTH_SHORT).show();
+
+            PlatformTokenKeeper.INSTANCE.setToken(channelType, user.token);
         });
     };
 

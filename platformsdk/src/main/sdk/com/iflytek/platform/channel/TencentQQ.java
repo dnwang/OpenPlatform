@@ -125,13 +125,6 @@ final class TencentQQ extends Channel implements Socialize {
         }
     }
 
-    @Override
-    public void getFriends(AccessToken token, Callback<List<AccountInfo>> callback) {
-        if (null != callback) {
-            callback.call(ChannelType.QQ, null, null, Constants.Code.ERROR_NOT_SUPPORT);
-        }
-    }
-
     private AccountInfo toAccountInfo(String openId, String userInfo) throws Exception {
         // user:{ret,msg,is_lost,nickname,gender,province,city,figureurl,figureurl_1,figureurl_2,figureurl_qq_1,figureurl_qq_2}
         JSONObject json = new JSONObject(userInfo);
