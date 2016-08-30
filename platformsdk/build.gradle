@@ -14,6 +14,7 @@ android {
     sourceSets {
         main {
             jniLibs.srcDirs = ["libs", "libs/weibo", "libs/weixin", "libs/tencent", "libs/umeng"]
+            java.srcDirs = ["src/main/java", "src/main/sdk", "src/main/project"]
         }
     }
 
@@ -31,5 +32,5 @@ dependencies {
     compile fileTree(dir: 'libs/weixin', include: ['*.jar'])
     compile fileTree(dir: 'libs/tencent', include: ['*.jar'])
     compile fileTree(dir: 'libs/umeng', include: ['*.jar'])
-    compile 'com.android.support:support-v4:24.2.0'
+    compile 'com.android.support:support-v4:24.2.0'// only tencent platform need support-v4
 }
