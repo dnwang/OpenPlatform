@@ -311,6 +311,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         accountInfo.nickName = Tools.getJsonString(json, "nickname");
         accountInfo.headerImg = Tools.getJsonString(json, "headimgurl");
         accountInfo.gender = Tools.getJsonInt(json, "sex", 0);
+        accountInfo.location = Tools.getJsonString(json, "city");
         accountInfo.putExtra("openId", openId);
         accountInfo.putExtra("language", Tools.getJsonString(json, "language"));
         accountInfo.putExtra("city", Tools.getJsonString(json, "city"));

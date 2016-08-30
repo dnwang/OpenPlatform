@@ -220,6 +220,7 @@ final class SinaWeibo extends Channel implements Socialize {
         accountInfo.headerImg = Tools.getJsonString(json, "profile_image_url");
         final String gender = Tools.getJsonString(json, "gender").toLowerCase();
         accountInfo.gender = "m".equals(gender) ? 1 : ("w".equals(gender) ? 2 : 0);
+        accountInfo.location = Tools.getJsonString(json, "location");
         accountInfo.putExtra("avatar_large", Tools.getJsonString(json, "avatar_large"));
         accountInfo.putExtra("avatar_hd", Tools.getJsonString(json, "avatar_hd"));
         accountInfo.putExtra("language", Tools.getJsonString(json, "lang"));

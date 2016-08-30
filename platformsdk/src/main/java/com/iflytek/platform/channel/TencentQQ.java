@@ -145,6 +145,7 @@ final class TencentQQ extends Channel implements Socialize {
         accountInfo.headerImg = Tools.getJsonString(json, "figureurl");
         final String gender = Tools.getJsonString(json, "gender");
         accountInfo.gender = "男".equals(gender) ? 1 : ("女".equals(gender) ? 2 : 0);
+        accountInfo.location = Tools.getJsonString(json, "city");
         accountInfo.putExtra("figureurl_1", Tools.getJsonString(json, "figureurl_1"));
         accountInfo.putExtra("figureurl_2", Tools.getJsonString(json, "figureurl_2"));
         accountInfo.putExtra("province", Tools.getJsonString(json, "province"));
