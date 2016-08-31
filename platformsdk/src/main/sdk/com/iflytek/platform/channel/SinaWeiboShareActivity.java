@@ -175,7 +175,7 @@ public final class SinaWeiboShareActivity extends Activity implements IWeiboHand
                 onResult(Constants.Code.ERROR_CANCEL, null);
             }
         };
-        shareAPI.sendRequest(this, request, authInfo, "", listener);
+//        shareAPI.sendRequest(this, request, authInfo, "", listener);
         try {
             //仅使用网页版分享,客户端分享暂且有问题
             //private boolean startShareWeiboActivity(Activity act, String token, BaseRequest request, WeiboAuthListener authListener)
