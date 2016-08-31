@@ -49,9 +49,7 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
             "friendships_groups_read,friendships_groups_write,statuses_to_me_read," +
             "follow_app_official_microblog,invitation_write";
 
-
     private SsoHandler ssoHandler;
-
     private Callback<Object> shareCallback;
 
     public SinaWeibo(Context context) {
@@ -114,10 +112,10 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
                         activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Callback<AccountInfo> call = getCallback();
-                                if (null != call) {
+                                Callback<AccountInfo> c = getCallback();
+                                if (null != c) {
                                     final boolean isSuccess = (null != accountInfo);
-                                    getCallback().call(ChannelType.WEIBO, accountInfo, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
+                                    c.call(ChannelType.WEIBO, accountInfo, null, isSuccess ? Constants.Code.SUCCESS : Constants.Code.ERROR);
                                 }
                             }
                         });
@@ -229,12 +227,10 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
             }
             try {
                 String content = URLEncoder.encode(shareContent.getAllContent(), "UTF-8");
-                Map<String, Object> params = new HashMap<>(4);
+                Map<String, Object> params = new HashMap<>(2);
                 params.put("access_token", token);
                 params.put("status", content);
-                params.put("visible", 0);
-                params.put("annotations", "");
-                final String result = HttpsUtils.post(API_SHARE, params);
+                final String result = HttpsUtils.post(API_SHARE, null, params);
                 return null != result && result.contains("created_at");
             } catch (Exception e) {
                 e.printStackTrace();

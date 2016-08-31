@@ -82,7 +82,7 @@ public enum PlatformConfig {
         } catch (Exception e) {
             Log.e("PlatformConfig", "error: " + e.getMessage());
         } finally {
-            Tools.clone(br);
+            Tools.close(br);
         }
     }
 

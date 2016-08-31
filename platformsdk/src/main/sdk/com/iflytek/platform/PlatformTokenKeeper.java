@@ -68,6 +68,7 @@ public enum PlatformTokenKeeper {
             removeToken(type);
             return;
         }
+        tokenCache.put(type, token);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(getKey(type), convertValue(token));
         editor.apply();
