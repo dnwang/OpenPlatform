@@ -3,6 +3,7 @@ package com.iflytek.platform;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.iflytek.platform.channel.ChannelType;
 import com.iflytek.platform.entity.AccessToken;
@@ -42,6 +43,9 @@ public enum PlatformTokenKeeper {
     }
 
     private void loadConfig() {
+        if (!checkParams()) {
+            return;
+        }
         Map<String, ?> map = sp.getAll();
         for (Map.Entry<String, ?> entry : map.entrySet()) {
             ChannelType channelType = ChannelType.convert(entry.getKey());
@@ -53,6 +57,9 @@ public enum PlatformTokenKeeper {
     }
 
     private void save() {
+        if (!checkParams()) {
+            return;
+        }
         SharedPreferences.Editor editor = sp.edit();
         for (Map.Entry<ChannelType, AccessToken> tokenEntry : tokenCache.entrySet()) {
             editor.putString(getKey(tokenEntry.getKey()), convertValue(tokenEntry.getValue()));
@@ -61,6 +68,9 @@ public enum PlatformTokenKeeper {
     }
 
     public void setToken(ChannelType type, AccessToken token) {
+        if (!checkParams()) {
+            return;
+        }
         if (null == type) {
             return;
         }
@@ -82,6 +92,9 @@ public enum PlatformTokenKeeper {
     }
 
     public void removeToken(ChannelType type) {
+        if (!checkParams()) {
+            return;
+        }
         if (null == type) {
             return;
         }
@@ -89,6 +102,14 @@ public enum PlatformTokenKeeper {
         SharedPreferences.Editor editor = sp.edit();
         editor.remove(getKey(type));
         editor.apply();
+    }
+
+    private boolean checkParams() {
+        if (null == sp) {
+            Log.e("PlatformTokenKeeper", "please call init() method first!");
+            return false;
+        }
+        return true;
     }
 
     private String getKey(ChannelType type) {

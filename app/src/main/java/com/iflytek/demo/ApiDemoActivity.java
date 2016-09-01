@@ -11,8 +11,8 @@ import android.widget.Toast;
 import com.iflytek.ihou.chang.app.R;
 import com.iflytek.platform.PlatformBehavior;
 import com.iflytek.platform.PlatformTokenKeeper;
-import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.channel.ChannelType;
+import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.PayInfo;
 import com.iflytek.platform.entity.ShareContent;
@@ -52,9 +52,11 @@ public class ApiDemoActivity extends Activity {
 //            Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
 //        });
         // 静默分享
-        platformBehavior.select(type).share(PlatformTokenKeeper.INSTANCE.getToken(type), content, new Callback<Object>() {
-            @Override
-            public void call(ChannelType type, Object o, String msg, int code) {
+        AccessToken accessToken = PlatformTokenKeeper.INSTANCE.getToken(type);
+        platformBehavior.select(type).share(accessToken, content, (channelType, o, msg, code) -> {
+            if (Constants.Code.ERROR_AUTH_DENIED == code) {
+                Toast.makeText(getApplicationContext(), "silent share test.\nplease login first!", Toast.LENGTH_SHORT).show();
+            } else {
                 Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
             }
         });

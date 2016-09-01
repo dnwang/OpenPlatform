@@ -44,7 +44,6 @@ import java.util.Map;
 final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
 
     // 由于后端没有配置，始终出现21322，以下URL摘自友盟新浪分享，可用作默认值
-    static final String REDIRECT_URL = "http://sns.whalecloud.com/sina2/callback";
     static final String SCOPE = "email,direct_messages_read,direct_messages_write," +
             "friendships_groups_read,friendships_groups_write,statuses_to_me_read," +
             "follow_app_official_microblog,invitation_write";
@@ -85,7 +84,7 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
 
     @Override
     public void login(Callback<AccountInfo> callback) {
-        AuthInfo authInfo = new AuthInfo(getContext(), PlatformConfig.INSTANCE.getSinaKey(), REDIRECT_URL, SCOPE);
+        AuthInfo authInfo = new AuthInfo(getContext(), PlatformConfig.INSTANCE.getSinaKey(), PlatformConfig.INSTANCE.getSinaRedirectUrl(), SCOPE);
         ssoHandler = new SsoHandler((Activity) getContext(), authInfo);
         ssoHandler.authorize(new WeiboAuthListenerWrapper<AccountInfo>(callback) {
             @Override
@@ -127,7 +126,7 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
-        AuthInfo authInfo = new AuthInfo(getContext(), PlatformConfig.INSTANCE.getSinaKey(), REDIRECT_URL, SCOPE);
+        AuthInfo authInfo = new AuthInfo(getContext(), PlatformConfig.INSTANCE.getSinaKey(), PlatformConfig.INSTANCE.getSinaRedirectUrl(), SCOPE);
         ssoHandler = new SsoHandler((Activity) getContext(), authInfo);
         ssoHandler.authorize(new WeiboAuthListenerWrapper<List<AccountInfo>>(callback) {
             @Override

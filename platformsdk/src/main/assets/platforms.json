@@ -4,7 +4,8 @@
     {
       "name": "sina",
       "id": "778164658",
-      "secret": "06552db3dc303529ba971b257379c49e"
+      "secret": "06552db3dc303529ba971b257379c49e",
+      "redirect_url": "http://sns.whalecloud.com/sina2/callback"
     },
     {
       "name": "weixin",

@@ -16,8 +16,6 @@ import com.sina.weibo.sdk.api.share.IWeiboHandler;
 import com.sina.weibo.sdk.api.share.IWeiboShareAPI;
 import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
-import com.sina.weibo.sdk.auth.AuthInfo;
-import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.constant.WBConstants;
 import com.sina.weibo.sdk.exception.WeiboException;
@@ -147,7 +145,7 @@ public final class SinaWeiboShareActivity extends Activity implements IWeiboHand
     }
 
     private void share(ShareContent shareContent) {
-        AuthInfo authInfo = new AuthInfo(this, PlatformConfig.INSTANCE.getSinaKey(), SinaWeibo.REDIRECT_URL, SinaWeibo.SCOPE);
+//        AuthInfo authInfo = new AuthInfo(this, PlatformConfig.INSTANCE.getSinaKey(), PlatformConfig.INSTANCE.getSinaRedirectUrl(), SinaWeibo.SCOPE);
         TextObject textObject = new TextObject();
         textObject.text = shareContent.content;
         textObject.title = shareContent.title;
@@ -166,7 +164,7 @@ public final class SinaWeiboShareActivity extends Activity implements IWeiboHand
 
             @Override
             public void onComplete(Bundle bundle) {
-                final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
+//                final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
                 onResult(Constants.Code.SUCCESS, null);
             }
 

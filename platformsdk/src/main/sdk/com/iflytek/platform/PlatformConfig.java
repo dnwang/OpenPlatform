@@ -33,7 +33,7 @@ public enum PlatformConfig {
     INSTANCE;
 
     private enum Type {
-        SINA,
+        SINA,// 小写对应配置文件中的平台名称
         WEIXIN,
         TAOBAO,
         ALIPAY,
@@ -53,6 +53,7 @@ public enum PlatformConfig {
     private static final String KEY_NAME = "name";
     private static final String KEY_ID = "id";
     private static final String KEY_SECRET = "secret";
+    private static final String KEY_REDIRECT_URL = "redirect_url";
 
     private EnumMap<Type, Map<String, String>> keyStore;
 
@@ -108,6 +109,10 @@ public enum PlatformConfig {
 
     public String getSinaSecret() {
         return getValue(Type.SINA, KEY_SECRET);
+    }
+
+    public String getSinaRedirectUrl() {
+        return getValue(Type.SINA, KEY_REDIRECT_URL);
     }
 
     public String getTaobaoKey() {
