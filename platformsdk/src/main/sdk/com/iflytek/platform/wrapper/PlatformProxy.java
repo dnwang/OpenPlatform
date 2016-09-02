@@ -141,7 +141,7 @@ public final class PlatformProxy extends Activity {
         ProgressBar progress = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
         TextView tipsTxt = new TextView(this);
         tipsTxt.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
-        tipsTxt.setTextColor(Color.LTGRAY);
+        tipsTxt.setTextColor(Color.WHITE);
         final String tipStr = behavior == BEHAVIOR_SHARE ? "正在分享" : (behavior == BEHAVIOR_LOGIN ? "正在登录" : "请稍等");
         tipsTxt.setText(String.format(Locale.PRC, " %s...", tipStr));
         waiting.addView(progress);
