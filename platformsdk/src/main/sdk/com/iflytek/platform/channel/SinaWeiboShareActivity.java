@@ -8,8 +8,6 @@ import android.view.Window;
 import com.iflytek.platform.PlatformConfig;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
-import com.sina.weibo.sdk.api.TextObject;
-import com.sina.weibo.sdk.api.WeiboMultiMessage;
 import com.sina.weibo.sdk.api.share.BaseRequest;
 import com.sina.weibo.sdk.api.share.BaseResponse;
 import com.sina.weibo.sdk.api.share.IWeiboHandler;
@@ -145,17 +143,10 @@ public final class SinaWeiboShareActivity extends Activity implements IWeiboHand
     }
 
     private void share(ShareContent shareContent) {
-//        AuthInfo authInfo = new AuthInfo(this, PlatformConfig.INSTANCE.getSinaKey(), PlatformConfig.INSTANCE.getSinaRedirectUrl(), SinaWeibo.SCOPE);
-        TextObject textObject = new TextObject();
-        textObject.text = shareContent.content;
-        textObject.title = shareContent.title;
-        WeiboMultiMessage message = new WeiboMultiMessage();
-        message.textObject = textObject;
         SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
         // 用transaction唯一标识一个请求
         request.transaction = String.valueOf(System.currentTimeMillis());
-        request.multiMessage = message;
-
+        request.multiMessage = shareContent.getWeiboContent();
         final WeiboAuthListener listener = new WeiboAuthListener() {
             @Override
             public void onWeiboException(WeiboException e) {
@@ -164,7 +155,6 @@ public final class SinaWeiboShareActivity extends Activity implements IWeiboHand
 
             @Override
             public void onComplete(Bundle bundle) {
-//                final Oauth2AccessToken tokenInfo = Oauth2AccessToken.parseAccessToken(bundle);
                 onResult(Constants.Code.SUCCESS, null);
             }
 
@@ -173,10 +163,10 @@ public final class SinaWeiboShareActivity extends Activity implements IWeiboHand
                 onResult(Constants.Code.ERROR_CANCEL, null);
             }
         };
+//        AuthInfo authInfo = new AuthInfo(this, PlatformConfig.INSTANCE.getSinaKey(), PlatformConfig.INSTANCE.getSinaRedirectUrl(), SinaWeibo.SCOPE);
 //        shareAPI.sendRequest(this, request, authInfo, "", listener);
         try {
             //仅使用网页版分享,客户端分享暂且有问题
-            //private boolean startShareWeiboActivity(Activity act, String token, BaseRequest request, WeiboAuthListener authListener)
             Class cls = Class.forName("com.sina.weibo.sdk.api.share.WeiboShareAPIImpl");
             Method method = cls.getDeclaredMethod("startShareWeiboActivity", Activity.class, String.class, BaseRequest.class, WeiboAuthListener.class);
             method.setAccessible(true);

@@ -72,7 +72,9 @@ final class TencentQQ extends Channel implements Socialize {
         params.putString(QQShare.SHARE_TO_QQ_TARGET_URL, content.targetUrl);//必填
         params.putString(QQShare.SHARE_TO_QQ_TITLE, content.title);
         params.putString(QQShare.SHARE_TO_QQ_SUMMARY, content.content);
-        params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, content.imageUrl);
+        if (null != content.image && content.image instanceof String) {
+            params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, String.valueOf(content.image));
+        }
 
         shareCallback = new UIListenerWrapper<>(ChannelType.QQ, callback);
         shareApi.shareToQQ((Activity) getContext(), params, shareCallback);

@@ -35,8 +35,9 @@ public class ProxyDemoActivity extends Activity {
         final ShareContent content = new ShareContent.Builder()
                 .title("share sdk")
                 .content("share from ichang")
-                .imageUrl("http://www.weipet.cn/common/images/pic/a347.jpg")
+                .image("http://www.weipet.cn/common/images/pic/a347.jpg")
                 .targetUrl("http://www.baidu.com")
+                .mediaUrl("http://mp3.ffxia.com//13/张韶涵-终于[68mtv.com].mp3")
                 .create();
         PlatformProxy.share(ProxyDemoActivity.this, type, content, (channelType, obj, msg, code) -> {
             // TODO: 2016/8/23

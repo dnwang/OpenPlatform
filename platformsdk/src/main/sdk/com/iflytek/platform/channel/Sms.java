@@ -33,7 +33,7 @@ final class Sms extends Channel implements Socialize {
         if (null == content) {
             return;
         }
-        final String smsText = content.getAllContent();
+        final String smsText = content.getSimpleTxtContent();
         Uri uri = Uri.parse("smsto:");
         Intent intent = new Intent(android.content.Intent.ACTION_SENDTO, uri);
         intent.putExtra("sms_body", smsText);

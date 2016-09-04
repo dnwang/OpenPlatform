@@ -225,7 +225,7 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
                 return false;
             }
             try {
-                String content = URLEncoder.encode(shareContent.getAllContent(), "UTF-8");
+                String content = URLEncoder.encode(shareContent.getSimpleTxtContent(), "UTF-8");
                 Map<String, Object> params = new HashMap<>(2);
                 params.put("access_token", token);
                 params.put("status", content);

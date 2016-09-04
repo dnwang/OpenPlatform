@@ -43,8 +43,9 @@ public class ApiDemoActivity extends Activity {
         final ShareContent content = new ShareContent.Builder()
                 .title("share sdk")
                 .content("share from ichang")
-                .imageUrl("http://www.weipet.cn/common/images/pic/a347.jpg")
+                .image("http://www.weipet.cn/common/images/pic/a347.jpg")
                 .targetUrl("http://www.baidu.com")
+                .mediaUrl("http://mp3.ffxia.com//13/张韶涵-终于[68mtv.com].mp3")
                 .create();
         // 授权分享
 //        platformBehavior.select(type).share(content, (channelType, obj, msg, code) -> {
@@ -74,8 +75,9 @@ public class ApiDemoActivity extends Activity {
                 tips = user.id + ", " + tips;
             }
             Toast.makeText(getApplicationContext(), tips, Toast.LENGTH_SHORT).show();
-
-            PlatformTokenKeeper.INSTANCE.setToken(channelType, user.token);
+            if (Constants.Code.SUCCESS == code) {
+                PlatformTokenKeeper.INSTANCE.setToken(channelType, user.token);
+            }
         });
     };
 
