@@ -43,7 +43,6 @@ import java.util.Map;
  */
 final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
 
-    // 由于后端没有配置，始终出现21322，以下URL摘自友盟新浪分享，可用作默认值
     static final String SCOPE = "email,direct_messages_read,direct_messages_write," +
             "friendships_groups_read,friendships_groups_write,statuses_to_me_read," +
             "follow_app_official_microblog,invitation_write";
@@ -181,7 +180,7 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
         new Thread() {
             @Override
             public void run() {
-                final boolean isSuccess = SinaWeiboAPI.share(content, token.getToken());
+                final boolean isSuccess = SinaWeiboAPI.shareImage(content, token.getToken());
                 final Activity activity = (Activity) getContext();
                 if (activity.isFinishing()) {
                     return;
@@ -204,23 +203,25 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
     private static class SinaWeiboAPI {
 
         /**
-         * 分享
-         * token,content
+         * 分享纯文本
          */
-        private static final String API_SHARE = "https://api.weibo.com/2/statuses/update.json";
+        private static final String API_SHARE_TXT = "https://api.weibo.com/2/statuses/update.json";
+        /**
+         * 分享带图片
+         */
+        private static final String API_SHARE_IMAGE = "https://upload.api.weibo.com/2/statuses/upload.json";
         /**
          * 认证token获取用户信息
-         * token,uid
          */
         private static final String API_SHOW_USER = "https://api.weibo.com/2/users/show.json";
         /**
          * 获取好友关注列表,单页最大count=200
-         * token,uid,count,cursor
          */
         private static final String API_GET_FRIENDS = "https://api.weibo.com/2/friendships/friends.json";
         private static final int PAGE_SIZE = 200;
 
-        private static boolean share(ShareContent shareContent, String token) {
+        @Deprecated
+        private static boolean shareTxt(ShareContent shareContent, String token) {
             if (null == shareContent || TextUtils.isEmpty(token)) {
                 return false;
             }
@@ -229,7 +230,24 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
                 Map<String, Object> params = new HashMap<>(2);
                 params.put("access_token", token);
                 params.put("status", content);
-                final String result = HttpsUtils.post(API_SHARE, null, params);
+                final String result = HttpsUtils.post(API_SHARE_TXT, null, params);
+                return null != result && result.contains("created_at");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        private static boolean shareImage(ShareContent shareContent, String token){
+            if (null == shareContent || TextUtils.isEmpty(token)) {
+                return false;
+            }
+            try {
+                String content = URLEncoder.encode(ContentConverter.getSimpleContent(shareContent), "UTF-8");
+                Map<String, Object> params = new HashMap<>(2);
+                params.put("access_token", token);
+                params.put("status", content);
+                final String result = HttpsUtils.postWithMultipart(API_SHARE_IMAGE, null, params);
                 return null != result && result.contains("created_at");
             } catch (Exception e) {
                 e.printStackTrace();
