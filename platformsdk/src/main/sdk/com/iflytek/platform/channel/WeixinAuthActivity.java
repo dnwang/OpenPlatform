@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.Window;
 
 import com.iflytek.platform.PlatformConfig;
+import com.iflytek.platform.callbacks.SimpleListener;
 import com.iflytek.platform.entity.AccessToken;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
@@ -23,7 +24,6 @@ import com.tencent.mm.sdk.openapi.SendAuth;
 import com.tencent.mm.sdk.openapi.SendMessageToWX;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.tencent.mm.sdk.openapi.WXMediaMessage;
-import com.tencent.mm.sdk.openapi.WXTextObject;
 
 import org.json.JSONObject;
 
@@ -135,7 +135,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         switch (type) {
             case TYPE_SHARE_FRIEND: {
                 if (null != content) {
-                    share2Session((ShareContent) content);
+                    share((ShareContent) content, SendMessageToWX.Req.WXSceneSession);
                 } else {
                     onResult(Constants.Code.ERROR, null);
                 }
@@ -143,7 +143,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
             }
             case TYPE_SHARE_CIRCLE: {
                 if (null != content) {
-                    share2Timeline((ShareContent) content);
+                    share((ShareContent) content, SendMessageToWX.Req.WXSceneTimeline);
                 } else {
                     onResult(Constants.Code.ERROR, null);
                 }
@@ -160,29 +160,32 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         }
     }
 
-    private void share2Session(ShareContent shareContent) {
-        WXTextObject textObject = new WXTextObject();
-        textObject.text = shareContent.content;
-        WXMediaMessage message = new WXMediaMessage(textObject);
-        message.description = shareContent.title;
-
-        SendMessageToWX.Req req = new SendMessageToWX.Req();
-        req.transaction = String.valueOf(System.currentTimeMillis());
-        req.message = message;
-        req.scene = SendMessageToWX.Req.WXSceneSession;
-        wxApi.sendReq(req);
+    private void share(ShareContent shareContent, final int scene) {
+        ContentConverter.getWeixinContent(getResources(), shareContent, new SimpleListener<WXMediaMessage>() {
+            @Override
+            public void call(final WXMediaMessage wxMediaMessage) {
+                if (isFinishing()) {
+                    return;
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        share(wxMediaMessage, scene);
+                    }
+                });
+            }
+        });
     }
 
-    private void share2Timeline(ShareContent shareContent) {
-        WXTextObject textObject = new WXTextObject();
-        textObject.text = shareContent.content;
-        WXMediaMessage message = new WXMediaMessage(textObject);
-        message.description = shareContent.title;
-
+    private void share(WXMediaMessage message, int scene) {
+        if (null == message) {
+            onResult(Constants.Code.ERROR, null);
+            return;
+        }
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         req.transaction = String.valueOf(System.currentTimeMillis());
         req.message = message;
-        req.scene = SendMessageToWX.Req.WXSceneTimeline;
+        req.scene = scene;
         wxApi.sendReq(req);
     }
 

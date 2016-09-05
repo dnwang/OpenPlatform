@@ -130,6 +130,4 @@ public final class Tools {
         }
     }
 
-    public static void getBitmap(String url, call)
-
 }

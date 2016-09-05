@@ -1,17 +1,11 @@
 package com.iflytek.platform.entity;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
-import com.sina.weibo.sdk.api.ImageObject;
-import com.sina.weibo.sdk.api.MusicObject;
-import com.sina.weibo.sdk.api.TextObject;
-import com.sina.weibo.sdk.api.WeiboMultiMessage;
+import com.iflytek.platform.utils.Tools;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * Copyright (C), 2016 <br>
@@ -27,47 +21,25 @@ public class ShareContent implements Serializable {
 
     public String title;
     public String content;
-    public Object image;
-    public String targetUrl;
+    public Serializable image; // byte[], int, string
+    public String linkUrl;
 
     public String mediaUrl;
 
-    private ShareContent(String title, String content, Object image, String targetUrl, String mediaUrl) {
+    private ShareContent(String title, String content, Serializable image, String linkUrl, String mediaUrl) {
         this.title = title;
         this.content = content;
         this.image = image;
-        this.targetUrl = targetUrl;
+        this.linkUrl = linkUrl;
         this.mediaUrl = mediaUrl;
-    }
-
-    public String getSimpleTxtContent() {
-        return title + "\n" +
-                content + "\n" +
-                ((null != image && image instanceof String) ? image : "") +
-                targetUrl;
-    }
-
-    public WeiboMultiMessage getWeiboContent(Bitmap bitmap) {
-        WeiboMultiMessage weiboMultiMessage = new WeiboMultiMessage();
-        // text obj
-        TextObject textObject = new TextObject();
-        textObject.title = title;
-        textObject.text = content;
-        // image obj
-        ImageObject imageObject = new ImageObject();
-        imageObject.setImageObject(bitmap);
-        //
-        weiboMultiMessage.textObject = textObject;
-        weiboMultiMessage.imageObject = imageObject;
-        return weiboMultiMessage;
     }
 
     public final static class Builder {
 
         private String title;
         private String content;
-        private Object image;
-        private String targetUrl;
+        private Serializable image;
+        private String linkUrl;
 
         private String mediaUrl;
 
@@ -75,7 +47,7 @@ public class ShareContent implements Serializable {
             title = "";
             content = "";
             image = null;
-            targetUrl = "";
+            linkUrl = "";
             mediaUrl = "";
         }
 
@@ -85,7 +57,7 @@ public class ShareContent implements Serializable {
                 title = shareContent.title;
                 content = shareContent.content;
                 image = shareContent.image;
-                targetUrl = shareContent.targetUrl;
+                linkUrl = shareContent.linkUrl;
                 mediaUrl = shareContent.mediaUrl;
             }
         }
@@ -101,7 +73,12 @@ public class ShareContent implements Serializable {
         }
 
         public Builder image(Bitmap bitmap) {
-            this.image = bitmap;
+            if (null != bitmap) {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+                this.image = outputStream.toByteArray();
+                Tools.close(outputStream);
+            }
             return this;
         }
 
@@ -110,8 +87,13 @@ public class ShareContent implements Serializable {
             return this;
         }
 
-        public Builder targetUrl(String url) {
-            this.targetUrl = url;
+        public Builder image(int resId) {
+            this.image = resId;
+            return this;
+        }
+
+        public Builder linkUrl(String url) {
+            this.linkUrl = url;
             return this;
         }
 
@@ -121,7 +103,7 @@ public class ShareContent implements Serializable {
         }
 
         public ShareContent create() {
-            return new ShareContent(title, content, image, targetUrl, mediaUrl);
+            return new ShareContent(title, content, image, linkUrl, mediaUrl);
         }
 
     }

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.nfc.FormatException;
-import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.iflytek.platform.Channel;
@@ -17,7 +16,6 @@ import com.iflytek.platform.entity.ShareContent;
 import com.iflytek.platform.utils.Tools;
 import com.tencent.connect.UserInfo;
 import com.tencent.connect.auth.QQToken;
-import com.tencent.connect.share.QQShare;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
@@ -65,19 +63,11 @@ final class TencentQQ extends Channel implements Socialize {
 
     @Override
     public void share(ShareContent content, final Callback<Object> callback) {
-        if (null == content || TextUtils.isEmpty(content.targetUrl)) {
+        if (null == content) {
             return;
         }
-        final Bundle params = new Bundle();
-        params.putString(QQShare.SHARE_TO_QQ_TARGET_URL, content.targetUrl);//必填
-        params.putString(QQShare.SHARE_TO_QQ_TITLE, content.title);
-        params.putString(QQShare.SHARE_TO_QQ_SUMMARY, content.content);
-        if (null != content.image && content.image instanceof String) {
-            params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, String.valueOf(content.image));
-        }
-
         shareCallback = new UIListenerWrapper<>(ChannelType.QQ, callback);
-        shareApi.shareToQQ((Activity) getContext(), params, shareCallback);
+        shareApi.shareToQQ((Activity) getContext(), ContentConverter.getQQContent(content), shareCallback);
     }
 
     @Override

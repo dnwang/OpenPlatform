@@ -44,8 +44,8 @@ public class ApiDemoActivity extends Activity {
                 .title("share sdk")
                 .content("share from ichang")
                 .image("http://www.weipet.cn/common/images/pic/a347.jpg")
-                .targetUrl("http://www.baidu.com")
-                .mediaUrl("http://mp3.ffxia.com//13/张韶涵-终于[68mtv.com].mp3")
+                .linkUrl("http://172.16.4.3/group1/M00/01/AF/rBAEA1bUaTmAHc7GAIrbl2MfKI8642.mp3")
+                .mediaUrl("http://172.16.4.196:8080/share/df917a22bd1f4c7380340cab94af2061.shtml")
                 .create();
         // 授权分享
 //        platformBehavior.select(type).share(content, (channelType, obj, msg, code) -> {

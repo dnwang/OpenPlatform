@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.view.Window;
 
 import com.iflytek.platform.PlatformConfig;
+import com.iflytek.platform.callbacks.SimpleListener;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
+import com.sina.weibo.sdk.api.WeiboMultiMessage;
 import com.sina.weibo.sdk.api.share.BaseRequest;
 import com.sina.weibo.sdk.api.share.BaseResponse;
 import com.sina.weibo.sdk.api.share.IWeiboHandler;
@@ -67,7 +69,8 @@ public final class SinaWeiboShareActivity extends Activity implements IWeiboHand
         type = intent.getIntExtra(FLAG_TYPE, -1);
         content = intent.getSerializableExtra(Constants.KEY_CONTENT);
         if (type < 0) {
-            finish();
+            onResult(Constants.Code.ERROR, null);
+            return;
         }
         shareAPI = WeiboShareSDK.createWeiboAPI(this, PlatformConfig.INSTANCE.getSinaKey());
         shareAPI.registerApp();
@@ -129,24 +132,40 @@ public final class SinaWeiboShareActivity extends Activity implements IWeiboHand
         switch (type) {
             case TYPE_SHARE: {
                 if (null != content) {
-                    share((ShareContent) content);
+                    ContentConverter.getWeiboContent(getResources(), (ShareContent) content, new SimpleListener<WeiboMultiMessage>() {
+                        @Override
+                        public void call(final WeiboMultiMessage weiboMultiMessage) {
+                            if (isFinishing()) {
+                                return;
+                            }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    share(weiboMultiMessage);
+                                }
+                            });
+                        }
+                    });
                 } else {
-                    finish();
+                    onResult(Constants.Code.ERROR, null);
                 }
                 break;
             }
             default: {
-                finish();
+                onResult(Constants.Code.ERROR_NOT_SUPPORT, null);
                 break;
             }
         }
     }
 
-    private void share(ShareContent shareContent) {
+    private void share(WeiboMultiMessage message) {
+        if (null == message) {
+            onResult(Constants.Code.ERROR, null);
+            return;
+        }
         SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
-        // 用transaction唯一标识一个请求
         request.transaction = String.valueOf(System.currentTimeMillis());
-        request.multiMessage = shareContent.getWeiboContent();
+        request.multiMessage = message;
         final WeiboAuthListener listener = new WeiboAuthListener() {
             @Override
             public void onWeiboException(WeiboException e) {

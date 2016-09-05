@@ -3,8 +3,6 @@ package com.iflytek.platform.channel;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.iflytek.platform.Channel;
 import com.iflytek.platform.PlatformConfig;
@@ -12,11 +10,9 @@ import com.iflytek.platform.callbacks.Callback;
 import com.iflytek.platform.entity.AccountInfo;
 import com.iflytek.platform.entity.Constants;
 import com.iflytek.platform.entity.ShareContent;
-import com.tencent.connect.share.QzoneShare;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,17 +47,14 @@ final class TencentQZone extends Channel implements Socialize {
 
     @Override
     public void share(ShareContent content, final Callback<Object> callback) {
-        if (null == content || TextUtils.isEmpty(content.targetUrl)) {
+        if (null == content) {
+            if (null != callback) {
+                callback.call(ChannelType.QZONE, null, null, Constants.Code.ERROR);
+            }
             return;
         }
-        final Bundle params = new Bundle();
-        params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, content.targetUrl);//必填
-        params.putString(QzoneShare.SHARE_TO_QQ_TITLE, content.title);
-        params.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, content.content);
-        params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, new ArrayList<String>());
-
         shareCallback = new TencentQQ.UIListenerWrapper<>(ChannelType.QZONE, callback);
-        shareApi.shareToQzone((Activity) getContext(), params, shareCallback);
+        shareApi.shareToQzone((Activity) getContext(), ContentConverter.getQZoneContent(content), shareCallback);
     }
 
     @Override

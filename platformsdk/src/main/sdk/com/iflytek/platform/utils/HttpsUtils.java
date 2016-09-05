@@ -1,8 +1,11 @@
 package com.iflytek.platform.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -186,6 +189,38 @@ public final class HttpsUtils {
             // TODO Auto-generated method stub
             return null;
         }
+    }
+
+    public static Bitmap getBitmap(String url) {
+        if (TextUtils.isEmpty(url) || !url.startsWith("http")) {
+            return null;
+        }
+        Bitmap bitmap = null;
+        HttpURLConnection connection = null;
+        InputStream inputStream = null;
+        try {
+            if (url.startsWith("https")) {
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, new TrustManager[]{new CustomTrustManager()}, new SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+                HttpsURLConnection.setDefaultHostnameVerifier(new CustomHostnameVerifier());
+                connection = (HttpsURLConnection) new URL(url).openConnection();
+            } else {
+                connection = (HttpURLConnection) new URL(url).openConnection();
+            }
+            connection.setConnectTimeout(TIME_OUT);
+            connection.setReadTimeout(TIME_OUT);
+            inputStream = connection.getInputStream();
+            bitmap = BitmapFactory.decodeStream(inputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            Tools.close(inputStream);
+            if (null != connection) {
+                connection.disconnect();
+            }
+        }
+        return bitmap;
     }
 
 }
