@@ -72,24 +72,29 @@ public class ShareContent implements Serializable {
             return this;
         }
 
-        public Builder image(Bitmap bitmap) {
+        /**
+         * Bitmap, String(url), Int(resId)
+         */
+        public Builder image(Object obj) {
+            if (null != obj) {
+                if (obj instanceof Bitmap) {
+                    image((Bitmap) obj);
+                } else if (obj instanceof String || obj instanceof Integer) {
+                    this.image = (Serializable) obj;
+                }
+            } else {
+                this.image = null;
+            }
+            return this;
+        }
+
+        private void image(Bitmap bitmap) {
             if (null != bitmap) {
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
                 this.image = outputStream.toByteArray();
                 Tools.close(outputStream);
             }
-            return this;
-        }
-
-        public Builder image(String url) {
-            this.image = url;
-            return this;
-        }
-
-        public Builder image(int resId) {
-            this.image = resId;
-            return this;
         }
 
         public Builder linkUrl(String url) {
