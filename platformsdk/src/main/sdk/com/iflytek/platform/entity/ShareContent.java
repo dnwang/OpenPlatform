@@ -23,7 +23,6 @@ public class ShareContent implements Serializable {
     public String content;
     public Serializable image; // byte[], int, string
     public String linkUrl;
-
     public String mediaUrl;
 
     private ShareContent(String title, String content, Serializable image, String linkUrl, String mediaUrl) {
@@ -40,7 +39,6 @@ public class ShareContent implements Serializable {
         private String content;
         private Serializable image;
         private String linkUrl;
-
         private String mediaUrl;
 
         public Builder() {
@@ -91,7 +89,7 @@ public class ShareContent implements Serializable {
         private void image(Bitmap bitmap) {
             if (null != bitmap) {
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream);
                 this.image = outputStream.toByteArray();
                 Tools.close(outputStream);
             }

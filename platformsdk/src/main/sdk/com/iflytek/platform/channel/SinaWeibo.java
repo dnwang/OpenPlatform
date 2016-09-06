@@ -180,7 +180,7 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
         new Thread() {
             @Override
             public void run() {
-                final boolean isSuccess = SinaWeiboAPI.shareImage(content, token.getToken());
+                final boolean isSuccess = SinaWeiboAPI.shareTxt(content, token.getToken());
                 final Activity activity = (Activity) getContext();
                 if (activity.isFinishing()) {
                     return;
@@ -208,6 +208,7 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
         private static final String API_SHARE_TXT = "https://api.weibo.com/2/statuses/update.json";
         /**
          * 分享带图片
+         * 接口未调试成功
          */
         private static final String API_SHARE_IMAGE = "https://upload.api.weibo.com/2/statuses/upload.json";
         /**
@@ -220,7 +221,6 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
         private static final String API_GET_FRIENDS = "https://api.weibo.com/2/friendships/friends.json";
         private static final int PAGE_SIZE = 200;
 
-        @Deprecated
         private static boolean shareTxt(ShareContent shareContent, String token) {
             if (null == shareContent || TextUtils.isEmpty(token)) {
                 return false;
@@ -231,23 +231,6 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
                 params.put("access_token", token);
                 params.put("status", content);
                 final String result = HttpsUtils.post(API_SHARE_TXT, null, params);
-                return null != result && result.contains("created_at");
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-
-        private static boolean shareImage(ShareContent shareContent, String token){
-            if (null == shareContent || TextUtils.isEmpty(token)) {
-                return false;
-            }
-            try {
-                String content = URLEncoder.encode(ContentConverter.getSimpleContent(shareContent), "UTF-8");
-                Map<String, Object> params = new HashMap<>(2);
-                params.put("access_token", token);
-                params.put("status", content);
-                final String result = HttpsUtils.postWithMultipart(API_SHARE_IMAGE, null, params);
                 return null != result && result.contains("created_at");
             } catch (Exception e) {
                 e.printStackTrace();

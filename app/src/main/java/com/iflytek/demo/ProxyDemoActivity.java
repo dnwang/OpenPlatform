@@ -1,6 +1,7 @@
 package com.iflytek.demo;
 
 import android.app.Activity;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,9 @@ public class ProxyDemoActivity extends Activity {
         final ShareContent content = new ShareContent.Builder()
                 .title("share sdk")
                 .content("share from ichang")
-                .image("http://www.weipet.cn/common/images/pic/a347.jpg")
+//                .image("http://www.weipet.cn/common/images/pic/a347.jpg")
+                .image(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+//                .image(R.mipmap.ic_launcher)
                 .linkUrl("http://172.16.4.3/group1/M00/01/AF/rBAEA1bUaTmAHc7GAIrbl2MfKI8642.mp3")
                 .mediaUrl("http://172.16.4.196:8080/share/df917a22bd1f4c7380340cab94af2061.shtml")
                 .create();

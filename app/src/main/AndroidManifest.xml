@@ -6,8 +6,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="三方平台SDK">
 
-        <activity android:name="com.iflytek.demo.ApiDemoActivity">
-        <!--<activity android:name="com.iflytek.demo.ProxyDemoActivity">-->
+        <!--<activity android:name="com.iflytek.demo.ApiDemoActivity">-->
+        <activity android:name="com.iflytek.demo.ProxyDemoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

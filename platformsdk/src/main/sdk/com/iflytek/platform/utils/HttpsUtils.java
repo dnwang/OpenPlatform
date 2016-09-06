@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -104,118 +103,6 @@ public final class HttpsUtils {
             }
         }
         return result;
-    }
-
-
-    public static String postWithMultipart(String url, Map<String, String> headers, Map<String, Object> params) {
-        if (TextUtils.isEmpty(url) || !url.startsWith("http")) {
-            return null;
-        }
-        String result = null;
-        HttpURLConnection connection = null;
-        BufferedReader reader = null;
-        OutputStream outputStream = null;
-        try {
-            if (url.startsWith("https")) {
-                SSLContext sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, new TrustManager[]{new CustomTrustManager()}, new SecureRandom());
-                HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-                HttpsURLConnection.setDefaultHostnameVerifier(new CustomHostnameVerifier());
-                connection = (HttpsURLConnection) new URL(url).openConnection();
-            } else {
-                connection = (HttpURLConnection) new URL(url).openConnection();
-            }
-            connection.setRequestMethod("POST");
-            connection.setConnectTimeout(TIME_OUT);
-            connection.setReadTimeout(TIME_OUT);
-            // headers
-            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
-            if (null != headers && !headers.isEmpty()) {
-                for (Map.Entry<String, String> header : headers.entrySet()) {
-                    String key = header.getKey();
-                    Object value = header.getValue();
-                    value = null == value ? "" : value;
-                    if (!TextUtils.isEmpty(key)) {
-                        connection.setRequestProperty(key, String.valueOf(value));
-                    }
-                }
-            }
-            // params
-            outputStream = connection.getOutputStream();
-
-            if (null != headers && !headers.isEmpty()) {
-                for (Map.Entry<String, String> header : headers.entrySet()) {
-                    String key = header.getKey();
-                    Object value = header.getValue();
-                    value = null == value ? "" : value;
-                    if (!TextUtils.isEmpty(key)) {
-                        addFormField(outputStream, key, value);
-                    }
-                }
-            }
-
-
-
-
-
-            // read response
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder stringBuilder = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-            result = stringBuilder.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            Tools.close(reader);
-            Tools.close(outputStream);
-            if (null != connection) {
-                connection.disconnect();
-            }
-        }
-        return result;
-    }
-
-    private static final String CRLF = "\r\n";
-    private static final String BOUNDARY = "BoundaryTest";
-    private static final String TWOHYPHENS = "--";
-
-    /**
-     * Adds a form field to the request
-     *
-     * @param name  field name
-     * @param value field value
-     */
-    public static void addFormField(OutputStream outputStream, String name, String value)throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append(TWOHYPHENS + BOUNDARY + CRLF)
-                .append("Content-Disposition: form-data; name=\"" + name + "\""+ CRLF)
-                .append("Content-Type: text/plain; charset=UTF-8" + CRLF)
-                .append(CRLF)
-                .append(value+ CRLF);
-        outputStream.write(sb.toString().getBytes());
-    }
-
-    /**
-     * Adds a upload file section to the request
-     *
-     * @param fieldName  name attribute in <input type="file" name="..." />
-     * @param uploadFile a File to be uploaded
-     * @throws IOException
-     */
-    public void addFilePart(String fieldName, File uploadFile)
-            throws IOException {
-        String fileName = uploadFile.getName();
-        request.writeBytes(this.twoHyphens + this.boundary + this.crlf);
-        request.writeBytes("Content-Disposition: form-data; name=\"" +
-                fieldName + "\";filename=\"" +
-                fileName + "\"" + this.crlf);
-        request.writeBytes(this.crlf);
-
-        byte[] bytes = Files.readAllBytes(uploadFile.toPath());
-        request.write(bytes);
     }
 
     private static String convertParams(Map<String, Object> params) {

@@ -37,7 +37,7 @@ final class ContentConverter {
 
     public static String getSimpleContent(ShareContent content) {
         return content.title + "\n" +
-                content + "\n" +
+                content.content + "\n" +
                 content.mediaUrl + "\n" +
                 content.linkUrl;
     }
