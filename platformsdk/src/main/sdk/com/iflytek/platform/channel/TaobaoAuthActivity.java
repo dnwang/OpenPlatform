@@ -1,9 +1,11 @@
 package com.iflytek.platform.channel;
 
+import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,10 +57,12 @@ public final class TaobaoAuthActivity extends Activity {
 
     private ProgressBar progressBar;
     private WebView webView;
+    private View errorView;
 
     private WebViewClient webViewClient = new WebViewClient() {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            errorView.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
             checkAndGetOpenId(url);
         }
@@ -66,11 +70,16 @@ public final class TaobaoAuthActivity extends Activity {
         @Override
         public void onPageFinished(WebView view, String url) {
             progressBar.setVisibility(View.GONE);
+            if (View.GONE == errorView.getVisibility()) {
+                webView.setVisibility(View.VISIBLE);
+            }
         }
 
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-            // TODO: 2016/8/18
+            errorView.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            webView.setVisibility(View.GONE);
         }
 
         @Override
@@ -112,10 +121,9 @@ public final class TaobaoAuthActivity extends Activity {
         settings.setDisplayZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-
-        // title
+        // title bar
         FrameLayout titleBar = new FrameLayout(getApplicationContext());
-        // close btn
+        // close button
         TextView closeBtn = new TextView(getApplicationContext());
         closeBtn.setText("关闭");
         closeBtn.setTextColor(Color.GRAY);
@@ -138,20 +146,45 @@ public final class TaobaoAuthActivity extends Activity {
         titleBar.addView(titleTxt, new FrameLayout.LayoutParams(-1, -1, Gravity.CENTER));
         View divider = new View(getApplicationContext());
         divider.setBackgroundColor(Color.LTGRAY);
-
         // content
         FrameLayout contentLayout = new FrameLayout(getApplicationContext());
-
+        LayoutTransition transition = new LayoutTransition();
+        transition.setAnimator(LayoutTransition.CHANGE_APPEARING, transition.getAnimator(LayoutTransition.CHANGE_APPEARING));
+        transition.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, transition.getAnimator(LayoutTransition.CHANGE_DISAPPEARING));
+        contentLayout.setLayoutTransition(transition);
         // progress
         progressBar = new ProgressBar(getApplicationContext(), null, android.R.attr.progressBarStyleHorizontal);
         progressBar.setMax(100);
+        // error tips
+        TextView errorView = new TextView(getApplicationContext());
+        this.errorView = errorView;
+        errorView.setGravity(Gravity.CENTER | Gravity.TOP);
+        errorView.setTextColor(Color.GRAY);
+        errorView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+        errorView.setText("页面加载失败\n点击重试");
+        errorView.setVisibility(View.GONE);
+        errorView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Tools.isNetworkConnected(getApplicationContext())) {
+                    webView.reload();
+                }
+            }
+        });
+        try {
+            Drawable icon = getResources().getDrawable(android.R.drawable.ic_menu_myplaces);
+            icon.setBounds(0, 0, icon.getIntrinsicWidth(), icon.getIntrinsicHeight());
+            errorView.setCompoundDrawables(null, icon, null, null);
+        } catch (Exception e) {
+        }
+        contentLayout.addView(errorView, new FrameLayout.LayoutParams(-2, Tools.dip2px(this, 120), Gravity.CENTER));
         contentLayout.addView(webView, -1, -1);
         contentLayout.addView(progressBar, new FrameLayout.LayoutParams(-1, Tools.dip2px(this, 2), Gravity.TOP));
         // root
         LinearLayout container = new LinearLayout(getApplicationContext());
         container.setBackgroundColor(Color.WHITE);
         container.setOrientation(LinearLayout.VERTICAL);
-
+        //
         container.addView(titleBar, new LinearLayout.LayoutParams(-1, Tools.dip2px(this, 48)));
         container.addView(divider, new LinearLayout.LayoutParams(-1, 1));
         container.addView(contentLayout, new LinearLayout.LayoutParams(-1, 0, 1));

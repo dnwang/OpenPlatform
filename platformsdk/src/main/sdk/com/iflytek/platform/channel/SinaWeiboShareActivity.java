@@ -105,7 +105,7 @@ public final class SinaWeiboShareActivity extends Activity implements IWeiboHand
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // TODO: 8/23/16  但存在微博客户端时,在登录账号或取消都会已相同的返回值走到这里,暂时无法区别
+        // FIXME: 8/23/16  但存在微博客户端时,在登录账号或取消都会已相同的返回值走到这里,暂时无法区别
         onResult(Constants.Code.ERROR_CANCEL, null);
     }
 

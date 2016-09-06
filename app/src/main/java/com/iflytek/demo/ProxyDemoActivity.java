@@ -43,7 +43,6 @@ public class ProxyDemoActivity extends Activity {
                 .mediaUrl("http://172.16.4.196:8080/share/df917a22bd1f4c7380340cab94af2061.shtml")
                 .create();
         PlatformProxy.share(ProxyDemoActivity.this, type, content, (channelType, obj, msg, code) -> {
-            // TODO: 2016/8/23
             Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
 //        PlatformProxy.share(DemoWrapperActivity.this, type, content, new Callback<Object>() {
@@ -60,7 +59,6 @@ public class ProxyDemoActivity extends Activity {
     private final View.OnClickListener loginClick = view -> {
         final ChannelType type = getSelectedType();
         PlatformProxy.login(ProxyDemoActivity.this, type, (channelType, user, msg, code) -> {
-            // TODO: 2016/8/23
             String tips = Tools.getSimpleTips(code) + ", " + msg;
             if (Constants.Code.SUCCESS == code) {
                 tips = user.id + ", " + tips;
@@ -75,7 +73,6 @@ public class ProxyDemoActivity extends Activity {
     private final View.OnClickListener getFriendsClick = view -> {
         final ChannelType type = getSelectedType();
         PlatformProxy.getFriends(ProxyDemoActivity.this, type, (channelType, users, msg, code) -> {
-            // TODO: 2016/8/23
             String tips = Tools.getSimpleTips(code) + ", " + msg;
             if (Constants.Code.SUCCESS == code) {
                 tips = users.size() + ", " + tips;
@@ -91,7 +88,6 @@ public class ProxyDemoActivity extends Activity {
         final ChannelType type = getSelectedType();
         final PayInfo payInfo = new PayInfo();
         PlatformProxy.pay(ProxyDemoActivity.this, type, payInfo, (channelType, isSuccess, msg, code) -> {
-            // TODO: 2016/8/23
             Toast.makeText(getApplicationContext(), isSuccess + ", " + Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
     };

@@ -1,6 +1,8 @@
 package com.iflytek.platform.utils;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.iflytek.platform.entity.Constants;
 
@@ -107,6 +109,20 @@ public final class Tools {
             }
         }
         return result;
+    }
+
+    public static boolean isNetworkConnected(Context context) {
+        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity == null) {
+            return false;
+        }
+        NetworkInfo info = connectivity.getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            if (info.getState() == NetworkInfo.State.CONNECTED) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String getSimpleTips(int code) {

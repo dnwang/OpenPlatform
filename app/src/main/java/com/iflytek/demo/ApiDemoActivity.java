@@ -50,7 +50,6 @@ public class ApiDemoActivity extends Activity {
                 .create();
         // 授权分享
 //        platformBehavior.select(type).share(content, (channelType, obj, msg, code) -> {
-//            // TODO: 2016/8/23
 //            Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
 //        });
         // 静默分享
@@ -70,7 +69,6 @@ public class ApiDemoActivity extends Activity {
     private final View.OnClickListener loginClick = view -> {
         final ChannelType type = getSelectedType();
         platformBehavior.select(type).login((channelType, user, msg, code) -> {
-            // TODO: 2016/8/23
             String tips = Tools.getSimpleTips(code) + ", " + msg;
             if (Constants.Code.SUCCESS == code) {
                 tips = user.id + ", " + tips;
@@ -88,7 +86,6 @@ public class ApiDemoActivity extends Activity {
     private final View.OnClickListener getFriendsClick = view -> {
         final ChannelType type = getSelectedType();
         platformBehavior.select(type).getFriends((channelType, users, msg, code) -> {
-            // TODO: 2016/8/23
             String tips = Tools.getSimpleTips(code) + ", " + msg;
             if (Constants.Code.SUCCESS == code) {
                 tips = users.size() + ", " + tips;
@@ -104,7 +101,6 @@ public class ApiDemoActivity extends Activity {
         final ChannelType type = getSelectedType();
         final PayInfo payInfo = new PayInfo();
         platformBehavior.select(type).pay(payInfo, (channelType, isSuccess, msg, code) -> {
-            // TODO: 2016/8/23
             Toast.makeText(getApplicationContext(), isSuccess + ", " + Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
     };

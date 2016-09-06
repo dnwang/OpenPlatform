@@ -195,7 +195,6 @@ public final class HttpsUtils {
 
         @Override
         public boolean verify(String hostname, SSLSession session) {
-            // TODO Auto-generated method stub
             return true;
         }
     }
@@ -203,22 +202,17 @@ public final class HttpsUtils {
     private static class CustomTrustManager implements X509TrustManager {
 
         @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-            // TODO Auto-generated method stub
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 
         }
 
         @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-            // TODO Auto-generated method stub
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 
         }
 
         @Override
         public X509Certificate[] getAcceptedIssuers() {
-            // TODO Auto-generated method stub
             return null;
         }
     }
