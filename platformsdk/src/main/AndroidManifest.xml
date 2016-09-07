@@ -14,7 +14,7 @@
 
         <!--(非必要)集成api封装调用-->
         <activity
-            android:name="com.iflytek.platform.wrapper.PlatformProxy"
+            android:name="org.pinwheel.platformsdk.wrapper.PlatformProxy"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent" />
@@ -29,7 +29,7 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name="com.iflytek.platform.channel.SinaWeiboShareActivity"
+            android:name="org.pinwheel.platformsdk.channel.SinaWeiboShareActivity"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent">
@@ -64,20 +64,9 @@
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
         <!--(必要)腾讯认证-->
 
-        <!--(必要)微信回调-->
-        <!--注意:singleInstance,exported,包名,类名-->
-        <activity
-            android:name="com.iflytek.ihou.chang.app.wxapi.WXEntryActivity"
-            android:configChanges="keyboardHidden|orientation"
-            android:exported="true"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Translucent" />
-        <!--(必要)微信回调-->
-
         <!--(必要)淘宝授权-->
         <activity
-            android:name="com.iflytek.platform.channel.TaobaoAuthActivity"
+            android:name="org.pinwheel.platformsdk.channel.TaobaoAuthActivity"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait" />
         <!--(必要)淘宝授权-->

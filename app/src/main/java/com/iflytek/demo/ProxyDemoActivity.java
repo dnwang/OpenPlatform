@@ -9,12 +9,12 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.iflytek.ihou.chang.app.R;
-import com.iflytek.platform.channel.ChannelType;
-import com.iflytek.platform.entity.Constants;
-import com.iflytek.platform.entity.PayInfo;
-import com.iflytek.platform.entity.ShareContent;
-import com.iflytek.platform.utils.Tools;
-import com.iflytek.platform.wrapper.PlatformProxy;
+import org.pinwheel.platformsdk.channel.ChannelType;
+import org.pinwheel.platformsdk.entity.Constants;
+import org.pinwheel.platformsdk.entity.PayInfo;
+import org.pinwheel.platformsdk.entity.ShareContent;
+import org.pinwheel.platformsdk.utils.Tools;
+import org.pinwheel.platformsdk.wrapper.PlatformProxy;
 
 /**
  * Copyright (C), 2016 <br>

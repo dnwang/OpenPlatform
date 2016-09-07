@@ -2,7 +2,7 @@ package com.iflytek.demo;
 
 import android.app.Application;
 
-import com.iflytek.platform.PlatformConfig;
+import org.pinwheel.platformsdk.PlatformConfig;
 
 /**
  * Copyright (C), 2016 <br>
