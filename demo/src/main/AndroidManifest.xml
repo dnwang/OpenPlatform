@@ -1,0 +1,30 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.iflytek.ihou.chang.app">
+
+    <application
+        android:name="com.iflytek.demo.App"
+        android:icon="@mipmap/ic_launcher"
+        android:label="三方平台SDK">
+
+        <!--<activity android:name="com.iflytek.demo.ApiDemoActivity">-->
+        <activity android:name="com.iflytek.demo.ProxyDemoActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--(必要)微信回调-->
+        <!--注意:singleInstance,exported,包名,类名-->
+        <activity
+            android:name="com.iflytek.ihou.chang.app.wxapi.WXEntryActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent" />
+        <!--(必要)微信回调-->
+
+    </application>
+
+</manifest>

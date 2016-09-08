@@ -1,0 +1,45 @@
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
+
+    defaultConfig {
+        applicationId "com.iflytek.ihou.chang.app"//for test
+        minSdkVersion 15
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+
+    signingConfigs {
+        alias {
+
+        }
+    }
+
+    buildTypes {
+        release {
+            debuggable true
+            signingConfig signingConfigs.alias
+        }
+    }
+
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile(name: 'platformsdk-v1.0.0', ext: 'aar')
+}
