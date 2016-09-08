@@ -8,14 +8,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Window;
 
-import org.pinwheel.platformsdk.PlatformConfig;
-import org.pinwheel.platformsdk.callbacks.SimpleListener;
-import org.pinwheel.platformsdk.entity.AccessToken;
-import org.pinwheel.platformsdk.entity.AccountInfo;
-import org.pinwheel.platformsdk.entity.Constants;
-import org.pinwheel.platformsdk.entity.ShareContent;
-import org.pinwheel.platformsdk.utils.HttpsUtils;
-import org.pinwheel.platformsdk.utils.Tools;
 import com.tencent.mm.sdk.openapi.BaseReq;
 import com.tencent.mm.sdk.openapi.BaseResp;
 import com.tencent.mm.sdk.openapi.IWXAPI;
@@ -26,6 +18,14 @@ import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.tencent.mm.sdk.openapi.WXMediaMessage;
 
 import org.json.JSONObject;
+import org.pinwheel.platformsdk.PlatformConfig;
+import org.pinwheel.platformsdk.callbacks.SimpleListener;
+import org.pinwheel.platformsdk.entity.AccessToken;
+import org.pinwheel.platformsdk.entity.AccountInfo;
+import org.pinwheel.platformsdk.entity.Constants;
+import org.pinwheel.platformsdk.entity.ShareContent;
+import org.pinwheel.platformsdk.utils.HttpsUtils;
+import org.pinwheel.platformsdk.utils.Tools;
 
 import java.io.Serializable;
 import java.util.HashMap;

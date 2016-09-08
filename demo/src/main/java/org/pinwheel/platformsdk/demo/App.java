@@ -1,4 +1,4 @@
-package com.iflytek.demo;
+package org.pinwheel.platformsdk.demo;
 
 import android.app.Application;
 

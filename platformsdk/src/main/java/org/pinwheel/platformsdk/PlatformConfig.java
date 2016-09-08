@@ -5,10 +5,9 @@ import android.content.res.AssetManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.pinwheel.platformsdk.utils.Tools;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.pinwheel.platformsdk.utils.Tools;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

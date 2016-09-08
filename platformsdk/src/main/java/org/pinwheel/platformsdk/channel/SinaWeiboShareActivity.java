@@ -5,10 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
 
-import org.pinwheel.platformsdk.PlatformConfig;
-import org.pinwheel.platformsdk.callbacks.SimpleListener;
-import org.pinwheel.platformsdk.entity.Constants;
-import org.pinwheel.platformsdk.entity.ShareContent;
 import com.sina.weibo.sdk.api.WeiboMultiMessage;
 import com.sina.weibo.sdk.api.share.BaseRequest;
 import com.sina.weibo.sdk.api.share.BaseResponse;
@@ -19,6 +15,11 @@ import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.constant.WBConstants;
 import com.sina.weibo.sdk.exception.WeiboException;
+
+import org.pinwheel.platformsdk.PlatformConfig;
+import org.pinwheel.platformsdk.callbacks.SimpleListener;
+import org.pinwheel.platformsdk.entity.Constants;
+import org.pinwheel.platformsdk.entity.ShareContent;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;

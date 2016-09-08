@@ -1,4 +1,4 @@
-package com.iflytek.demo;
+package org.pinwheel.platformsdk.demo;
 
 import android.app.Activity;
 import android.graphics.BitmapFactory;
@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.iflytek.ihou.chang.app.R;
 import org.pinwheel.platformsdk.channel.ChannelType;
 import org.pinwheel.platformsdk.entity.Constants;
 import org.pinwheel.platformsdk.entity.PayInfo;
@@ -45,12 +44,6 @@ public class ProxyDemoActivity extends Activity {
         PlatformProxy.share(ProxyDemoActivity.this, type, content, (channelType, obj, msg, code) -> {
             Toast.makeText(getApplicationContext(), Tools.getSimpleTips(code) + ", " + msg, Toast.LENGTH_SHORT).show();
         });
-//        PlatformProxy.share(DemoWrapperActivity.this, type, content, new Callback<Object>() {
-//            @Override
-//            public void call(ChannelType type, Object o, String msg, int code) {
-//
-//            }
-//        });
     };
 
     /**

@@ -1,13 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.iflytek.ihou.chang.app">
+    package="org.pinwheel.platformsdk.demo">
 
     <application
-        android:name="com.iflytek.demo.App"
+        android:name="org.pinwheel.platformsdk.demo.App"
         android:icon="@mipmap/ic_launcher"
-        android:label="三方平台SDK">
+        android:label="platformsdk">
 
-        <!--<activity android:name="com.iflytek.demo.ApiDemoActivity">-->
-        <activity android:name="com.iflytek.demo.ProxyDemoActivity">
+        <!--<activity android:name="org.pinwheel.platform.demo.ApiDemoActivity">-->
+        <activity android:name="org.pinwheel.platformsdk.demo.ProxyDemoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

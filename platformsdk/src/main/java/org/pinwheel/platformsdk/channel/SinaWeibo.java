@@ -7,6 +7,14 @@ import android.nfc.FormatException;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.sina.weibo.sdk.auth.AuthInfo;
+import com.sina.weibo.sdk.auth.Oauth2AccessToken;
+import com.sina.weibo.sdk.auth.WeiboAuthListener;
+import com.sina.weibo.sdk.auth.sso.SsoHandler;
+import com.sina.weibo.sdk.exception.WeiboException;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.pinwheel.platformsdk.Channel;
 import org.pinwheel.platformsdk.PlatformConfig;
 import org.pinwheel.platformsdk.callbacks.Callback;
@@ -16,14 +24,6 @@ import org.pinwheel.platformsdk.entity.Constants;
 import org.pinwheel.platformsdk.entity.ShareContent;
 import org.pinwheel.platformsdk.utils.HttpsUtils;
 import org.pinwheel.platformsdk.utils.Tools;
-import com.sina.weibo.sdk.auth.AuthInfo;
-import com.sina.weibo.sdk.auth.Oauth2AccessToken;
-import com.sina.weibo.sdk.auth.WeiboAuthListener;
-import com.sina.weibo.sdk.auth.sso.SsoHandler;
-import com.sina.weibo.sdk.exception.WeiboException;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;

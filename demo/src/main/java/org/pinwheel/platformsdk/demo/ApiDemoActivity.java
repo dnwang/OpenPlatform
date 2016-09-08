@@ -1,4 +1,4 @@
-package com.iflytek.demo;
+package org.pinwheel.platformsdk.demo;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.iflytek.ihou.chang.app.R;
 import org.pinwheel.platformsdk.PlatformBehavior;
 import org.pinwheel.platformsdk.PlatformTokenKeeper;
 import org.pinwheel.platformsdk.channel.ChannelType;

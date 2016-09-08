@@ -6,6 +6,13 @@ import android.content.Intent;
 import android.nfc.FormatException;
 import android.text.TextUtils;
 
+import com.tencent.connect.UserInfo;
+import com.tencent.connect.auth.QQToken;
+import com.tencent.tauth.IUiListener;
+import com.tencent.tauth.Tencent;
+import com.tencent.tauth.UiError;
+
+import org.json.JSONObject;
 import org.pinwheel.platformsdk.Channel;
 import org.pinwheel.platformsdk.PlatformConfig;
 import org.pinwheel.platformsdk.callbacks.Callback;
@@ -14,13 +21,6 @@ import org.pinwheel.platformsdk.entity.AccountInfo;
 import org.pinwheel.platformsdk.entity.Constants;
 import org.pinwheel.platformsdk.entity.ShareContent;
 import org.pinwheel.platformsdk.utils.Tools;
-import com.tencent.connect.UserInfo;
-import com.tencent.connect.auth.QQToken;
-import com.tencent.tauth.IUiListener;
-import com.tencent.tauth.Tencent;
-import com.tencent.tauth.UiError;
-
-import org.json.JSONObject;
 
 import java.util.List;
 

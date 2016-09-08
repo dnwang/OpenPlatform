@@ -6,9 +6,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import org.pinwheel.platformsdk.callbacks.SimpleListener;
-import org.pinwheel.platformsdk.entity.ShareContent;
-import org.pinwheel.platformsdk.utils.HttpsUtils;
 import com.sina.weibo.sdk.api.ImageObject;
 import com.sina.weibo.sdk.api.TextObject;
 import com.sina.weibo.sdk.api.WeiboMultiMessage;
@@ -16,6 +13,10 @@ import com.tencent.connect.share.QQShare;
 import com.tencent.connect.share.QzoneShare;
 import com.tencent.mm.sdk.openapi.WXMediaMessage;
 import com.tencent.mm.sdk.openapi.WXVideoObject;
+
+import org.pinwheel.platformsdk.callbacks.SimpleListener;
+import org.pinwheel.platformsdk.entity.ShareContent;
+import org.pinwheel.platformsdk.utils.HttpsUtils;
 
 import java.util.ArrayList;
 

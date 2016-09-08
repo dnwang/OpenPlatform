@@ -4,14 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import com.tencent.tauth.IUiListener;
+import com.tencent.tauth.Tencent;
+
 import org.pinwheel.platformsdk.Channel;
 import org.pinwheel.platformsdk.PlatformConfig;
 import org.pinwheel.platformsdk.callbacks.Callback;
 import org.pinwheel.platformsdk.entity.AccountInfo;
 import org.pinwheel.platformsdk.entity.Constants;
 import org.pinwheel.platformsdk.entity.ShareContent;
-import com.tencent.tauth.IUiListener;
-import com.tencent.tauth.Tencent;
 
 import java.util.List;
 

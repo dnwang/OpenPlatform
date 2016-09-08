@@ -4,10 +4,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import org.pinwheel.platformsdk.entity.Constants;
-
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.pinwheel.platformsdk.entity.Constants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
