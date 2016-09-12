@@ -3,6 +3,7 @@ package org.pinwheel.platformsdk.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.telephony.TelephonyManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -120,6 +121,16 @@ public final class Tools {
             if (info.getState() == NetworkInfo.State.CONNECTED) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public static boolean isSIMCardReady(Context context) {
+        try {
+            TelephonyManager mgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            return TelephonyManager.SIM_STATE_READY == mgr.getSimState();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }

@@ -9,6 +9,7 @@ import org.pinwheel.platformsdk.callbacks.Callback;
 import org.pinwheel.platformsdk.entity.AccountInfo;
 import org.pinwheel.platformsdk.entity.Constants;
 import org.pinwheel.platformsdk.entity.ShareContent;
+import org.pinwheel.platformsdk.utils.Tools;
 
 import java.util.List;
 
@@ -33,9 +34,16 @@ final class Sms extends Channel implements Socialize {
         if (null == content) {
             return;
         }
+        if (!Tools.isSIMCardReady(getContext())) {
+            if (null != callback) {
+                callback.call(ChannelType.SMS, null, null, Constants.Code.ERROR_NOT_INSTALL);
+            }
+            return;
+        }
         final String smsText = ContentConverter.getSimpleContent(content);
         Uri uri = Uri.parse("smsto:");
         Intent intent = new Intent(android.content.Intent.ACTION_SENDTO, uri);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("sms_body", smsText);
         getContext().startActivity(intent);
         if (null != callback) {
