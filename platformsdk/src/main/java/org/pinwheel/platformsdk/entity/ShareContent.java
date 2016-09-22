@@ -60,18 +60,24 @@ public class ShareContent implements Serializable {
             }
         }
 
+        /**
+         * 标题
+         */
         public Builder title(String title) {
             this.title = title;
             return this;
         }
 
+        /**
+         * 内容描述
+         */
         public Builder content(String content) {
             this.content = content;
             return this;
         }
 
         /**
-         * Bitmap, String(url), Int(resId)
+         * 只接受 Bitmap, String(url), Int(resId) 类型
          */
         public Builder image(Object obj) {
             if (null != obj) {
@@ -86,20 +92,28 @@ public class ShareContent implements Serializable {
             return this;
         }
 
+        private static final int QUALITY = 80;
+
         private void image(Bitmap bitmap) {
             if (null != bitmap) {
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream);
+                bitmap.compress(Bitmap.CompressFormat.PNG, QUALITY, outputStream);
                 this.image = outputStream.toByteArray();
                 Tools.close(outputStream);
             }
         }
 
+        /**
+         * 点击分享内容时页面跳转的链接地址(通常优先于MediaUrl使用)
+         */
         public Builder linkUrl(String url) {
             this.linkUrl = url;
             return this;
         }
 
+        /**
+         * 多媒体播放地址(通常是MP3下载地址)，linkUrl为空时被代替使用
+         */
         public Builder mediaUrl(String url) {
             this.mediaUrl = url;
             return this;

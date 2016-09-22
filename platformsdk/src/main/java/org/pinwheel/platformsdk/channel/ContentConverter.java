@@ -36,19 +36,19 @@ final class ContentConverter {
         throw new AssertionError();
     }
 
-    public static String getSimpleContent(ShareContent content) {
+    static String getSimpleContent(ShareContent content) {
         return content.title + "\n" +
                 content.content + "\n" +
-                content.mediaUrl + "\n" +
-                content.linkUrl;
+                content.linkUrl + "\n" +
+                content.mediaUrl;
     }
 
-    public static void getWeiboContent(Resources res, ShareContent content, final SimpleListener<WeiboMultiMessage> listener) {
+    static void getWeiboContent(Resources res, ShareContent content, final SimpleListener<WeiboMultiMessage> listener) {
         final WeiboMultiMessage weiboMultiMessage = new WeiboMultiMessage();
         TextObject textObject = new TextObject();
         textObject.title = content.title;
         textObject.text = content.content;
-        textObject.actionUrl = TextUtils.isEmpty(content.mediaUrl) ? content.linkUrl : content.mediaUrl;
+        textObject.actionUrl = TextUtils.isEmpty(content.linkUrl) ? content.mediaUrl : content.linkUrl;
         final ImageObject imageObject = new ImageObject();
         weiboMultiMessage.textObject = textObject;
         weiboMultiMessage.imageObject = imageObject;
@@ -63,9 +63,9 @@ final class ContentConverter {
         });
     }
 
-    public static void getWeixinContent(Resources res, ShareContent content, final SimpleListener<WXMediaMessage> listener) {
+    static void getWeixinContent(Resources res, ShareContent content, final SimpleListener<WXMediaMessage> listener) {
         final WXVideoObject mediaObj = new WXVideoObject();
-        mediaObj.videoUrl = TextUtils.isEmpty(content.mediaUrl) ? content.linkUrl : content.mediaUrl;
+        mediaObj.videoUrl = TextUtils.isEmpty(content.linkUrl) ? content.mediaUrl : content.linkUrl;
         final WXMediaMessage message = new WXMediaMessage(mediaObj);
         message.description = content.content;
         message.title = content.title;
@@ -80,9 +80,9 @@ final class ContentConverter {
         });
     }
 
-    public static Bundle getQQContent(ShareContent content) {
+    static Bundle getQQContent(ShareContent content) {
         final Bundle params = new Bundle();
-        String url = TextUtils.isEmpty(content.mediaUrl) ? content.linkUrl : content.mediaUrl;
+        final String url = TextUtils.isEmpty(content.linkUrl) ? content.mediaUrl : content.linkUrl;
         params.putString(QQShare.SHARE_TO_QQ_TARGET_URL, url);//必填
         params.putString(QQShare.SHARE_TO_QQ_TITLE, content.title);
         params.putString(QQShare.SHARE_TO_QQ_SUMMARY, content.content);
@@ -92,9 +92,9 @@ final class ContentConverter {
         return params;
     }
 
-    public static Bundle getQZoneContent(ShareContent content) {
+    static Bundle getQZoneContent(ShareContent content) {
         final Bundle params = new Bundle();
-        String url = TextUtils.isEmpty(content.mediaUrl) ? content.linkUrl : content.mediaUrl;
+        final String url = TextUtils.isEmpty(content.linkUrl) ? content.mediaUrl : content.linkUrl;
         params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, url);//必填
         params.putString(QzoneShare.SHARE_TO_QQ_TITLE, content.title);
         params.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, content.content);

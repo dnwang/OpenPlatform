@@ -1,8 +1,10 @@
 package org.pinwheel.platformsdk.channel;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 
 import org.pinwheel.platformsdk.Channel;
 import org.pinwheel.platformsdk.callbacks.Callback;
@@ -26,17 +28,44 @@ final class WeixinCircle extends Channel implements Socialize {
 
     private Callback<Object> shareCallback;
 
+    private final IntentFilter filter = new IntentFilter(WeixinAuthActivity.ACTION_WEIXIN_RESULT);
+    /**
+     * 代替{@link Activity#onActivityResult 接收数据回调}
+     */
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (null != getContext()) {
+                getContext().unregisterReceiver(receiver);
+            }
+            final String action = intent.getAction();
+            if (WeixinAuthActivity.ACTION_WEIXIN_RESULT.equals(action)) {
+                onCallback(intent);
+            }
+            shareCallback = null;
+        }
+    };
+
     public WeixinCircle(Context context) {
         super(context);
     }
 
+    private void onCallback(Intent data) {
+        final int code = (null == data) ? -1 : data.getIntExtra(Constants.KEY_CODE, -1);
+        if (null != shareCallback) {
+            shareCallback.call(ChannelType.WEIXIN_CIRCLE, null, null, code);
+        }
+    }
+
+    /**
+     * 红米手机生命周期回调异常，在下次启动Activity才出发onActivityResult，导致不能正常的回调上层
+     * 改为广播{@link Weixin#receiver}
+     */
+    @Deprecated
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         if (WeixinAuthActivity.REQ_WEIXIN == requestCode && Activity.RESULT_OK == resultCode) {
-            final int code = data.getIntExtra(Constants.KEY_CODE, -1);
-            if (null != shareCallback) {
-                shareCallback.call(ChannelType.WEIXIN_CIRCLE, null, null, code);
-            }
+            onCallback(data);
         }
         shareCallback = null;
     }
@@ -49,6 +78,7 @@ final class WeixinCircle extends Channel implements Socialize {
         }
         if (WeixinAuthActivity.startActivity((Activity) getContext(), WeixinAuthActivity.TYPE_SHARE_CIRCLE, content)) {
             shareCallback = callback;
+            registerReceiver();
         }
     }
 
@@ -63,6 +93,12 @@ final class WeixinCircle extends Channel implements Socialize {
     public void getFriends(Callback<List<AccountInfo>> callback) {
         if (null != callback) {
             callback.call(ChannelType.WEIXIN_CIRCLE, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+        }
+    }
+
+    private void registerReceiver() {
+        if (null != getContext()) {
+            getContext().registerReceiver(receiver, filter);
         }
     }
 

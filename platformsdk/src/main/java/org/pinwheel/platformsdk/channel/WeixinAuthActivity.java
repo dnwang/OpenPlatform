@@ -43,6 +43,11 @@ import java.util.Map;
  */
 public abstract class WeixinAuthActivity extends Activity implements IWXAPIEventHandler {
 
+    /**
+     * 红米手机生命周期回调异常,在下次启动Activity才出发onActivityResult,导致不能正常的回调上层,改为广播代替
+     */
+    static final String ACTION_WEIXIN_RESULT = "com.iflytek.platform.ACTION_WEIXIN_RESULT";
+
     private static final String CLASS_WXAPI = ".wxapi.WXEntryActivity";// 固定api类名，必须存在
 
     private static final String FLAG_TYPE = "type";
@@ -59,6 +64,10 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
      */
     public static final int TYPE_LOGIN = 200;
 
+    /**
+     * ActivityResult方式替换成广播,Action{@link WeixinAuthActivity#ACTION_WEIXIN_RESULT}
+     */
+    @Deprecated
     public static final int REQ_WEIXIN = 0x763;
 
     private IWXAPI wxApi;
@@ -76,7 +85,9 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         Intent intent = new Intent(activity, wxApiActivity);
         intent.putExtra(FLAG_TYPE, type);
         intent.putExtra(Constants.KEY_CONTENT, content);
-        activity.startActivityForResult(intent, REQ_WEIXIN);
+        // 红米手机生命周期forResult回调异常,已经替换为广播方式回调
+//        activity.startActivityForResult(intent, REQ_WEIXIN);
+        activity.startActivity(intent);
         activity.overridePendingTransition(0, 0);
         return true;
     }
@@ -95,7 +106,6 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        setContentView(getContentView());
         getWindow().getDecorView().setBackgroundColor(0);
         wxApi = WXAPIFactory.createWXAPI(this, PlatformConfig.INSTANCE.getWeixinId(), false);
         wxApi.handleIntent(getIntent(), this);
@@ -251,7 +261,6 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         }
     }
 
-
     private void onResult(int code, Serializable content) {
         if (isFinishing()) {
             return;
@@ -261,7 +270,11 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         if (null != content) {
             intent.putExtra(Constants.KEY_CONTENT, content);
         }
-        setResult(RESULT_OK, intent);
+        // 红米手机生命周期onActivityResult回调异常
+//        setResult(RESULT_OK, intent);
+        // 替换为广播方式回调
+        intent.setAction(ACTION_WEIXIN_RESULT);
+        sendBroadcast(intent);
         finish();
     }
 

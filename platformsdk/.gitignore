@@ -1,3 +1,5 @@
 /build
 *.iml
-*.keystore
+/src/main/obj
+/src/main/libs
+/.externalNativeBuild
