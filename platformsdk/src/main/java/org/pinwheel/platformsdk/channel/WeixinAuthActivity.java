@@ -127,15 +127,17 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         content = intent.getSerializableExtra(Constants.KEY_CONTENT);
     }
 
+    /**
+     * 微信在“留在微信”之后不回调，为了始终都能回调上层（比如:关闭透明Activity），在onResume中返回一个临时状态值
+     */
     private boolean finishInResume = true;
 
     @Override
     protected void onResume() {
         super.onResume();
-        // 没有安装微信 || 点击"留在微信中"之后再返回要关闭
-        final boolean isInstalled = wxApi.isWXAppInstalled();
+        final boolean isInstalled = wxApi.isWXAppInstalled();// 没有安装微信
         if (!isInstalled || finishInResume) {
-            int code = !isInstalled ? Constants.Code.ERROR_NOT_INSTALL : Constants.Code.SUCCESS;
+            int code = !isInstalled ? Constants.Code.ERROR_NOT_INSTALL : Constants.Code.UNKNOWN_WEIXIN_RETURN;
             onResult(code, null);
         }
         finishInResume = true;

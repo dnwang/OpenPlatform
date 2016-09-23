@@ -37,6 +37,10 @@ public interface Constants {
          * 未安装应用程序
          */
         int ERROR_NOT_INSTALL = 105;
+        /**
+         * 微信返回使用的临时状态值，不具备任何属性
+         */
+        int UNKNOWN_WEIXIN_RETURN = -100;
 
         /**
          * 操作成功
