@@ -3,6 +3,7 @@ package org.pinwheel.platformsdk.channel;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.nfc.FormatException;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,6 +13,8 @@ import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
+import com.sina.weibo.sdk.net.RequestListener;
+import com.sina.weibo.sdk.openapi.StatusesAPI;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -236,6 +239,32 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
                 e.printStackTrace();
                 return false;
             }
+        }
+
+        private static boolean shareTxt2(Context context, ShareContent shareContent, String token) {
+            if (null == shareContent || TextUtils.isEmpty(token)) {
+                return false;
+            }
+            try {
+                Oauth2AccessToken accessToken = new Oauth2AccessToken(token, null);
+                StatusesAPI api = new StatusesAPI(context, PlatformConfig.INSTANCE.getSinaKey(), accessToken);
+                byte[] data = (byte[]) shareContent.image;
+                api.upload(shareContent.content, BitmapFactory.decodeByteArray(data, 0, data.length), null, null, new RequestListener() {
+                    @Override
+                    public void onComplete(String s) {
+                        System.out.println("share complete, info: " + s);
+                    }
+
+                    @Override
+                    public void onWeiboException(WeiboException e) {
+                        System.out.println("share complete, info: " + e.getMessage());
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
         }
 
         /**
