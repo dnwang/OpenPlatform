@@ -25,6 +25,24 @@
             android:theme="@android:style/Theme.Translucent" />
         <!--(必要)微信回调-->
 
+        <!--(必要)腾讯认证-->
+        <activity
+            android:name="com.tencent.tauth.AuthActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tencent100526240" />
+            </intent-filter>
+        </activity>
+        <!--(必要)腾讯认证-->
+
     </application>
 
 </manifest>
