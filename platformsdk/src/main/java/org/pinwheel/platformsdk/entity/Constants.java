@@ -57,4 +57,6 @@ public interface Constants {
      */
     String KEY_CONTENT = "content";
 
+    String DEFAULT_SINA_REDIRECT_URL = "http://sns.whalecloud.com/sina2/callback";
+
 }

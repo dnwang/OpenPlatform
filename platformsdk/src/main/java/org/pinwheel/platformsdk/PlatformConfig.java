@@ -7,6 +7,7 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.pinwheel.platformsdk.entity.Constants;
 import org.pinwheel.platformsdk.utils.Tools;
 
 import java.io.BufferedReader;
@@ -60,30 +61,11 @@ public enum PlatformConfig {
         keyStore = new EnumMap<>(Type.class);
     }
 
-    public void loadConfig(Context context) {
+    public void init(Context context) {
         // init native token
         PlatformTokenKeeper.INSTANCE.init(context);
-        if (!keyStore.isEmpty()) {
-            return;
-        }
-        AssetManager assetManager = context.getAssets();
-        BufferedReader br = null;
-        try {
-            InputStream inputStream = assetManager.open(CONFIG_FILE);
-            br = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder result = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                result.append(line);
-            }
-            JSONObject json = new JSONObject(result.toString());
-            final String version = json.getString("version");
-            parseConfig(json);
-        } catch (Exception e) {
-            Log.e("PlatformConfig", "error: " + e.getMessage());
-        } finally {
-            Tools.close(br);
-        }
+        // load config
+        loadAssetsConfig(context);
     }
 
     public String getWeixinId() {
@@ -111,7 +93,7 @@ public enum PlatformConfig {
     }
 
     public String getSinaRedirectUrl() {
-        return getValue(Type.SINA, KEY_REDIRECT_URL);
+        return getValue(Type.SINA, KEY_REDIRECT_URL, Constants.DEFAULT_SINA_REDIRECT_URL);
     }
 
     public String getTaobaoKey() {
@@ -131,16 +113,49 @@ public enum PlatformConfig {
     }
 
     private String getValue(Type type, String key) {
+        return getValue(type, key, null);
+    }
+
+    private String getValue(Type type, String key, String defaultValue) {
         String value = null;
         if (keyStore.containsKey(type)) {
-            value = keyStore.get(type).get(key);
+            Map<String, String> valueMap = keyStore.get(type);
+            if (valueMap.containsKey(key)) {
+                value = valueMap.get(key);
+            } else {
+                value = defaultValue;
+            }
         }
         return null == value ? "" : value;
     }
 
-    private void parseConfig(JSONObject json) throws Exception {
+    private void loadAssetsConfig(Context context) {
+        AssetManager assetManager = context.getAssets();
+        BufferedReader br = null;
+        try {
+            InputStream inputStream = assetManager.open(CONFIG_FILE);
+            br = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuilder result = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                result.append(line);
+            }
+            JSONObject json = new JSONObject(result.toString());
+            final String version = json.getString("version");
+            if (TextUtils.isEmpty(version) || "1.0".equals(version)) {
+                parseConfigBy10(json);
+            }
+        } catch (Exception e) {
+            Log.e("PlatformConfig", "error: " + e.getMessage());
+        } finally {
+            Tools.close(br);
+        }
+    }
+
+    private void parseConfigBy10(JSONObject json) throws Exception {
         JSONArray platforms = json.getJSONArray("platforms");
         final int size = platforms.length();
+        keyStore.clear();
         for (int i = 0; i < size; i++) {
             JSONObject jsonObj = platforms.getJSONObject(i);
             final String typeName = jsonObj.getString(KEY_NAME);

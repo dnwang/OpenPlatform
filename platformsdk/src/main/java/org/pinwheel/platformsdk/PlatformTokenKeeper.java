@@ -46,6 +46,7 @@ public enum PlatformTokenKeeper {
         if (!checkParams()) {
             return;
         }
+        tokenCache.clear();
         Map<String, ?> map = sp.getAll();
         for (Map.Entry<String, ?> entry : map.entrySet()) {
             ChannelType channelType = ChannelType.convert(entry.getKey());
