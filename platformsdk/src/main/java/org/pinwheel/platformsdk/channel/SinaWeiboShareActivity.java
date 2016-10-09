@@ -37,6 +37,7 @@ import java.lang.reflect.Method;
  * @version 8/23/16,21:01
  * @see
  */
+@Deprecated
 public final class SinaWeiboShareActivity extends Activity implements IWeiboHandler.Response {
 
     private static final String FLAG_TYPE = "type";

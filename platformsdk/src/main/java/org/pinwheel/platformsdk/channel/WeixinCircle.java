@@ -52,9 +52,7 @@ final class WeixinCircle extends Channel implements Socialize {
 
     private void onCallback(Intent data) {
         final int code = (null == data) ? -1 : data.getIntExtra(Constants.KEY_CODE, -1);
-        if (null != shareCallback) {
-            shareCallback.call(ChannelType.WEIXIN_CIRCLE, null, null, code);
-        }
+        dispatchCallback(shareCallback, null, null, code);
     }
 
     /**
@@ -74,6 +72,7 @@ final class WeixinCircle extends Channel implements Socialize {
     public void share(ShareContent content, Callback<Object> callback) {
         shareCallback = null;
         if (null == content) {
+            dispatchCallback(callback, null, null, Constants.Code.ERROR);
             return;
         }
         if (WeixinAuthActivity.startActivity((Activity) getContext(), WeixinAuthActivity.TYPE_SHARE_CIRCLE, content)) {
@@ -84,21 +83,23 @@ final class WeixinCircle extends Channel implements Socialize {
 
     @Override
     public void login(Callback<AccountInfo> callback) {
-        if (null != callback) {
-            callback.call(ChannelType.WEIXIN_CIRCLE, null, null, Constants.Code.ERROR_NOT_SUPPORT);
-        }
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
     }
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
-        if (null != callback) {
-            callback.call(ChannelType.WEIXIN_CIRCLE, null, null, Constants.Code.ERROR_NOT_SUPPORT);
-        }
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
     }
 
     private void registerReceiver() {
         if (null != getContext()) {
             getContext().registerReceiver(receiver, filter);
+        }
+    }
+
+    private <T> void dispatchCallback(Callback<T> callback, T obj, String msg, int code) {
+        if (null != callback) {
+            callback.call(ChannelType.WEIXIN_CIRCLE, obj, msg, code);
         }
     }
 

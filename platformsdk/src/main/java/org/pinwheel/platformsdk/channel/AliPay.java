@@ -25,8 +25,12 @@ final class AliPay extends Channel implements Payable {
 
     @Override
     public void pay(PayInfo payInfo, Callback<Object> callback) {
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+    }
+
+    private <T> void dispatchCallback(Callback<T> callback, T obj, String msg, int code) {
         if (null != callback) {
-            callback.call(ChannelType.ALIPAY, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+            callback.call(ChannelType.ALIPAY, obj, msg, code);
         }
     }
 }

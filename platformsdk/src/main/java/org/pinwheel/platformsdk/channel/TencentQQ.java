@@ -64,6 +64,7 @@ final class TencentQQ extends Channel implements Socialize {
     @Override
     public void share(ShareContent content, final Callback<Object> callback) {
         if (null == content) {
+            dispatchCallback(callback, null, null, Constants.Code.ERROR);
             return;
         }
         shareCallback = new UIListenerWrapper<>(ChannelType.QQ, callback);
@@ -71,15 +72,12 @@ final class TencentQQ extends Channel implements Socialize {
     }
 
     @Override
-    public void login(final Callback<AccountInfo> callback) {
+    public void login(Callback<AccountInfo> callback) {
         loginCallback = new UIListenerWrapper<AccountInfo>(ChannelType.QQ, callback) {
             @Override
             public void onComplete(Object obj) {
-                if (null == getCallback()) {
-                    return;
-                }
                 if (null == obj) {
-                    getCallback().call(ChannelType.QQ, null, null, Constants.Code.ERROR);
+                    dispatchCallback(getCallback(), null, null, Constants.Code.ERROR);
                     return;
                 }
                 JSONObject json = (JSONObject) obj;
@@ -99,9 +97,9 @@ final class TencentQQ extends Channel implements Socialize {
                         try {
                             final AccountInfo accountInfo = toAccountInfo(openId, String.valueOf(obj));
                             accountInfo.token = AccessToken.createToken(qqToken);
-                            getCallback().call(ChannelType.QQ, accountInfo, null, Constants.Code.SUCCESS);
+                            dispatchCallback(getCallback(), accountInfo, null, Constants.Code.SUCCESS);
                         } catch (Exception e) {
-                            getCallback().call(ChannelType.QQ, null, e.getMessage(), Constants.Code.ERROR);
+                            dispatchCallback(getCallback(), null, e.getMessage(), Constants.Code.ERROR);
                         }
                     }
                 });
@@ -112,9 +110,7 @@ final class TencentQQ extends Channel implements Socialize {
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
-        if (null != callback) {
-            callback.call(ChannelType.QQ, null, null, Constants.Code.ERROR_NOT_SUPPORT);
-        }
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
     }
 
     private AccountInfo toAccountInfo(String openId, String userInfo) throws Exception {
@@ -139,6 +135,12 @@ final class TencentQQ extends Channel implements Socialize {
         return accountInfo;
     }
 
+    private <T> void dispatchCallback(Callback<T> callback, T obj, String msg, int code) {
+        if (null != callback) {
+            callback.call(ChannelType.QQ, obj, msg, code);
+        }
+    }
+
     static class UIListenerWrapper<T> implements IUiListener {
 
         private Callback<T> callback;
@@ -155,26 +157,24 @@ final class TencentQQ extends Channel implements Socialize {
 
         @Override
         public void onComplete(Object o) {
-            if (null == callback) {
-                return;
+            if (null != callback) {
+                callback.call(type, null, null, Constants.Code.SUCCESS);
             }
-            callback.call(type, null, null, Constants.Code.SUCCESS);
         }
 
         @Override
         public void onCancel() {
-            if (null == callback) {
-                return;
+            if (null != callback) {
+                callback.call(type, null, null, Constants.Code.ERROR_CANCEL);
             }
-            callback.call(type, null, null, Constants.Code.ERROR_CANCEL);
         }
 
         @Override
         public void onError(UiError uiError) {
-            if (null == callback) {
-                return;
+            if (null != callback) {
+                String err = (null == uiError) ? null : ("code: " + uiError.errorCode + "; msg: " + uiError.errorMessage);
+                callback.call(type, null, err, Constants.Code.ERROR);
             }
-            callback.call(type, null, String.valueOf(uiError.errorCode), Constants.Code.ERROR);
         }
     }
 

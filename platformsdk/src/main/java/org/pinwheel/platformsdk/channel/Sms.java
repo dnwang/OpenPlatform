@@ -32,12 +32,11 @@ final class Sms extends Channel implements Socialize {
     @Override
     public void share(ShareContent content, final Callback<Object> callback) {
         if (null == content) {
+            dispatchCallback(callback, null, null, Constants.Code.ERROR);
             return;
         }
         if (!Tools.isSIMCardReady(getContext())) {
-            if (null != callback) {
-                callback.call(ChannelType.SMS, null, null, Constants.Code.ERROR_NOT_INSTALL);
-            }
+            dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_INSTALL);
             return;
         }
         final String smsText = ContentConverter.getSimpleContent(content);
@@ -46,22 +45,22 @@ final class Sms extends Channel implements Socialize {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("sms_body", smsText);
         getContext().startActivity(intent);
-        if (null != callback) {
-            callback.call(ChannelType.SMS, null, null, Constants.Code.SUCCESS);
-        }
+        dispatchCallback(callback, null, null, Constants.Code.SUCCESS);
     }
 
     @Override
     public void login(Callback<AccountInfo> callback) {
-        if (null != callback) {
-            callback.call(ChannelType.SMS, null, null, Constants.Code.ERROR_NOT_SUPPORT);
-        }
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
     }
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+    }
+
+    private <T> void dispatchCallback(Callback<T> callback, T obj, String msg, int code) {
         if (null != callback) {
-            callback.call(ChannelType.SMS, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+            callback.call(ChannelType.SMS, obj, msg, code);
         }
     }
 

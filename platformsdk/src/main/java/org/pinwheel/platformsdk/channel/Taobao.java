@@ -35,19 +35,15 @@ final class Taobao extends Channel implements Socialize {
         if (TaobaoAuthActivity.REQ_TAOBAO == requestCode && Activity.RESULT_OK == resultCode) {
             final int code = data.getIntExtra(Constants.KEY_CODE, -1);
             final Object obj = data.getSerializableExtra(Constants.KEY_CONTENT);
-            if (null != loginCallback) {
-                final AccountInfo accountInfo = (null != obj && obj instanceof AccountInfo) ? (AccountInfo) obj : null;
-                loginCallback.call(ChannelType.TAOBAO, accountInfo, null, code);
-            }
+            final AccountInfo accountInfo = (null != obj && obj instanceof AccountInfo) ? (AccountInfo) obj : null;
+            dispatchCallback(loginCallback, accountInfo, null, code);
         }
         loginCallback = null;
     }
 
     @Override
     public void share(ShareContent content, Callback<Object> callback) {
-        if (null != callback) {
-            callback.call(ChannelType.TAOBAO, null, null, Constants.Code.ERROR_NOT_SUPPORT);
-        }
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
     }
 
     @Override
@@ -58,8 +54,12 @@ final class Taobao extends Channel implements Socialize {
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+    }
+
+    private <T> void dispatchCallback(Callback<T> callback, T obj, String msg, int code) {
         if (null != callback) {
-            callback.call(ChannelType.TAOBAO, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+            callback.call(ChannelType.TAOBAO, obj, msg, code);
         }
     }
 

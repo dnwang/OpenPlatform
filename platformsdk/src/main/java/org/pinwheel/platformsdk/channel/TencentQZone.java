@@ -49,9 +49,7 @@ final class TencentQZone extends Channel implements Socialize {
     @Override
     public void share(ShareContent content, final Callback<Object> callback) {
         if (null == content) {
-            if (null != callback) {
-                callback.call(ChannelType.QZONE, null, null, Constants.Code.ERROR);
-            }
+            dispatchCallback(callback, null, null, Constants.Code.ERROR);
             return;
         }
         shareCallback = new TencentQQ.UIListenerWrapper<>(ChannelType.QZONE, callback);
@@ -60,15 +58,17 @@ final class TencentQZone extends Channel implements Socialize {
 
     @Override
     public void login(Callback<AccountInfo> callback) {
-        if (null != callback) {
-            callback.call(ChannelType.QZONE, null, null, Constants.Code.ERROR_NOT_SUPPORT);
-        }
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
     }
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+    }
+
+    private <T> void dispatchCallback(Callback<T> callback, T obj, String msg, int code) {
         if (null != callback) {
-            callback.call(ChannelType.QZONE, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+            callback.call(ChannelType.QZONE, obj, msg, code);
         }
     }
 

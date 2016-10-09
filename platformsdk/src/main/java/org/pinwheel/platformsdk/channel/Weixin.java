@@ -55,13 +55,11 @@ final class Weixin extends Channel implements Socialize {
     private void onCallback(Intent data) {
         final int code = (null == data) ? -1 : data.getIntExtra(Constants.KEY_CODE, -1);
         final Object obj = (null == data) ? null : data.getSerializableExtra(Constants.KEY_CONTENT);
-        if (null != shareCallback) {
-            shareCallback.call(ChannelType.WEIXIN, null, null, code);
-        }
-        if (null != loginCallback) {
-            final AccountInfo accountInfo = (null != obj && obj instanceof AccountInfo) ? (AccountInfo) obj : null;
-            loginCallback.call(ChannelType.WEIXIN, accountInfo, null, code);
-        }
+        // share
+        dispatchCallback(shareCallback, null, null, code);
+        // login
+        final AccountInfo accountInfo = (null != obj && obj instanceof AccountInfo) ? (AccountInfo) obj : null;
+        dispatchCallback(loginCallback, accountInfo, null, code);
     }
 
     /**
@@ -82,6 +80,7 @@ final class Weixin extends Channel implements Socialize {
     public void share(ShareContent content, Callback<Object> callback) {
         shareCallback = null;
         if (null == content) {
+            dispatchCallback(callback, null, null, Constants.Code.ERROR);
             return;
         }
         if (WeixinAuthActivity.startActivity((Activity) getContext(), WeixinAuthActivity.TYPE_SHARE_FRIEND, content)) {
@@ -101,14 +100,18 @@ final class Weixin extends Channel implements Socialize {
 
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
-        if (null != callback) {
-            callback.call(ChannelType.WEIXIN, null, null, Constants.Code.ERROR_NOT_SUPPORT);
-        }
+        dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
     }
 
     private void registerReceiver() {
         if (null != getContext()) {
             getContext().registerReceiver(receiver, filter);
+        }
+    }
+
+    private <T> void dispatchCallback(Callback<T> callback, T obj, String msg, int code) {
+        if (null != callback) {
+            callback.call(ChannelType.WEIXIN, obj, msg, code);
         }
     }
 
