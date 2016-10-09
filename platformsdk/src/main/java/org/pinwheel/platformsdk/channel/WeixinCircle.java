@@ -35,7 +35,8 @@ final class WeixinCircle extends Channel implements Socialize {
             unRegisterReceiver();
             final String action = intent.getAction();
             if (WeixinAuthActivity.ACTION_WEIXIN_RESULT.equals(action)) {
-                onCallback(intent);
+                final int code = intent.getIntExtra(Constants.KEY_CODE, Constants.Code.ERROR);
+                dispatchCallback(shareCallback, null, null, code);
             }
             shareCallback = null;
         }
@@ -43,11 +44,6 @@ final class WeixinCircle extends Channel implements Socialize {
 
     public WeixinCircle(Context context) {
         super(context);
-    }
-
-    private void onCallback(Intent data) {
-        final int code = (null == data) ? -1 : data.getIntExtra(Constants.KEY_CODE, -1);
-        dispatchCallback(shareCallback, null, null, code);
     }
 
     @Override

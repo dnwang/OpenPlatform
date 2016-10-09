@@ -43,7 +43,7 @@ final class ContentConverter {
     }
 
     /**
-     * 现在微博分享修改为openapi{@link ContentConverter#getWeiboContent2(Resources, ShareContent, SimpleListener)}
+     * 现在微博分享修改为openapi
      */
     @Deprecated
     static void getWeiboContent(Resources res, ShareContent content, final SimpleListener<WeiboMultiMessage> listener) {
@@ -64,10 +64,6 @@ final class ContentConverter {
                 }
             }
         });
-    }
-
-    static void getWeiboContent2(Resources res, ShareContent content, final SimpleListener<Bitmap> listener) {
-        getBitmap(res, content.image, listener);
     }
 
     static void getWeixinContent(Resources res, ShareContent content, final SimpleListener<WXMediaMessage> listener) {
@@ -113,7 +109,7 @@ final class ContentConverter {
         return params;
     }
 
-    private static void getBitmap(final Resources resources, final Object image, final SimpleListener<Bitmap> listener) {
+    static void getBitmap(final Resources resources, final Object image, final SimpleListener<Bitmap> listener) {
         if (null != image) {
             new Thread() {
                 @Override

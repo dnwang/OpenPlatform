@@ -36,7 +36,13 @@ final class Weixin extends Channel implements Socialize {
             unRegisterReceiver();
             final String action = intent.getAction();
             if (WeixinAuthActivity.ACTION_WEIXIN_RESULT.equals(action)) {
-                onCallback(intent);
+                final int code = intent.getIntExtra(Constants.KEY_CODE, Constants.Code.ERROR);
+                final Object obj = intent.getSerializableExtra(Constants.KEY_CONTENT);
+                // share
+                dispatchCallback(shareCallback, null, null, code);
+                // login
+                final AccountInfo accountInfo = (null != obj && obj instanceof AccountInfo) ? (AccountInfo) obj : null;
+                dispatchCallback(loginCallback, accountInfo, null, code);
             }
             shareCallback = null;
             loginCallback = null;
@@ -45,16 +51,6 @@ final class Weixin extends Channel implements Socialize {
 
     public Weixin(Context context) {
         super(context);
-    }
-
-    private void onCallback(Intent data) {
-        final int code = (null == data) ? -1 : data.getIntExtra(Constants.KEY_CODE, -1);
-        final Object obj = (null == data) ? null : data.getSerializableExtra(Constants.KEY_CONTENT);
-        // share
-        dispatchCallback(shareCallback, null, null, code);
-        // login
-        final AccountInfo accountInfo = (null != obj && obj instanceof AccountInfo) ? (AccountInfo) obj : null;
-        dispatchCallback(loginCallback, accountInfo, null, code);
     }
 
     @Override

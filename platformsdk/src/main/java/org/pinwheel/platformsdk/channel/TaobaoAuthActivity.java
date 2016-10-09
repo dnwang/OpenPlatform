@@ -2,6 +2,7 @@ package org.pinwheel.platformsdk.channel;
 
 import android.animation.LayoutTransition;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -53,7 +54,7 @@ public final class TaobaoAuthActivity extends Activity {
 
     private static final String API_AUTH = "https://oauth.taobao.com/authorize?response_type=token&client_id=%s&view=wap";
 
-    public static final int REQ_TAOBAO = 0x863;
+    static final String ACTION_TAOBAO_RESULT = "org.pinwheel.platformsdk.ACTION_TAOBAO_RESULT";
 
     private ProgressBar progressBar;
     private WebView webView;
@@ -95,8 +96,8 @@ public final class TaobaoAuthActivity extends Activity {
         }
     };
 
-    public static void startActivity(Activity activity) {
-        activity.startActivityForResult(new Intent(activity.getApplicationContext(), TaobaoAuthActivity.class), REQ_TAOBAO);
+    public static void startActivity(Context context) {
+        context.startActivity(new Intent(context, TaobaoAuthActivity.class));
     }
 
     @Override
@@ -108,6 +109,7 @@ public final class TaobaoAuthActivity extends Activity {
     }
 
     private View getContentView(String title) {
+        final int dp6 = Tools.dip2px(this, 6);
         // web view
         webView = new WebView(getApplicationContext());
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
@@ -123,6 +125,7 @@ public final class TaobaoAuthActivity extends Activity {
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         // title bar
         FrameLayout titleBar = new FrameLayout(getApplicationContext());
+        titleBar.setBackgroundColor(Color.WHITE);
         // close button
         TextView closeBtn = new TextView(getApplicationContext());
         closeBtn.setText("关闭");
@@ -142,7 +145,7 @@ public final class TaobaoAuthActivity extends Activity {
         titleTxt.setGravity(Gravity.CENTER);
         titleTxt.setTextColor(Color.DKGRAY);
         titleTxt.setText(title);
-        titleBar.addView(closeBtn, new FrameLayout.LayoutParams(Tools.dip2px(this, 48), -1, Gravity.LEFT | Gravity.CENTER));
+        titleBar.addView(closeBtn, new FrameLayout.LayoutParams(dp6 * 8, -1, Gravity.LEFT | Gravity.CENTER));
         titleBar.addView(titleTxt, new FrameLayout.LayoutParams(-1, -1, Gravity.CENTER));
         View divider = new View(getApplicationContext());
         divider.setBackgroundColor(Color.LTGRAY);
@@ -177,15 +180,15 @@ public final class TaobaoAuthActivity extends Activity {
             errorView.setCompoundDrawables(null, icon, null, null);
         } catch (Exception e) {
         }
-        contentLayout.addView(errorView, new FrameLayout.LayoutParams(-2, Tools.dip2px(this, 120), Gravity.CENTER));
+        contentLayout.addView(errorView, new FrameLayout.LayoutParams(-2, dp6 * 20, Gravity.CENTER));
         contentLayout.addView(webView, -1, -1);
-        contentLayout.addView(progressBar, new FrameLayout.LayoutParams(-1, Tools.dip2px(this, 2), Gravity.TOP));
+        contentLayout.addView(progressBar, new FrameLayout.LayoutParams(-1, dp6 / 3, Gravity.TOP));
         // root
         LinearLayout container = new LinearLayout(getApplicationContext());
-        container.setBackgroundColor(Color.WHITE);
+        container.setBackgroundColor(Color.argb(255, 0xEF, 0xEF, 0xEF));
         container.setOrientation(LinearLayout.VERTICAL);
         //
-        container.addView(titleBar, new LinearLayout.LayoutParams(-1, Tools.dip2px(this, 48)));
+        container.addView(titleBar, new LinearLayout.LayoutParams(-1, dp6 * 8));
         container.addView(divider, new LinearLayout.LayoutParams(-1, 1));
         container.addView(contentLayout, new LinearLayout.LayoutParams(-1, 0, 1));
         return container;
@@ -255,16 +258,14 @@ public final class TaobaoAuthActivity extends Activity {
         if (null != content) {
             intent.putExtra(Constants.KEY_CONTENT, content);
         }
-        setResult(RESULT_OK, intent);
+        intent.setAction(ACTION_TAOBAO_RESULT);
+        sendBroadcast(intent);
         super.finish();
     }
 
     @Override
     public void finish() {
-        Intent intent = new Intent();
-        intent.putExtra(Constants.KEY_CODE, Constants.Code.ERROR_CANCEL);
-        setResult(RESULT_OK, intent);
-        super.finish();
+        onResult(Constants.Code.ERROR_CANCEL, null);
     }
 
     /**

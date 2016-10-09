@@ -64,7 +64,10 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
             "friendships_groups_read,friendships_groups_write,statuses_to_me_read," +
             "follow_app_official_microblog,invitation_write";
 
-    private Callback<Object> shareCallback;
+    private SsoHandler ssoHandler;
+
+    private Callback<Object> shareTempCallback;
+    private AccessToken shareTempToken;
 
     private final IntentFilter filter = new IntentFilter(SinaWeiboShareActivity.ACTION_WEIBO_RESULT);
 
@@ -74,9 +77,17 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
             unRegisterReceiver();
             final String action = intent.getAction();
             if (SinaWeiboShareActivity.ACTION_WEIBO_RESULT.equals(action)) {
-                onCallback(intent);
+                final int code = intent.getIntExtra(Constants.KEY_CODE, Constants.Code.ERROR);
+                if (Constants.Code.SUCCESS == code) {
+                    final Object obj = intent.getSerializableExtra(Constants.KEY_CONTENT);
+                    final ShareContent content = (null != obj && obj instanceof ShareContent) ? (ShareContent) obj : null;
+                    share(shareTempToken, content, shareTempCallback);
+                } else {
+                    dispatchCallback(shareTempCallback, null, null, code);
+                }
             }
-            shareCallback = null;
+            shareTempCallback = null;
+            shareTempToken = null;
         }
     };
 
@@ -84,9 +95,17 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
         super(context);
     }
 
+    @Override
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        // 客户端授权回调,网页授权不需要
+        if (ssoHandler != null) {
+            ssoHandler.authorizeCallBack(requestCode, resultCode, data);
+        }
+    }
+
     private void authUser(final SimpleListener<Oauth2AccessToken> listener) {
         AuthInfo authInfo = new AuthInfo(getContext(), PlatformConfig.INSTANCE.getSinaKey(), PlatformConfig.INSTANCE.getSinaRedirectUrl(), SCOPE);
-        SsoHandler ssoHandler = new SsoHandler((Activity) getContext(), authInfo);
+        ssoHandler = new SsoHandler((Activity) getContext(), authInfo);
         ssoHandler.authorize(new WeiboAuthListener() {
             @Override
             public void onComplete(Bundle bundle) {
@@ -116,10 +135,6 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
         });
     }
 
-    private void onCallback(Intent intent) {
-        // TODO: 2016/10/9
-    }
-
     @Override
     public void share(final ShareContent content, final Callback<Object> callback) {
         if (null == content) {
@@ -129,9 +144,14 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
         authUser(new SimpleListener<Oauth2AccessToken>() {
             @Override
             public void call(Oauth2AccessToken accessToken) {
+                if (null == accessToken) {
+                    dispatchCallback(callback, null, null, Constants.Code.ERROR_AUTH_DENIED);
+                    return;
+                }
                 SinaWeiboShareActivity.startActivity(getContext(), content);
                 registerReceiver();
-                shareCallback = callback;
+                shareTempCallback = callback;
+                shareTempToken = AccessToken.createToken(accessToken);
             }
         });
     }
@@ -245,14 +265,14 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
             }
         };
         if (null != content.image) {
-            ContentConverter.getWeiboContent2(getContext().getResources(), content, new SimpleListener<Bitmap>() {
+            ContentConverter.getBitmap(getContext().getResources(), content.image, new SimpleListener<Bitmap>() {
                 @Override
                 public void call(Bitmap bitmap) {
-                    api.upload(content.content, bitmap, null, null, requestListener);
+                    api.upload(ContentConverter.getSimpleContent(content), bitmap, null, null, requestListener);
                 }
             });
         } else {
-            api.update(content.content, null, null, requestListener);
+            api.update(ContentConverter.getSimpleContent(content), null, null, requestListener);
         }
     }
 
