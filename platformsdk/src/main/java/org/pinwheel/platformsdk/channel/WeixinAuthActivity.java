@@ -19,7 +19,6 @@ import com.tencent.mm.sdk.openapi.WXMediaMessage;
 
 import org.json.JSONObject;
 import org.pinwheel.platformsdk.PlatformConfig;
-import org.pinwheel.platformsdk.callbacks.SimpleListener;
 import org.pinwheel.platformsdk.entity.AccessToken;
 import org.pinwheel.platformsdk.entity.AccountInfo;
 import org.pinwheel.platformsdk.entity.Constants;
@@ -43,10 +42,7 @@ import java.util.Map;
  */
 public abstract class WeixinAuthActivity extends Activity implements IWXAPIEventHandler {
 
-    /**
-     * 红米手机生命周期回调异常,在下次启动Activity才出发onActivityResult,导致不能正常的回调上层,改为广播代替
-     */
-    static final String ACTION_WEIXIN_RESULT = "com.iflytek.platform.ACTION_WEIXIN_RESULT";
+    static final String ACTION_WEIXIN_RESULT = "org.pinwheel.platformsdk.ACTION_WEIXIN_RESULT";
 
     private static final String CLASS_WXAPI = ".wxapi.WXEntryActivity";// 固定api类名，必须存在
 
@@ -64,31 +60,25 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
      */
     public static final int TYPE_LOGIN = 200;
 
-    /**
-     * ActivityResult方式替换成广播,Action{@link WeixinAuthActivity#ACTION_WEIXIN_RESULT}
-     */
-    @Deprecated
-    public static final int REQ_WEIXIN = 0x763;
-
     private IWXAPI wxApi;
     private int type;
     private Object content;
 
-    public static boolean startActivity(Activity activity, int type, Serializable content) {
+    public static boolean startActivity(Context context, int type, Serializable content) {
         if (type < 0) {
             return false;
         }
-        Class wxApiActivity = getWXApiActivity(activity);
+        Class wxApiActivity = getWXApiActivity(context);
         if (null == wxApiActivity) {
             return false;
         }
-        Intent intent = new Intent(activity, wxApiActivity);
+        Intent intent = new Intent(context, wxApiActivity);
         intent.putExtra(FLAG_TYPE, type);
         intent.putExtra(Constants.KEY_CONTENT, content);
-        // 红米手机生命周期forResult回调异常,已经替换为广播方式回调
-//        activity.startActivityForResult(intent, REQ_WEIXIN);
-        activity.startActivity(intent);
-        activity.overridePendingTransition(0, 0);
+        context.startActivity(intent);
+        if (content instanceof Activity) {
+            ((Activity) content).overridePendingTransition(0, 0);
+        }
         return true;
     }
 
@@ -272,9 +262,6 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
         if (null != content) {
             intent.putExtra(Constants.KEY_CONTENT, content);
         }
-        // 红米手机生命周期onActivityResult回调异常
-//        setResult(RESULT_OK, intent);
-        // 替换为广播方式回调
         intent.setAction(ACTION_WEIXIN_RESULT);
         sendBroadcast(intent);
         finish();
@@ -284,6 +271,7 @@ public abstract class WeixinAuthActivity extends Activity implements IWXAPIEvent
     public void finish() {
         super.finish();
         overridePendingTransition(0, 0);
+        // 此为透明页面，代码不会主动结束，在此不用回调状态
     }
 
     private static class WeixinAPI {

@@ -1,4 +1,4 @@
-package org.pinwheel.platformsdk.callbacks;
+package org.pinwheel.platformsdk.channel;
 
 /**
  * Copyright (C), 2016 <br>
@@ -10,7 +10,7 @@ package org.pinwheel.platformsdk.callbacks;
  * @version 2016/9/5,9:47
  * @see
  */
-public interface SimpleListener<T> {
+interface SimpleListener<T> {
 
     void call(T t);
 

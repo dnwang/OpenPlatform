@@ -1,8 +1,11 @@
 package org.pinwheel.platformsdk.channel;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.nfc.FormatException;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -22,7 +25,6 @@ import org.json.JSONObject;
 import org.pinwheel.platformsdk.Channel;
 import org.pinwheel.platformsdk.PlatformConfig;
 import org.pinwheel.platformsdk.callbacks.Callback;
-import org.pinwheel.platformsdk.callbacks.SimpleListener;
 import org.pinwheel.platformsdk.entity.AccessToken;
 import org.pinwheel.platformsdk.entity.AccountInfo;
 import org.pinwheel.platformsdk.entity.Constants;
@@ -62,6 +64,22 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
             "friendships_groups_read,friendships_groups_write,statuses_to_me_read," +
             "follow_app_official_microblog,invitation_write";
 
+    private Callback<Object> shareCallback;
+
+    private final IntentFilter filter = new IntentFilter(SinaWeiboShareActivity.ACTION_WEIBO_RESULT);
+
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            unRegisterReceiver();
+            final String action = intent.getAction();
+            if (SinaWeiboShareActivity.ACTION_WEIBO_RESULT.equals(action)) {
+                onCallback(intent);
+            }
+            shareCallback = null;
+        }
+    };
+
     public SinaWeibo(Context context) {
         super(context);
     }
@@ -98,8 +116,12 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
         });
     }
 
+    private void onCallback(Intent intent) {
+        // TODO: 2016/10/9
+    }
+
     @Override
-    public void share(ShareContent content, final Callback<Object> callback) {
+    public void share(final ShareContent content, final Callback<Object> callback) {
         if (null == content) {
             dispatchCallback(callback, null, null, Constants.Code.ERROR);
             return;
@@ -107,8 +129,9 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
         authUser(new SimpleListener<Oauth2AccessToken>() {
             @Override
             public void call(Oauth2AccessToken accessToken) {
-                // TODO: 2016/10/9
-                dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+                SinaWeiboShareActivity.startActivity(getContext(), content);
+                registerReceiver();
+                shareCallback = callback;
             }
         });
     }
@@ -210,9 +233,9 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
             return;
         }
         // request weibo open api
-        Oauth2AccessToken accessToken = new Oauth2AccessToken(token.getToken(), null);
-        StatusesAPI api = new StatusesAPI(getContext(), PlatformConfig.INSTANCE.getSinaKey(), accessToken);
-        RequestListener requestListener = new RequestListenerWrapper<Object>(callback) {
+        final Oauth2AccessToken accessToken = new Oauth2AccessToken(token.getToken(), null);
+        final StatusesAPI api = new StatusesAPI(getContext(), PlatformConfig.INSTANCE.getSinaKey(), accessToken);
+        final RequestListener requestListener = new RequestListenerWrapper<Object>(callback) {
             @Override
             public void onComplete(String response) {
                 final boolean isSuccess = !isOpenApiError(response);
@@ -222,10 +245,26 @@ final class SinaWeibo extends Channel implements Socialize, SilentlySocialize {
             }
         };
         if (null != content.image) {
-            byte[] data = (byte[]) content.image;
-            api.upload(content.content, BitmapFactory.decodeByteArray(data, 0, data.length), null, null, requestListener);
+            ContentConverter.getWeiboContent2(getContext().getResources(), content, new SimpleListener<Bitmap>() {
+                @Override
+                public void call(Bitmap bitmap) {
+                    api.upload(content.content, bitmap, null, null, requestListener);
+                }
+            });
         } else {
             api.update(content.content, null, null, requestListener);
+        }
+    }
+
+    private void registerReceiver() {
+        if (null != getContext()) {
+            getContext().registerReceiver(receiver, filter);
+        }
+    }
+
+    private void unRegisterReceiver() {
+        if (null != getContext()) {
+            getContext().unregisterReceiver(receiver);
         }
     }
 

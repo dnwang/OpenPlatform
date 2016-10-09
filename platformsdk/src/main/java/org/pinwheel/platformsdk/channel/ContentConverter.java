@@ -14,7 +14,6 @@ import com.tencent.connect.share.QzoneShare;
 import com.tencent.mm.sdk.openapi.WXMediaMessage;
 import com.tencent.mm.sdk.openapi.WXVideoObject;
 
-import org.pinwheel.platformsdk.callbacks.SimpleListener;
 import org.pinwheel.platformsdk.entity.ShareContent;
 import org.pinwheel.platformsdk.utils.HttpsUtils;
 
@@ -43,6 +42,10 @@ final class ContentConverter {
                 content.mediaUrl;
     }
 
+    /**
+     * 现在微博分享修改为openapi{@link ContentConverter#getWeiboContent2(Resources, ShareContent, SimpleListener)}
+     */
+    @Deprecated
     static void getWeiboContent(Resources res, ShareContent content, final SimpleListener<WeiboMultiMessage> listener) {
         final WeiboMultiMessage weiboMultiMessage = new WeiboMultiMessage();
         TextObject textObject = new TextObject();
@@ -61,6 +64,10 @@ final class ContentConverter {
                 }
             }
         });
+    }
+
+    static void getWeiboContent2(Resources res, ShareContent content, final SimpleListener<Bitmap> listener) {
+        getBitmap(res, content.image, listener);
     }
 
     static void getWeixinContent(Resources res, ShareContent content, final SimpleListener<WXMediaMessage> listener) {
