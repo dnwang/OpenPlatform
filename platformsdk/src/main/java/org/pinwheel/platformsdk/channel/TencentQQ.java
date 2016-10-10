@@ -3,6 +3,8 @@ package org.pinwheel.platformsdk.channel;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.nfc.FormatException;
 import android.text.TextUtils;
 
@@ -63,6 +65,10 @@ final class TencentQQ extends Channel implements Socialize {
 
     @Override
     public void share(ShareContent content, final Callback<Object> callback) {
+        if (!isQQAppInstalled(getContext())) {
+            dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_INSTALL);
+            return;
+        }
         if (null == content) {
             dispatchCallback(callback, null, null, Constants.Code.ERROR);
             return;
@@ -73,6 +79,10 @@ final class TencentQQ extends Channel implements Socialize {
 
     @Override
     public void login(Callback<AccountInfo> callback) {
+        if (!isQQAppInstalled(getContext())) {
+            dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_INSTALL);
+            return;
+        }
         loginCallback = new UIListenerWrapper<AccountInfo>(ChannelType.QQ, callback) {
             @Override
             public void onComplete(Object obj) {
@@ -139,6 +149,19 @@ final class TencentQQ extends Channel implements Socialize {
         if (null != callback) {
             callback.call(ChannelType.QQ, obj, msg, code);
         }
+    }
+
+    static boolean isQQAppInstalled(Context context) {
+        final String qqPackageName = "com.tencent.mobileqq";
+        PackageManager pm = context.getPackageManager();
+        boolean installed = false;
+        try {
+            PackageInfo packageInfo = pm.getPackageInfo(qqPackageName, PackageManager.GET_ACTIVITIES);
+            installed = null != packageInfo;
+        } catch (PackageManager.NameNotFoundException e) {
+            installed = false;
+        }
+        return installed;
     }
 
     static class UIListenerWrapper<T> implements IUiListener {

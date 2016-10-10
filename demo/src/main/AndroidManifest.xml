@@ -6,7 +6,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="platformsdk">
 
-        <!--<activity android:name="org.pinwheel.platform.demo.ApiDemoActivity">-->
+        <!--<activity android:name="org.pinwheel.platformsdk.demo.ApiDemoActivity">-->
         <activity android:name="org.pinwheel.platformsdk.demo.ProxyDemoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -144,9 +144,11 @@ public enum PlatformConfig {
             final String version = json.getString("version");
             if (TextUtils.isEmpty(version) || "1.0".equals(version)) {
                 parseConfigBy10(json);
+            } else {
+                Log.e(Constants.TAG, "[PlatformConfig]: unknown 'platform.json' format version");
             }
         } catch (Exception e) {
-            Log.e("PlatformConfig", "error: " + e.getMessage());
+            Log.e(Constants.TAG, "[PlatformConfig]: platform.json format error.\n " + e.getMessage());
         } finally {
             Tools.close(br);
         }

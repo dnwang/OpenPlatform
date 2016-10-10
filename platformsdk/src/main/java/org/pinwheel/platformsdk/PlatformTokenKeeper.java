@@ -7,6 +7,7 @@ import android.util.Log;
 
 import org.pinwheel.platformsdk.channel.ChannelType;
 import org.pinwheel.platformsdk.entity.AccessToken;
+import org.pinwheel.platformsdk.entity.Constants;
 import org.pinwheel.platformsdk.utils.Tools;
 
 import java.util.EnumMap;
@@ -107,7 +108,7 @@ public enum PlatformTokenKeeper {
 
     private boolean checkParams() {
         if (null == sp) {
-            Log.e("PlatformTokenKeeper", "please call init() method first!");
+            Log.e(Constants.TAG, "[PlatformTokenKeeper]: please call init() method first!");
             return false;
         }
         return true;

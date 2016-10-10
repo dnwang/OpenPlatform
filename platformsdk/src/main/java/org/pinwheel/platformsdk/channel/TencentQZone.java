@@ -48,6 +48,10 @@ final class TencentQZone extends Channel implements Socialize {
 
     @Override
     public void share(ShareContent content, final Callback<Object> callback) {
+        if (!TencentQQ.isQQAppInstalled(getContext())) {
+            dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_INSTALL);
+            return;
+        }
         if (null == content) {
             dispatchCallback(callback, null, null, Constants.Code.ERROR);
             return;

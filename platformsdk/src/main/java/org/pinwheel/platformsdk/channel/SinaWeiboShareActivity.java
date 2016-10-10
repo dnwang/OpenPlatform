@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -21,6 +23,8 @@ import org.pinwheel.platformsdk.entity.Constants;
 import org.pinwheel.platformsdk.entity.ShareContent;
 import org.pinwheel.platformsdk.utils.Tools;
 
+import java.util.Locale;
+
 /**
  * Copyright (C), 2016 <br>
  * <br>
@@ -34,6 +38,8 @@ import org.pinwheel.platformsdk.utils.Tools;
 public final class SinaWeiboShareActivity extends Activity {
 
     static final String ACTION_WEIBO_RESULT = "org.pinwheel.platformsdk.ACTION_WEIBO_RESULT";
+
+    private static final int MAX_EDIT_SIZE = 140;
 
     public static void startActivity(Context context, ShareContent content) {
         Intent intent = new Intent(context, SinaWeiboShareActivity.class);
@@ -59,16 +65,20 @@ public final class SinaWeiboShareActivity extends Activity {
     }
 
     private View getContentView(String title) {
+        final int contentMaxSize = getMaxEditSize();
+
         final int dp6 = Tools.dip2px(this, 6);
         // content edit
         final EditText contentEdt = new EditText(getApplicationContext());
-        contentEdt.setMaxEms(140);
-        contentEdt.setHint("说点什么吧...");
+        contentEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(contentMaxSize)});
+        contentEdt.setHint("分享新鲜事...");
+        contentEdt.setHintTextColor(Color.GRAY);
         contentEdt.setGravity(Gravity.LEFT | Gravity.TOP);
-        contentEdt.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+        contentEdt.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
         contentEdt.setTextColor(Color.DKGRAY);
-        contentEdt.setBackgroundColor(Color.WHITE);
+        contentEdt.setBackgroundColor(Color.TRANSPARENT);
         contentEdt.setText(shareContent.content);
+        contentEdt.setPadding(0, 0, 0, 0);
         // title bar
         FrameLayout titleBar = new FrameLayout(getApplicationContext());
         titleBar.setBackgroundColor(Color.WHITE);
@@ -112,13 +122,23 @@ public final class SinaWeiboShareActivity extends Activity {
 
         View divider = new View(getApplicationContext());
         divider.setBackgroundColor(Color.LTGRAY);
-        // content
-        LinearLayout contentLayout = new LinearLayout(getApplicationContext());
-        contentLayout.setOrientation(LinearLayout.VERTICAL);
-        LayoutTransition transition = new LayoutTransition();
-        transition.setAnimator(LayoutTransition.CHANGE_APPEARING, transition.getAnimator(LayoutTransition.CHANGE_APPEARING));
-        transition.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, transition.getAnimator(LayoutTransition.CHANGE_DISAPPEARING));
-        contentLayout.setLayoutTransition(transition);
+
+        //
+        LinearLayout editContainer = new LinearLayout(getApplicationContext());
+        editContainer.setPadding(dp6, dp6, dp6, dp6);
+        editContainer.setOrientation(LinearLayout.VERTICAL);
+        editContainer.setBackgroundColor(Color.WHITE);
+        TextView tipsTxt = new TextView(getApplicationContext());
+        tipsTxt.setText(String.format(Locale.PRC, "最多输入%d个汉字", contentMaxSize));
+        tipsTxt.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10);
+        tipsTxt.setTextColor(Color.GRAY);
+        LinearLayout.LayoutParams tipsTxtParams = new LinearLayout.LayoutParams(-2, -2);
+        tipsTxtParams.gravity = Gravity.RIGHT;
+        editContainer.addView(contentEdt, -1, dp6 * 28);
+        editContainer.addView(tipsTxt, tipsTxtParams);
+        LinearLayout.LayoutParams editContainerParams = new LinearLayout.LayoutParams(-1, -2);
+        editContainerParams.setMargins(dp6, dp6 * 2, dp6, dp6);
+
         // image
         final ImageView imageView = new ImageView(getApplicationContext());
         imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -138,14 +158,32 @@ public final class SinaWeiboShareActivity extends Activity {
                 }
             });
         }
-        //
-        LinearLayout.LayoutParams contentEdtParams = new LinearLayout.LayoutParams(-1, dp6 * 25);
-        contentEdtParams.setMargins(dp6, dp6 * 2, dp6, dp6);
-        contentLayout.addView(contentEdt, contentEdtParams);
-        LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(dp6 * 10, dp6 * 10);
-        imageParams.setMargins(dp6, dp6, dp6, dp6);
-        imageParams.gravity = Gravity.LEFT;
-        contentLayout.addView(imageView, imageParams);
+
+        // attachment container
+        LinearLayout attachmentContainer = new LinearLayout(getApplicationContext());
+        attachmentContainer.setOrientation(LinearLayout.HORIZONTAL);
+        attachmentContainer.setPadding(dp6, dp6, dp6, dp6);
+        attachmentContainer.setGravity(Gravity.CENTER);
+        // link text
+        LinearLayout linkContainer = new LinearLayout(getApplicationContext());
+        linkContainer.setPadding(0, 0, dp6, 0);
+        linkContainer.setOrientation(LinearLayout.VERTICAL);
+        linkContainer.addView(createLinkTxt(shareContent.linkUrl), -1, -2);
+        linkContainer.addView(createLinkTxt(shareContent.mediaUrl), -1, -2);
+
+        attachmentContainer.addView(linkContainer, new LinearLayout.LayoutParams(0, -2, 1));
+        attachmentContainer.addView(imageView, new LinearLayout.LayoutParams(dp6 * 10, dp6 * 10));
+
+        // content
+        LinearLayout contentLayout = new LinearLayout(getApplicationContext());
+        contentLayout.setOrientation(LinearLayout.VERTICAL);
+        LayoutTransition transition = new LayoutTransition();
+        transition.setAnimator(LayoutTransition.CHANGE_APPEARING, transition.getAnimator(LayoutTransition.CHANGE_APPEARING));
+        transition.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, transition.getAnimator(LayoutTransition.CHANGE_DISAPPEARING));
+        contentLayout.setLayoutTransition(transition);
+
+        contentLayout.addView(editContainer, editContainerParams);
+        contentLayout.addView(attachmentContainer);
         // root view
         LinearLayout container = new LinearLayout(getApplicationContext());
         container.setBackgroundColor(Color.argb(255, 0xEF, 0xEF, 0xEF));
@@ -155,6 +193,34 @@ public final class SinaWeiboShareActivity extends Activity {
         container.addView(divider, new LinearLayout.LayoutParams(-1, 1));
         container.addView(contentLayout, new LinearLayout.LayoutParams(-1, 0, 1));
         return container;
+    }
+
+    private TextView createLinkTxt(String link) {
+        final int dp4 = Tools.dip2px(this, 4);
+        TextView textView = new TextView(getApplicationContext());
+        textView.setPadding(0, 0, dp4, dp4);
+        textView.setGravity(Gravity.CENTER | Gravity.LEFT);
+        textView.setSingleLine();
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+        textView.setTextColor(Color.LTGRAY);
+        textView.setEllipsize(TextUtils.TruncateAt.END);
+//        Drawable linkIcon = getResources().getDrawable(android.R.drawable.);
+//        linkIcon.setBounds(0, 0, linkIcon.getMinimumWidth(), linkIcon.getMinimumHeight());
+//        textView.setCompoundDrawables(linkIcon, null, null, null);
+        textView.setText(link);
+        if (TextUtils.isEmpty(link)) {
+            textView.setVisibility(View.GONE);
+        }
+        return textView;
+    }
+
+    private int getMaxEditSize() {
+        if (null == shareContent) {
+            return MAX_EDIT_SIZE;
+        }
+        int linkUrlSize = TextUtils.isEmpty(shareContent.linkUrl) ? 0 : shareContent.linkUrl.length() / 2;
+        int mediaUrlSize = TextUtils.isEmpty(shareContent.mediaUrl) ? 0 : shareContent.mediaUrl.length() / 2;
+        return MAX_EDIT_SIZE - linkUrlSize - mediaUrlSize;
     }
 
     private void onResult(int code) {

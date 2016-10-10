@@ -49,14 +49,18 @@ public interface Constants {
     }
 
     /**
-     * onActivityResult回调结果中 状态值
+     * 回调结果中 状态值
      */
     String KEY_CODE = "code";
     /**
-     * onActivityResult回调结果中 内容
+     * 回调结果中 内容
      */
     String KEY_CONTENT = "content";
 
+    /**
+     * 微博通用回调地址，在platform.json中未指定时，默认使用
+     */
     String DEFAULT_SINA_REDIRECT_URL = "http://sns.whalecloud.com/sina2/callback";
 
+    String TAG = "PlatformSDK";
 }
