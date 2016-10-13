@@ -125,14 +125,13 @@ final class TencentQQ extends Channel implements Socialize {
 
     private AccountInfo toAccountInfo(String openId, String userInfo) throws Exception {
         // user:{ret,msg,is_lost,nickname,gender,province,city,figureurl,figureurl_1,figureurl_2,figureurl_qq_1,figureurl_qq_2}
-        JSONObject json = new JSONObject(userInfo);
-        final String nickName = Tools.getJsonString(json, "nickname");
-        if (TextUtils.isEmpty(nickName)) {
-            throw new FormatException(userInfo);
+        if (TextUtils.isEmpty(openId)) {
+            throw new FormatException("tencent openId is empty");
         }
+        JSONObject json = new JSONObject(userInfo);
         AccountInfo accountInfo = new AccountInfo(ChannelType.QQ);
         accountInfo.id = openId;
-        accountInfo.nickName = nickName;
+        accountInfo.nickName = Tools.getJsonString(json, "nickname");
         accountInfo.headerImg = Tools.getJsonString(json, "figureurl");
         final String gender = Tools.getJsonString(json, "gender");
         accountInfo.gender = "男".equals(gender) ? 1 : ("女".equals(gender) ? 2 : 0);
