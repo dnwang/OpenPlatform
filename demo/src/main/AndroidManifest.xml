@@ -15,12 +15,12 @@
         </activity>
 
         <!--(必要)微信回调-->
-        <!--注意:singleInstance,exported,包名,类名-->
+        <!--注意:singleTop,exported,包名,类名-->
         <activity
             android:name="com.iflytek.ihou.chang.app.wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation"
             android:exported="true"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent" />
         <!--(必要)微信回调-->
