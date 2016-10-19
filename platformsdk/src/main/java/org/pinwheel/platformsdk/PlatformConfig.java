@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -142,12 +143,13 @@ public enum PlatformConfig {
             }
             JSONObject json = new JSONObject(result.toString());
             final String version = json.getString("version");
-            if (TextUtils.isEmpty(version) || "1.0".equals(version)) {
+            if (TextUtils.isEmpty(version) || version.startsWith("1.0")) {
                 parseConfigBy10(json);
             } else {
                 Log.e(Constants.TAG, "[PlatformConfig]: unknown 'platform.json' format version");
             }
         } catch (Exception e) {
+            Toast.makeText(context, Constants.TAG + ":\n'platform.json' format error.", Toast.LENGTH_SHORT).show();
             Log.e(Constants.TAG, "[PlatformConfig]: platform.json format error.\n " + e.getMessage());
         } finally {
             Tools.close(br);

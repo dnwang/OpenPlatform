@@ -41,6 +41,7 @@
         <!--(必要)新浪微博认证-->
 
         <!--(必要)腾讯认证-->
+        <!--注意:scheme="tencent+'id'"-->
         <activity
             android:name="com.tencent.tauth.AuthActivity"
             android:launchMode="singleTask"

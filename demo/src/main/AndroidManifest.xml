@@ -26,6 +26,7 @@
         <!--(必要)微信回调-->
 
         <!--(必要)腾讯认证-->
+        <!--注意:scheme="tencent+'id'"-->
         <activity
             android:name="com.tencent.tauth.AuthActivity"
             android:launchMode="singleTask"
@@ -38,7 +39,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="tencent100526240" />
+                <data android:scheme="tencent000000000" />
             </intent-filter>
         </activity>
         <!--(必要)腾讯认证-->

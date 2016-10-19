@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 2
-        versionName "1.1.0"
+        versionCode 3
+        versionName "1.1.1"
     }
 
     sourceSets {
@@ -38,5 +38,5 @@ dependencies {
     compile fileTree(dir: 'libs/weixin', include: ['*.jar'])
     compile fileTree(dir: 'libs/tencent', include: ['*.jar'])
     compile fileTree(dir: 'libs/umeng', include: ['*.jar'])
-    compile 'com.android.support:support-v4:24.2.0'// only tencent platform need support-v4
+    compile 'com.android.support:support-v4:24.2.1'// only tencent platform need support-v4
 }
