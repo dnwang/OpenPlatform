@@ -16,6 +16,7 @@ import com.tencent.mm.sdk.openapi.WXVideoObject;
 
 import org.pinwheel.platformsdk.entity.ShareContent;
 import org.pinwheel.platformsdk.utils.HttpsUtils;
+import org.pinwheel.platformsdk.utils.Tools;
 
 import java.util.ArrayList;
 
@@ -114,14 +115,16 @@ final class ContentConverter {
             new Thread() {
                 @Override
                 public void run() {
+                    Bitmap bitmap = null;
                     if (image instanceof String) {
-                        listener.call(HttpsUtils.getBitmap((String) image));
+                        bitmap = HttpsUtils.getBitmap((String) image);
                     } else if (image instanceof byte[]) {
                         byte[] data = (byte[]) image;
-                        listener.call(BitmapFactory.decodeByteArray(data, 0, data.length));
+                        bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                     } else if (image instanceof Integer) {
-                        listener.call(BitmapFactory.decodeResource(resources, (Integer) image));
+                        bitmap = BitmapFactory.decodeResource(resources, (Integer) image);
                     }
+                    listener.call(Tools.scaleBitmap(bitmap, 100));// 微信分享图片不能过大,限制100KB
                 }
             }.start();
         } else {

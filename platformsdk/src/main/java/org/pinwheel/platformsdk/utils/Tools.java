@@ -1,6 +1,8 @@
 package org.pinwheel.platformsdk.utils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
@@ -154,6 +156,38 @@ public final class Tools {
             default:
                 return "未知";
         }
+    }
+
+    /**
+     * @param maxSize KB
+     */
+    public static Bitmap scaleBitmap(Bitmap bitmap, int maxSize) {
+        if (null == bitmap || maxSize <= 0) {
+            return null;
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        double mid = b.length / 1024;
+        if (mid > maxSize) {
+            double i = mid / maxSize;
+            return scaleBitmap(bitmap, bitmap.getWidth() / Math.sqrt(i), bitmap.getHeight() / Math.sqrt(i));
+        } else {
+            return bitmap;
+        }
+    }
+
+    public static Bitmap scaleBitmap(Bitmap bitmap, double newWidth, double newHeight) {
+        if (null == bitmap || newWidth <= 0 || newHeight <= 0) {
+            return null;
+        }
+        float width = bitmap.getWidth();
+        float height = bitmap.getHeight();
+        Matrix matrix = new Matrix();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        matrix.postScale(scaleWidth, scaleHeight);
+        return Bitmap.createBitmap(bitmap, 0, 0, (int) width, (int) height, matrix, true);
     }
 
 }
