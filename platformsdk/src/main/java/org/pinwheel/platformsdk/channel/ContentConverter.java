@@ -36,11 +36,12 @@ final class ContentConverter {
         throw new AssertionError();
     }
 
-    static String getSimpleContent(ShareContent content) {
-        return content.title + "\n" +
-                content.content + "\n" +
-                content.linkUrl + "\n" +
-                content.mediaUrl;
+    static String getSimpleContent(ShareContent shareContent) {
+        final String title = (null != shareContent.title) ? shareContent.title : "";
+        final String content = (null != shareContent.content) ? shareContent.content : "";
+        final String linkUrl = (null != shareContent.linkUrl) ? shareContent.linkUrl : "";
+        final String mediaUrl = (null != shareContent.mediaUrl) ? shareContent.mediaUrl : "";
+        return title + "\n" + content + "\n" + linkUrl + "\n" + mediaUrl;
     }
 
     /**
