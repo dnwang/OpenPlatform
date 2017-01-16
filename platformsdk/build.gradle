@@ -1,20 +1,19 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 25
-        versionCode 3
-        versionName "1.1.1"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
     }
 
     sourceSets {
         main {
             jniLibs.srcDirs = ["libs", "libs/weibo", "libs/weixin", "libs/tencent", "libs/umeng"]
-            java.srcDirs = ["src/main/java", "src/main/sdk", "src/main/project"]
         }
     }
 
@@ -38,5 +37,5 @@ dependencies {
     compile fileTree(dir: 'libs/weixin', include: ['*.jar'])
     compile fileTree(dir: 'libs/tencent', include: ['*.jar'])
     compile fileTree(dir: 'libs/umeng', include: ['*.jar'])
-    compile 'com.android.support:support-v4:25.0.0'// only tencent platform need support-v4
+    compile 'com.android.support:support-v4:' + rootProject.ext.supportVersion
 }

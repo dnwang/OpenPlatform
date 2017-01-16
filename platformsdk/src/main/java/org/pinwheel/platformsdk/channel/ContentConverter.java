@@ -13,6 +13,7 @@ import com.tencent.connect.share.QQShare;
 import com.tencent.connect.share.QzoneShare;
 import com.tencent.mm.sdk.openapi.WXMediaMessage;
 import com.tencent.mm.sdk.openapi.WXVideoObject;
+import com.tencent.mm.sdk.openapi.WXWebpageObject;
 
 import org.pinwheel.platformsdk.entity.ShareContent;
 import org.pinwheel.platformsdk.utils.HttpsUtils;
@@ -69,8 +70,17 @@ final class ContentConverter {
     }
 
     static void getWeixinContent(Resources res, ShareContent content, final SimpleListener<WXMediaMessage> listener) {
-        final WXVideoObject mediaObj = new WXVideoObject();
-        mediaObj.videoUrl = TextUtils.isEmpty(content.linkUrl) ? content.mediaUrl : content.linkUrl;
+        final WXMediaMessage.IMediaObject mediaObj;
+        if (TextUtils.isEmpty(content.mediaUrl)) {
+            WXWebpageObject webObj = new WXWebpageObject();
+            webObj.webpageUrl = content.linkUrl;
+            mediaObj = webObj;
+        } else {
+            WXVideoObject videoObj = new WXVideoObject();
+            videoObj.videoUrl = content.mediaUrl;
+            mediaObj = videoObj;
+        }
+
         final WXMediaMessage message = new WXMediaMessage(mediaObj);
         message.description = content.content;
         message.title = content.title;
