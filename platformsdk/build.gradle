@@ -37,5 +37,5 @@ dependencies {
     compile fileTree(dir: 'libs/weixin', include: ['*.jar'])
     compile fileTree(dir: 'libs/tencent', include: ['*.jar'])
     compile fileTree(dir: 'libs/umeng', include: ['*.jar'])
-    compile 'com.android.support:support-v4:' + rootProject.ext.supportVersion
+    provided 'com.android.support:support-v4:' + rootProject.ext.supportVersion
 }
