@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 
 import org.pinwheel.platformsdk.Channel;
 import org.pinwheel.platformsdk.callbacks.Callback;
@@ -56,6 +58,10 @@ final class Weixin extends Channel implements Socialize {
     @Override
     public void share(ShareContent content, Callback<Object> callback) {
         shareCallback = null;
+        if (!isWeiXinAppInstalled(getContext())) {
+            dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_INSTALL);
+            return;
+        }
         if (null == content) {
             dispatchCallback(callback, null, null, Constants.Code.ERROR);
             return;
@@ -69,6 +75,10 @@ final class Weixin extends Channel implements Socialize {
     @Override
     public void login(Callback<AccountInfo> callback) {
         loginCallback = null;
+        if (!isWeiXinAppInstalled(getContext())) {
+            dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_INSTALL);
+            return;
+        }
         if (WeixinAuthActivity.startActivity(getContext(), WeixinAuthActivity.TYPE_LOGIN, null)) {
             loginCallback = callback;
             registerReceiver();
@@ -78,6 +88,19 @@ final class Weixin extends Channel implements Socialize {
     @Override
     public void getFriends(Callback<List<AccountInfo>> callback) {
         dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_SUPPORT);
+    }
+
+    static boolean isWeiXinAppInstalled(Context context) {
+        final String qqPackageName = "com.tencent.mm";
+        PackageManager pm = context.getPackageManager();
+        boolean installed = false;
+        try {
+            PackageInfo packageInfo = pm.getPackageInfo(qqPackageName, PackageManager.GET_ACTIVITIES);
+            installed = null != packageInfo;
+        } catch (PackageManager.NameNotFoundException e) {
+            installed = false;
+        }
+        return installed;
     }
 
     private void registerReceiver() {

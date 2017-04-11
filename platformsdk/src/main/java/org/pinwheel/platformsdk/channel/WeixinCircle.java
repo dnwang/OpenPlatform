@@ -49,6 +49,10 @@ final class WeixinCircle extends Channel implements Socialize {
     @Override
     public void share(ShareContent content, Callback<Object> callback) {
         shareCallback = null;
+        if (!Weixin.isWeiXinAppInstalled(getContext())) {
+            dispatchCallback(callback, null, null, Constants.Code.ERROR_NOT_INSTALL);
+            return;
+        }
         if (null == content) {
             dispatchCallback(callback, null, null, Constants.Code.ERROR);
             return;
