@@ -1,4 +1,14 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'pinwheel'
+    groupId = rootProject.ext.groupId
+    artifactId = rootProject.ext.artifactId
+    publishVersion = rootProject.ext.versionName
+    desc = 'Android open platform share sdk'
+    website = 'https://github.com/dnwang/OpenPlatform.git'
+}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -16,19 +26,6 @@ android {
             jniLibs.srcDirs = ["libs", "libs/weibo", "libs/weixin", "libs/tencent", "libs/umeng"]
         }
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    repositories {
-        flatDir {
-            dirs 'libs'
-        }
-    }
 }
 
 dependencies {
@@ -37,5 +34,5 @@ dependencies {
     compile fileTree(dir: 'libs/weixin', include: ['*.jar'])
     compile fileTree(dir: 'libs/tencent', include: ['*.jar'])
     compile fileTree(dir: 'libs/umeng', include: ['*.jar'])
-    provided 'com.android.support:support-v4:' + rootProject.ext.supportVersion
+    provided "com.android.support:support-v4:$supportVer"
 }

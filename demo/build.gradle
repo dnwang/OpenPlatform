@@ -6,16 +6,17 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.iflytek.ihou.chang.app" //for test
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
+        applicationId "com.iflytek.ihou.chang.app" //for test
+//        signingConfig signingConfigs.alias
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
     }
 
     repositories {
@@ -29,19 +30,11 @@ android {
 
         }
     }
-
-    buildTypes {
-        release {
-            debuggable true
-            signingConfig signingConfigs.alias
-        }
-    }
-
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:' + rootProject.ext.supportVersion
-    compile(name: 'platformsdk-v' + rootProject.ext.versionName, ext: 'aar')
-//    compile project(':platformsdk')
+    "com.android.support:support-v4:$supportVer"
+//    compile(name: 'platformsdk-v' + rootProject.ext.versionName, ext: 'aar')
+    compile project(':platformsdk')
 }
